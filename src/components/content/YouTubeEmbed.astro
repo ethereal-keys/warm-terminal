@@ -1,0 +1,126 @@
+---
+interface Props {
+  videoId: string;
+  title?: string;
+  class?: string;
+}
+
+const { videoId, title = 'YouTube video', class: className } = Astro.props;
+const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+---
+
+<figure class:list={["youtube-embed", className]}>
+  <div class="video-frame">
+    <span class="corner corner--tl">┌</span>
+    <span class="corner corner--tr">┐</span>
+    <span class="corner corner--bl">└</span>
+    <span class="corner corner--br">┘</span>
+
+    <div class="video-wrapper" data-video-id={videoId}>
+      <img
+        src={thumbnailUrl}
+        alt={title}
+        class="video-thumbnail"
+        loading="lazy"
+      />
+      <button class="play-button" aria-label="Play video">
+        <svg viewBox="0 0 68 48" width="68" height="48">
+          <path d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#212121" fill-opacity="0.8"/>
+          <path d="M 45,24 27,14 27,34" fill="#fff"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  {title && <figcaption class="video-caption">{title}</figcaption>}
+</figure>
+
+<script>
+  document.querySelectorAll('.youtube-embed .video-wrapper').forEach(wrapper => {
+    const button = wrapper.querySelector('.play-button');
+    button?.addEventListener('click', () => {
+      const videoId = wrapper.getAttribute('data-video-id');
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`;
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.className = 'video-iframe';
+      wrapper.innerHTML = '';
+      wrapper.appendChild(iframe);
+    });
+  });
+</script>
+
+<style>
+  .youtube-embed {
+    margin: var(--space-4) 0;
+  }
+
+  .video-frame {
+    position: relative;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+  }
+
+  .corner {
+    position: absolute;
+    font-size: var(--text-sm);
+    line-height: 1;
+    color: var(--text-ghost);
+    background: var(--bg-tertiary);
+    padding: 0 3px;
+    z-index: 1;
+  }
+
+  .corner--tl { top: -1px; left: -1px; }
+  .corner--tr { top: -1px; right: -1px; }
+  .corner--bl { bottom: -1px; left: -1px; }
+  .corner--br { bottom: -1px; right: -1px; }
+
+  .video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+  }
+
+  .video-thumbnail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .play-button:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .video-wrapper :global(.video-iframe) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .video-caption {
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+</style>

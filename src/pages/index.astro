@@ -1,16 +1,88 @@
 ---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+import Hero from '@/components/home/Hero.astro';
+import ProjectGrid from '@/components/projects/ProjectGrid.astro';
+import ProjectCard from '@/components/projects/ProjectCard.astro';
+import Annotation from '@/components/ui/Annotation.astro';
+import { getCollection } from 'astro:content';
 
+const projects = await getCollection('projects');
+const featuredProjects = projects
+  .filter(p => p.data.featured)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 4);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout>
+  <Header />
+
+  <Hero />
+
+  <section class="projects-section">
+    <div class="section-header">
+      <div class="section-title-wrapper">
+        <h2>FEATURED PROJECTS</h2>
+        <Annotation rotate={-1.5} size="13px" color="var(--text-faded)">
+          — proud of these
+        </Annotation>
+      </div>
+      <a href="/projects" class="see-all">see all →</a>
+    </div>
+
+    <ProjectGrid>
+      {featuredProjects.map((project, i) => (
+        <ProjectCard
+          title={project.data.title}
+          description={project.data.description}
+          tags={project.data.tags}
+          slug={project.slug}
+          index={i}
+        />
+      ))}
+    </ProjectGrid>
+  </section>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .projects-section {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--space-4) var(--content-padding) var(--space-6);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-3);
+  }
+
+  .section-title-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .section-title-wrapper h2 {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+  }
+
+  .see-all {
+    color: var(--rust-muted);
+    text-decoration: none;
+    font-size: var(--text-xs);
+    transition: color 0.2s ease;
+  }
+
+  .see-all:hover {
+    color: var(--rust);
+  }
+</style>

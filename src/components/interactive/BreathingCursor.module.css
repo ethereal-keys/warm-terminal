@@ -1,0 +1,8 @@
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 17px;
+  background-color: var(--rust);
+  margin-left: 4px;
+  transform: translateY(2px);
+}

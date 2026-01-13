@@ -1,0 +1,65 @@
+---
+interface Props {
+  padding?: string;
+  background?: string;
+  hover?: boolean;
+  class?: string;
+}
+
+const {
+  padding = 'var(--space-3)',
+  background = 'var(--bg-card)',
+  hover = false,
+  class: className
+} = Astro.props;
+---
+
+<div
+  class:list={["box-frame", { "box-frame--hover": hover }, className]}
+  style={`padding: ${padding}; background: ${background};`}
+>
+  <div class="box-frame__border">
+    <span class="corner corner--tl">┌</span>
+    <span class="corner corner--tr">┐</span>
+    <span class="corner corner--bl">└</span>
+    <span class="corner corner--br">┘</span>
+  </div>
+  <slot />
+</div>
+
+<style>
+  .box-frame {
+    position: relative;
+  }
+
+  .box-frame__border {
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--border-light);
+    pointer-events: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .box-frame--hover:hover .box-frame__border {
+    border-color: var(--border-hover);
+  }
+
+  .corner {
+    position: absolute;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--text-ghost);
+    background: inherit;
+    padding: 0 3px;
+    transition: color 0.3s ease;
+  }
+
+  .box-frame--hover:hover .corner {
+    color: var(--border-hover);
+  }
+
+  .corner--tl { top: -1px; left: -1px; }
+  .corner--tr { top: -1px; right: -1px; }
+  .corner--bl { bottom: -1px; left: -1px; }
+  .corner--br { bottom: -1px; right: -1px; }
+</style>

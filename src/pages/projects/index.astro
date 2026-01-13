@@ -1,0 +1,80 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import ProjectGrid from '@/components/projects/ProjectGrid.astro';
+import ProjectCard from '@/components/projects/ProjectCard.astro';
+import Annotation from '@/components/ui/Annotation.astro';
+import { getCollection } from 'astro:content';
+
+const projects = await getCollection('projects');
+const sortedProjects = projects.sort((a, b) => {
+  if (a.data.order !== b.data.order) {
+    return a.data.order - b.data.order;
+  }
+  return b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf();
+});
+---
+
+<PageLayout title="Projects" description="Things I've built">
+  <section class="projects-page">
+    <header class="page-header">
+      <h1>./projects</h1>
+      <div class="title-line"></div>
+      <p class="page-description">
+        A collection of things I've built — from game engine plugins to
+        ML pipelines to experimental web experiences.
+      </p>
+      <Annotation rotate={-1.5} size="14px" color="var(--text-faded)" class="header-note">
+        some are polished, some are prototypes, all were fun to build
+      </Annotation>
+    </header>
+
+    <ProjectGrid>
+      {sortedProjects.map((project, i) => (
+        <ProjectCard
+          title={project.data.title}
+          description={project.data.description}
+          tags={project.data.tags}
+          slug={project.slug}
+          index={i}
+        />
+      ))}
+    </ProjectGrid>
+  </section>
+</PageLayout>
+
+<style>
+  .projects-page {
+    max-width: 100%;
+  }
+
+  .page-header {
+    margin-bottom: var(--space-5);
+    position: relative;
+  }
+
+  .page-header h1 {
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    margin: 0 0 var(--space-1) 0;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  .title-line {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--text-primary) 0%, transparent 100%);
+    margin-bottom: var(--space-2);
+  }
+
+  .page-description {
+    font-size: var(--text-base);
+    max-width: 60ch;
+    margin: 0;
+  }
+
+  .header-note {
+    display: block;
+    margin-top: var(--space-2);
+  }
+</style>

@@ -1,0 +1,196 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+import RelatedPosts from '@/components/blog/RelatedPosts.astro';
+import ReadingProgress from '@/components/interactive/ReadingProgress';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { formatDate, calculateReadingTime } from '@/lib/utils';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+
+const { post } = Astro.props;
+const { Content, rawContent } = await post.render();
+const readingTime = calculateReadingTime(rawContent());
+
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+const relatedPosts = post.data.related
+  ? allPosts.filter(p => post.data.related?.includes(p.slug))
+  : [];
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <Header
+    breadcrumb={[
+      { label: 'writing', path: '/writing' },
+      { label: post.slug, path: `/writing/${post.slug}` }
+    ]}
+  >
+    <ReadingProgress client:load slot="progress" />
+  </Header>
+
+  <main id="main" class="post-page">
+    <article class="post-content" id="post-content">
+      <span class="corner corner--tl">┌</span>
+      <span class="corner corner--tr">┐</span>
+      <span class="corner corner--bl">└</span>
+      <span class="corner corner--br">┘</span>
+
+      <header class="post-header">
+        <h1>{post.data.title}</h1>
+        <div class="title-line"></div>
+        <div class="meta">
+          <span>{formatDate(post.data.publishedAt)}</span>
+          <span class="separator">·</span>
+          <span>{readingTime} min read</span>
+          <span class="separator">·</span>
+          <span>{post.data.tags.join(', ')}</span>
+        </div>
+      </header>
+
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+
+    {relatedPosts.length > 0 && (
+      <RelatedPosts posts={relatedPosts} />
+    )}
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .post-page {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--space-5) var(--content-padding);
+  }
+
+  .post-content {
+    position: relative;
+    background: rgba(252, 250, 245, 0.5);
+    border: 1px solid var(--border);
+    padding: var(--space-4);
+  }
+
+  .corner {
+    position: absolute;
+    font-size: var(--text-sm);
+    line-height: 1;
+    color: var(--text-ghost);
+    background: rgba(252, 250, 245, 0.5);
+    padding: 0 3px;
+  }
+
+  .corner--tl { top: -1px; left: -1px; }
+  .corner--tr { top: -1px; right: -1px; }
+  .corner--bl { bottom: -1px; left: -1px; }
+  .corner--br { bottom: -1px; right: -1px; }
+
+  .post-header {
+    margin-bottom: var(--space-4);
+  }
+
+  .post-header h1 {
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    margin: 0 0 var(--space-1) 0;
+    letter-spacing: -0.01em;
+  }
+
+  .title-line {
+    width: 70%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--text-primary) 0%, transparent 100%);
+    margin-bottom: var(--space-2);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .separator {
+    color: var(--text-ghost);
+  }
+
+  .prose {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+  }
+
+  .prose :global(h2) {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-2);
+    text-transform: none;
+    letter-spacing: normal;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: var(--space-1);
+  }
+
+  .prose :global(h3) {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-2);
+    text-transform: none;
+  }
+
+  .prose :global(p) {
+    margin-bottom: var(--space-3);
+  }
+
+  .prose :global(blockquote) {
+    border-left: 2px solid var(--rust-muted);
+    padding-left: var(--space-2);
+    margin: var(--space-3) 0;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .prose :global(hr) {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: var(--space-4) 0;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+  }
+
+  .prose :global(li) {
+    margin-bottom: var(--space-1);
+  }
+
+  .prose :global(code) {
+    background: var(--bg-secondary);
+    padding: 0.15em 0.4em;
+    border-radius: 2px;
+    font-size: 0.9em;
+  }
+
+  .prose :global(pre code) {
+    background: transparent;
+    padding: 0;
+  }
+</style>

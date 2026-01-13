@@ -1,0 +1,224 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+import ProjectTabs from '@/components/projects/ProjectTabs';
+import ProjectNav from '@/components/projects/ProjectNav.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  const sorted = projects.sort((a, b) => a.data.order - b.data.order);
+
+  return sorted.map((project, index) => ({
+    params: { slug: project.slug },
+    props: {
+      project,
+      prevProject: sorted[index - 1] || null,
+      nextProject: sorted[index + 1] || null,
+    },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  prevProject: CollectionEntry<'projects'> | null;
+  nextProject: CollectionEntry<'projects'> | null;
+}
+
+const { project, prevProject, nextProject } = Astro.props;
+const { Content } = await project.render();
+---
+
+<BaseLayout title={project.data.title} description={project.data.description}>
+  <Header
+    breadcrumb={[
+      { label: 'projects', path: '/projects' },
+      { label: project.slug, path: `/projects/${project.slug}` }
+    ]}
+  />
+
+  <main id="main" class="project-page">
+    <article class="project-content">
+      <span class="corner corner--tl">┌</span>
+      <span class="corner corner--tr">┐</span>
+      <span class="corner corner--bl">└</span>
+      <span class="corner corner--br">┘</span>
+
+      <header class="project-header">
+        <h1>{project.data.title}</h1>
+        <div class="title-line"></div>
+        <p class="description">{project.data.description}</p>
+
+        <div class="meta">
+          <span class="tags">{project.data.tags.join(' · ')}</span>
+          <div class="links">
+            {project.data.github && (
+              <a href={project.data.github} target="_blank" rel="noopener noreferrer">
+                [ github ]
+              </a>
+            )}
+            {project.data.demo && (
+              <a href={project.data.demo} target="_blank" rel="noopener noreferrer">
+                [ demo ]
+              </a>
+            )}
+            {project.data.paper && (
+              <a href={project.data.paper} target="_blank" rel="noopener noreferrer">
+                [ paper ]
+              </a>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <ProjectTabs client:load>
+        <div class="prose">
+          <Content />
+        </div>
+      </ProjectTabs>
+    </article>
+
+    <ProjectNav prev={prevProject} next={nextProject} />
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .project-page {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--space-5) var(--content-padding);
+  }
+
+  .project-content {
+    position: relative;
+    background: rgba(252, 250, 245, 0.5);
+    border: 1px solid var(--border);
+    padding: var(--space-4);
+  }
+
+  .corner {
+    position: absolute;
+    font-size: var(--text-sm);
+    line-height: 1;
+    color: var(--text-ghost);
+    background: rgba(252, 250, 245, 0.5);
+    padding: 0 3px;
+  }
+
+  .corner--tl { top: -1px; left: -1px; }
+  .corner--tr { top: -1px; right: -1px; }
+  .corner--bl { bottom: -1px; left: -1px; }
+  .corner--br { bottom: -1px; right: -1px; }
+
+  .project-header {
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .project-header h1 {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    margin: 0 0 var(--space-1) 0;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  .title-line {
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--text-primary) 0%, transparent 100%);
+    margin-bottom: var(--space-2);
+  }
+
+  .description {
+    font-size: var(--text-base);
+    margin: 0 0 var(--space-3) 0;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--text-sm);
+  }
+
+  .tags {
+    color: var(--text-muted);
+  }
+
+  .links {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .links a {
+    color: var(--rust-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .links a:hover {
+    color: var(--rust);
+  }
+
+  .prose {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+  }
+
+  .prose :global(h2) {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-2);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  .prose :global(h3) {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-2);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  .prose :global(p) {
+    margin-bottom: var(--space-3);
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+  }
+
+  .prose :global(li) {
+    margin-bottom: var(--space-1);
+  }
+
+  .prose :global(blockquote) {
+    border-left: 2px solid var(--rust-muted);
+    padding-left: var(--space-2);
+    margin: var(--space-3) 0;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .prose :global(code) {
+    background: var(--bg-secondary);
+    padding: 0.15em 0.4em;
+    border-radius: 2px;
+    font-size: 0.9em;
+  }
+
+  .prose :global(pre code) {
+    background: transparent;
+    padding: 0;
+  }
+</style>

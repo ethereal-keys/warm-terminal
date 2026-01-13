@@ -1,0 +1,28 @@
+---
+interface Props {
+  color?: string;
+  class?: string;
+}
+
+const { color = 'var(--text-ghost)', class: className } = Astro.props;
+---
+
+<span class:list={["frame-corner frame-corner--tl", className]} style={`color: ${color}`}>┌</span>
+<span class:list={["frame-corner frame-corner--tr", className]} style={`color: ${color}`}>┐</span>
+<span class:list={["frame-corner frame-corner--bl", className]} style={`color: ${color}`}>└</span>
+<span class:list={["frame-corner frame-corner--br", className]} style={`color: ${color}`}>┘</span>
+
+<style>
+  .frame-corner {
+    position: absolute;
+    font-size: 14px;
+    line-height: 1;
+    background: inherit;
+    padding: 0 3px;
+    transition: color 0.3s ease;
+  }
+  .frame-corner--tl { top: -1px; left: -1px; }
+  .frame-corner--tr { top: -1px; right: -1px; }
+  .frame-corner--bl { bottom: -1px; left: -1px; }
+  .frame-corner--br { bottom: -1px; right: -1px; }
+</style>

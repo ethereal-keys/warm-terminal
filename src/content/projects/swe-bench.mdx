@@ -1,0 +1,55 @@
+---
+title: "SWE-Bench Agent Fine-tuning"
+description: "ML training pipeline processing 11,000+ conversation turns from successful code solutions, implementing custom tokenization for function-calling fine-tuning."
+tags: ["python", "ml", "transformers", "nlp"]
+publishedAt: 2024-11-20
+featured: true
+github: "https://github.com/ethereal-keys/NLP-Project"
+order: 2
+---
+
+## Overview
+
+Built an ML training pipeline for fine-tuning open-source LLMs on automated
+code generation tasks, benchmarking against commercial models.
+
+## The Problem
+
+Current AI coding assistants show significant performance gaps between
+commercial and open-source solutions. This project aimed to understand
+and close that gap through targeted fine-tuning.
+
+## Data Processing Pipeline
+
+Processed 11,000+ conversation turns from successful SWE-Bench solutions:
+
+```python
+def process_conversation(conv):
+    # Extract function calls and responses
+    turns = extract_turns(conv)
+    
+    # Custom tokenization for function-calling
+    tokens = tokenize_with_functions(turns)
+    
+    return format_for_training(tokens)
+```
+
+## Model Architecture
+
+Implemented custom tokenization for function-calling patterns on:
+- Qwen2.5-Coder
+- Mistral-7B
+
+## Results
+
+Identified critical performance gaps between commercial and open-source
+AI coding assistants, particularly in:
+- Multi-file context handling
+- Error recovery strategies
+- Code explanation quality
+
+## Reflections
+
+The biggest challenge was handling the diversity of coding patterns across
+different repositories and languages. Future work would focus on
+domain-specific fine-tuning strategies.

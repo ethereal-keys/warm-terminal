@@ -1,0 +1,66 @@
+---
+interface Props {
+  title?: string;
+  class?: string;
+}
+
+const { title, class: className } = Astro.props;
+---
+
+<figure class:list={["ascii-diagram", className]}>
+  <div class="diagram-frame">
+    <span class="corner corner--tl">┌</span>
+    <span class="corner corner--tr">┐</span>
+    <span class="corner corner--bl">└</span>
+    <span class="corner corner--br">┘</span>
+
+    <pre class="diagram-content"><slot /></pre>
+  </div>
+  {title && <figcaption class="diagram-caption">{title}</figcaption>}
+</figure>
+
+<style>
+  .ascii-diagram {
+    margin: var(--space-4) 0;
+  }
+
+  .diagram-frame {
+    position: relative;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    padding: var(--space-2) var(--space-3);
+    overflow-x: auto;
+  }
+
+  .corner {
+    position: absolute;
+    font-size: var(--text-sm);
+    line-height: 1;
+    color: var(--text-ghost);
+    background: var(--bg-secondary);
+    padding: 0 3px;
+  }
+
+  .corner--tl { top: -1px; left: -1px; }
+  .corner--tr { top: -1px; right: -1px; }
+  .corner--bl { bottom: -1px; left: -1px; }
+  .corner--br { bottom: -1px; right: -1px; }
+
+  .diagram-content {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    color: var(--text-primary);
+    background: transparent;
+    padding: 0;
+    border: none;
+    white-space: pre;
+  }
+
+  .diagram-caption {
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+</style>

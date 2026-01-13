@@ -1,0 +1,33 @@
+---
+interface Props {
+  rotate?: number;
+  size?: string;
+  color?: string;
+  class?: string;
+}
+
+const {
+  rotate = 0,
+  size = '15px',
+  color = 'var(--text-muted)',
+  class: className
+} = Astro.props;
+---
+
+<span
+  class:list={["annotation", className]}
+  style={`
+    font-size: ${size};
+    color: ${color};
+    transform: rotate(${rotate}deg);
+  `}
+>
+  <slot />
+</span>
+
+<style>
+  .annotation {
+    font-family: var(--font-annotation);
+    display: inline-block;
+  }
+</style>

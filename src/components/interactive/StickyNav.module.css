@@ -1,0 +1,125 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  padding: 0 var(--content-padding);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 50;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition:
+    opacity 0.4s var(--ease-out),
+    transform 0.4s var(--ease-out),
+    background 0.4s var(--ease-out),
+    border-color 0.4s var(--ease-out);
+}
+
+.nav.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  background: rgba(248, 245, 237, 0.92);
+  backdrop-filter: blur(12px);
+  border-color: rgba(176, 170, 162, 0.3);
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.initials {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+}
+
+.separator {
+  margin: 0 8px;
+  color: var(--text-ghost);
+}
+
+.breadcrumbLink {
+  color: var(--text-tertiary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumbLink:hover {
+  color: var(--text-primary);
+}
+
+.navItems {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.navLink {
+  position: relative;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  text-decoration: none;
+  padding: 4px 0;
+  transition: color 0.2s ease;
+}
+
+.navLink:hover,
+.navLink.active {
+  color: var(--text-primary);
+}
+
+.underline {
+  position: absolute;
+  bottom: -4px;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: var(--text-muted);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.upButton {
+  color: var(--text-tertiary);
+  text-decoration: none;
+  padding: 4px 8px;
+  font-size: var(--text-sm);
+  transition: color 0.2s ease;
+}
+
+.upButton:hover {
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .navItems {
+    display: none;
+  }
+}

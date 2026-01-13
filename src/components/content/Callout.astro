@@ -1,0 +1,49 @@
+---
+interface Props {
+  type?: 'note' | 'warning' | 'tip';
+  class?: string;
+}
+
+const { type = 'note', class: className } = Astro.props;
+---
+
+<aside class:list={["callout", `callout--${type}`, className]}>
+  <span class="callout-border">│</span>
+  <div class="callout-content">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .callout {
+    display: flex;
+    gap: var(--space-2);
+    margin: var(--space-3) 0;
+    padding: var(--space-2) 0;
+  }
+
+  .callout-border {
+    color: var(--rust-muted);
+    user-select: none;
+  }
+
+  .callout--warning .callout-border {
+    color: #B8860B;
+  }
+
+  .callout--tip .callout-border {
+    color: var(--status-green);
+  }
+
+  .callout-content {
+    flex: 1;
+  }
+
+  .callout-content :global(p) {
+    margin: 0;
+  }
+
+  .callout-content :global(p + p) {
+    margin-top: var(--space-2);
+  }
+</style>

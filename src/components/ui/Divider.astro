@@ -1,0 +1,22 @@
+---
+interface Props {
+  width?: string;
+  class?: string;
+}
+
+const { width = '100%', class: className } = Astro.props;
+---
+
+<div class:list={["divider", className]} style={`width: ${width}`} aria-hidden="true">
+  ────────────────────────────────────────────────────────────────────────────
+</div>
+
+<style>
+  .divider {
+    color: var(--border-light);
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 14px;
+    user-select: none;
+  }
+</style>

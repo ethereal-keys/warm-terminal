@@ -1,0 +1,74 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  class?: string;
+}
+
+const { src, alt, caption, class: className } = Astro.props;
+---
+
+<figure class:list={["comic", className]}>
+  <div class="comic-frame">
+    <span class="corner corner--tl">┌</span>
+    <span class="corner corner--tr">┐</span>
+    <span class="corner corner--bl">└</span>
+    <span class="corner corner--br">┘</span>
+
+    <img src={src} alt={alt} class="comic-image" loading="lazy" />
+  </div>
+
+  {caption && (
+    <figcaption class="comic-caption">
+      <span class="annotation">{caption}</span>
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  .comic {
+    margin: var(--space-4) 0;
+  }
+
+  .comic-frame {
+    position: relative;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    padding: var(--space-2);
+    transform: rotate(-0.5deg);
+  }
+
+  .corner {
+    position: absolute;
+    font-size: var(--text-sm);
+    line-height: 1;
+    color: var(--text-ghost);
+    background: var(--bg-primary);
+    padding: 0 3px;
+  }
+
+  .corner--tl { top: -1px; left: -1px; }
+  .corner--tr { top: -1px; right: -1px; }
+  .corner--bl { bottom: -1px; left: -1px; }
+  .corner--br { bottom: -1px; right: -1px; }
+
+  .comic-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .comic-caption {
+    margin-top: var(--space-2);
+    text-align: center;
+  }
+
+  .annotation {
+    font-family: var(--font-annotation);
+    font-size: var(--text-base);
+    color: var(--text-muted);
+    transform: rotate(-1deg);
+    display: inline-block;
+  }
+</style>

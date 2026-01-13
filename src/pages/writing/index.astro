@@ -1,0 +1,101 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import PostCard from '@/components/blog/PostCard.astro';
+import Annotation from '@/components/ui/Annotation.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('posts', ({ data }) => !data.draft);
+const sortedPosts = posts.sort(
+  (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
+);
+---
+
+<PageLayout title="Writing" description="Thoughts, tutorials, and late night musings">
+  <section class="writing-page">
+    <header class="page-header">
+      <h1>./writing</h1>
+      <div class="title-line"></div>
+      <p class="page-description">
+        Thoughts, tutorials, and the occasional deep dive into things
+        that kept me up at night.
+      </p>
+      <Annotation rotate={-2} size="14px" color="var(--text-faded)" class="header-note">
+        mostly technical, sometimes personal
+      </Annotation>
+    </header>
+
+    <div class="post-list">
+      {sortedPosts.map((post) => (
+        <PostCard
+          title={post.data.title}
+          description={post.data.description}
+          publishedAt={post.data.publishedAt}
+          tags={post.data.tags}
+          slug={post.slug}
+        />
+      ))}
+    </div>
+
+    {sortedPosts.length === 0 && (
+      <div class="empty-state">
+        <p>No posts yet. Check back soon!</p>
+        <Annotation rotate={1} size="15px">
+          — working on something...
+        </Annotation>
+      </div>
+    )}
+  </section>
+</PageLayout>
+
+<style>
+  .writing-page {
+    max-width: 100%;
+  }
+
+  .page-header {
+    margin-bottom: var(--space-5);
+    position: relative;
+  }
+
+  .page-header h1 {
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    margin: 0 0 var(--space-1) 0;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  .title-line {
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--text-primary) 0%, transparent 100%);
+    margin-bottom: var(--space-2);
+  }
+
+  .page-description {
+    font-size: var(--text-base);
+    max-width: 55ch;
+    margin: 0;
+  }
+
+  .header-note {
+    display: block;
+    margin-top: var(--space-2);
+  }
+
+  .post-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: var(--space-6) 0;
+    color: var(--text-muted);
+  }
+
+  .empty-state p {
+    margin-bottom: var(--space-2);
+  }
+</style>

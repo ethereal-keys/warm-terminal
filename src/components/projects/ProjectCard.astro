@@ -1,0 +1,141 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  tags: string[];
+  slug: string;
+  index?: number;
+}
+
+const { title, description, tags, slug, index = 0 } = Astro.props;
+
+const rotations = [-0.35, 0.25, 0.3, -0.2];
+const rotation = rotations[index % 4];
+---
+
+<a href={`/projects/${slug}`} class="project-card" style={`--rotation: ${rotation}deg`}>
+  <div class="card-border">
+    <span class="corner corner--tl">┌</span>
+    <span class="corner corner--tr">┐</span>
+    <span class="corner corner--bl">└</span>
+    <span class="corner corner--br">┘</span>
+  </div>
+
+  <h3 class="card-title">{title}</h3>
+  <div class="card-line"></div>
+  <p class="card-description">{description}</p>
+
+  <div class="card-footer">
+    <span class="card-tags">{tags.join(' · ')}</span>
+    <span class="card-action">view →</span>
+  </div>
+</a>
+
+<style>
+  .project-card {
+    position: relative;
+    display: block;
+    padding: var(--space-3);
+    background: var(--bg-card);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition:
+      background 0.3s var(--ease-out),
+      transform 0.3s var(--ease-out),
+      box-shadow 0.3s var(--ease-out);
+    transform: rotate(var(--rotation));
+    box-shadow: var(--shadow-sm);
+  }
+
+  .project-card:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-3px) rotate(0deg);
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-border {
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--border-light);
+    pointer-events: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .project-card:hover .card-border {
+    border-color: var(--border-hover);
+  }
+
+  .corner {
+    position: absolute;
+    font-size: var(--text-sm);
+    line-height: 1;
+    color: var(--text-ghost);
+    background: var(--bg-card);
+    padding: 0 3px;
+    transition: color 0.3s ease, background 0.3s ease;
+  }
+
+  .project-card:hover .corner {
+    color: var(--border-hover);
+    background: var(--bg-card-hover);
+  }
+
+  .corner--tl { top: -1px; left: -1px; }
+  .corner--tr { top: -1px; right: -1px; }
+  .corner--bl { bottom: -1px; left: -1px; }
+  .corner--br { bottom: -1px; right: -1px; }
+
+  .card-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  .card-line {
+    width: 40%;
+    height: 1px;
+    background: linear-gradient(90deg, var(--rust-muted) 60%, transparent);
+    margin-bottom: 14px;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+  }
+
+  .project-card:hover .card-line {
+    width: 50%;
+    opacity: 0.85;
+  }
+
+  .card-description {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-2) 0;
+    line-height: var(--leading-relaxed);
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--text-xs);
+  }
+
+  .card-tags {
+    color: var(--text-muted);
+  }
+
+  .card-action {
+    color: var(--rust-muted);
+    opacity: 0.6;
+    transform: translateX(0);
+    transition: all 0.3s ease;
+  }
+
+  .project-card:hover .card-action {
+    opacity: 1;
+    transform: translateX(4px);
+  }
+</style>

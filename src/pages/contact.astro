@@ -1,0 +1,130 @@
+---
+import PageLayout from '@/layouts/PageLayout.astro';
+import BoxFrame from '@/components/ui/BoxFrame.astro';
+import Annotation from '@/components/ui/Annotation.astro';
+---
+
+<PageLayout title="Contact" description="Say hello">
+  <section class="contact-page">
+    <header class="page-header">
+      <h1>./contact</h1>
+      <div class="title-line"></div>
+      <p class="page-description">
+        I'm always interested in hearing about new opportunities,
+        collaborations, or just chatting about systems and software.
+      </p>
+    </header>
+
+    <BoxFrame padding="32px" background="rgba(252, 250, 245, 0.5)">
+      <div class="contact-content">
+        <div class="contact-method">
+          <span class="method-label">&gt; email</span>
+          <a href="mailto:srkashy1@asu.edu" class="method-link">
+            srkashy1@asu.edu
+          </a>
+          <Annotation rotate={-1} size="13px" class="method-note">
+            best way to reach me
+          </Annotation>
+        </div>
+
+        <div class="contact-method">
+          <span class="method-label">&gt; linkedin</span>
+          <a href="https://linkedin.com/in/sushanth-kashyap/" target="_blank" rel="noopener noreferrer" class="method-link">
+            /in/sushanth-kashyap
+          </a>
+        </div>
+
+        <div class="contact-method">
+          <span class="method-label">&gt; github</span>
+          <a href="https://github.com/ethereal-keys" target="_blank" rel="noopener noreferrer" class="method-link">
+            @ethereal-keys
+          </a>
+        </div>
+
+        <div class="location">
+          <span class="location-label">&gt; location</span>
+          <span class="location-value">United States · open to relocation</span>
+        </div>
+      </div>
+    </BoxFrame>
+  </section>
+</PageLayout>
+
+<style>
+  .contact-page {
+    max-width: 100%;
+  }
+
+  .page-header {
+    margin-bottom: var(--space-4);
+  }
+
+  .page-header h1 {
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    margin: 0 0 var(--space-1) 0;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  .title-line {
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--text-primary) 0%, transparent 100%);
+    margin-bottom: var(--space-2);
+  }
+
+  .page-description {
+    max-width: 50ch;
+    margin: 0;
+  }
+
+  .contact-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 400px;
+  }
+
+  .contact-method {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .method-label {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .method-link {
+    font-size: var(--text-base);
+    color: var(--rust);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .method-link:hover {
+    color: var(--rust-light);
+  }
+
+  .method-note {
+    margin-top: 2px;
+  }
+
+  .location {
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-light);
+  }
+
+  .location-label {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--space-1);
+  }
+
+  .location-value {
+    color: var(--text-secondary);
+  }
+</style>

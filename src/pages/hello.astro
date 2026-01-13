@@ -1,0 +1,111 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BoxFrame from '@/components/ui/BoxFrame.astro';
+import SignatureMarkStatic from '@/components/ui/SignatureMarkStatic.astro';
+---
+
+<BaseLayout title="Hello" description="You found it.">
+  <main class="hello-page">
+    <BoxFrame padding="48px" background="rgba(252, 250, 245, 0.5)">
+      <div class="content">
+        <h1>you found it.</h1>
+        <div class="title-line"></div>
+
+        <p class="intro">thanks for exploring. it means a lot.</p>
+
+        <div class="secrets">
+          <p>since you're here, a few things:</p>
+          <ul>
+            <li>· this portfolio was built with care over many late nights</li>
+            <li>· the breathing dots? they're meant to feel alive</li>
+            <li>· the sound design took longer than the layout</li>
+            <li>· there might be other secrets. keep looking.</li>
+          </ul>
+        </div>
+
+        <p class="outro">now go build something beautiful.</p>
+
+        <div class="mark">
+          <SignatureMarkStatic />
+        </div>
+
+        <a href="/" class="back-link">[ back to home ]</a>
+      </div>
+    </BoxFrame>
+  </main>
+</BaseLayout>
+
+<style>
+  .hello-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+  }
+
+  .content {
+    max-width: 500px;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    margin: 0 0 var(--space-1) 0;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  .title-line {
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--text-primary) 50%, transparent 100%);
+    margin: 0 auto var(--space-4);
+  }
+
+  .intro {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-4);
+  }
+
+  .secrets {
+    text-align: left;
+    margin-bottom: var(--space-4);
+  }
+
+  .secrets ul {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-2) 0 0 0;
+  }
+
+  .secrets li {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-1);
+    padding-left: var(--space-2);
+  }
+
+  .outro {
+    margin-bottom: var(--space-5);
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+
+  .mark {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-4);
+  }
+
+  .back-link {
+    color: var(--rust-muted);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    transition: color 0.2s ease;
+  }
+
+  .back-link:hover {
+    color: var(--rust);
+  }
+</style>

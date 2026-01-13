@@ -1,0 +1,40 @@
+---
+import BoxFrame from '@/components/ui/BoxFrame.astro';
+import Annotation from '@/components/ui/Annotation.astro';
+import HeroContent from './HeroContent';
+---
+
+<section class="hero">
+  <BoxFrame padding="40px 38px 36px" background="rgba(252, 250, 245, 0.5)">
+    <HeroContent client:load />
+  </BoxFrame>
+
+  <div class="hero-annotation">
+    <Annotation rotate={1.5} size="16px" color="var(--text-muted)">
+      → press <kbd>/</kbd> to explore
+    </Annotation>
+  </div>
+</section>
+
+<style>
+  .hero {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 72px var(--content-padding) var(--space-5);
+    position: relative;
+  }
+
+  .hero-annotation {
+    position: absolute;
+    right: 20px;
+    bottom: 24px;
+  }
+
+  .hero-annotation kbd {
+    background: rgba(138, 134, 128, 0.12);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+</style>

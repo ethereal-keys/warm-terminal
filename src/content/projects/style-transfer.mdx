@@ -1,0 +1,62 @@
+---
+title: "Real-Time Style Transfer Plugin"
+description: "Godot engine plugin applying neural style transfer to viewport textures. Includes training pipeline and C++ integration."
+tags: ["c++", "pytorch", "godot", "ml"]
+publishedAt: 2024-12-15
+featured: true
+github: "https://github.com/ethereal-keys/Godot-Style-Transfer"
+order: 1
+---
+
+## Overview
+
+When I first started exploring neural style transfer, I didn't expect to end up
+knee deep in Godot's rendering pipeline. But here we are.
+
+The goal was simple: make a game look like a painting in real-time. The execution
+was anything but.
+
+## The First Attempt
+
+I started where anyone would: the original Gatys et al. paper. The results were
+beautiful. The performance was not.
+
+```python
+def style_transfer(content, style, iterations=500):
+    # This took 45 seconds per frame
+    for i in range(iterations):
+        optimize_step(content, style)
+    return content
+```
+
+45 seconds. Per frame. For a game targeting 60fps, I needed to be roughly
+2,700 times faster.
+
+## The Solution
+
+The breakthrough came from Johnson et al.'s feed-forward approach. Instead of
+optimizing at runtime, we train a network to perform the transformation in a
+single forward pass.
+
+## Technical Implementation
+
+The plugin integrates with Godot's rendering pipeline:
+
+1. Capture viewport texture each frame
+2. Pass through PyTorch model via C++ bindings
+3. Return stylized texture to viewport
+4. Maintain 60fps target
+
+## Reflections
+
+### What Worked
+- The feed-forward architecture delivered real-time performance
+- C++ integration with Godot was cleaner than expected
+
+### What I'd Do Differently
+- Start with a simpler style transfer model
+- Profile GPU memory usage earlier in development
+
+### Future Directions
+- Multi-style interpolation
+- Video temporal consistency

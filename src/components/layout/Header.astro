@@ -1,0 +1,23 @@
+---
+import StickyNav from '@/components/interactive/StickyNav';
+
+interface BreadcrumbItem {
+  label: string;
+  path: string;
+}
+
+interface Props {
+  breadcrumb?: BreadcrumbItem[];
+}
+
+const { breadcrumb } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<StickyNav
+  client:load
+  currentPath={currentPath}
+  breadcrumb={breadcrumb}
+>
+  <slot name="progress" />
+</StickyNav>

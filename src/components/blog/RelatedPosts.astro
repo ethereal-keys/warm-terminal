@@ -1,0 +1,83 @@
+---
+interface PostLink {
+  slug: string;
+  data: {
+    title: string;
+  };
+}
+
+interface Props {
+  posts: PostLink[];
+}
+
+const { posts } = Astro.props;
+---
+
+<nav class="related-posts" aria-label="Related posts">
+  <div class="divider" aria-hidden="true">
+    ────────────────────────────────────────────────────────────────────────────
+  </div>
+
+  <div class="related-header">
+    <span class="related-label">related</span>
+    <span class="related-line">───────</span>
+  </div>
+
+  <div class="related-links">
+    {posts.map(post => (
+      <a href={`/writing/${post.slug}`} class="related-link">
+        ./{post.slug}
+      </a>
+    ))}
+  </div>
+
+  <div class="divider" aria-hidden="true">
+    ────────────────────────────────────────────────────────────────────────────
+  </div>
+</nav>
+
+<style>
+  .related-posts {
+    margin-top: var(--space-5);
+  }
+
+  .divider {
+    color: rgba(176, 170, 162, 0.25);
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: var(--text-sm);
+    user-select: none;
+  }
+
+  .related-header {
+    padding: var(--space-2) 0;
+  }
+
+  .related-label {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .related-line {
+    color: var(--text-ghost);
+    margin-left: var(--space-1);
+  }
+
+  .related-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding-bottom: var(--space-2);
+  }
+
+  .related-link {
+    font-size: var(--text-sm);
+    color: var(--text-tertiary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .related-link:hover {
+    color: var(--text-primary);
+  }
+</style>

@@ -1,0 +1,78 @@
+---
+title: "XV6 OS Kernel Modules"
+description: "Implemented multithreading, on-demand paging, bootloading, and trap-and-emulate virtualization in xv6."
+tags: ["c", "os", "systems"]
+publishedAt: 2024-09-15
+featured: true
+order: 4
+---
+
+## Overview
+
+Extended the xv6 educational operating system with production-grade features,
+diving deep into how operating systems actually work under the hood.
+
+## Implemented Features
+
+### Multithreading
+
+Added POSIX-style threading support to xv6:
+
+```c
+int thread_create(void (*fn)(void*), void *arg) {
+    struct proc *np;
+    struct proc *curproc = myproc();
+    
+    // Allocate process
+    if ((np = allocproc()) == 0)
+        return -1;
+    
+    // Share address space with parent
+    np->pgdir = curproc->pgdir;
+    np->sz = curproc->sz;
+    
+    // Set up stack and entry point
+    // ...
+}
+```
+
+### On-Demand Paging
+
+Implemented lazy page allocation—pages are only allocated when actually
+accessed, not when requested:
+
+- Page fault handler for missing pages
+- Copy-on-write for fork optimization
+- Swap space management
+
+### Bootloading
+
+Wrote a custom bootloader that:
+- Loads kernel from disk
+- Sets up protected mode
+- Initializes page tables
+- Jumps to kernel entry point
+
+### Trap and Emulate Virtualization
+
+Implemented basic virtualization support allowing xv6 to host guest
+operating systems through trap-and-emulate:
+
+- Sensitive instruction trapping
+- Virtual memory management for guests
+- Device emulation layer
+
+## Reflections
+
+### What I Learned
+- The elegance of Unix's design decisions
+- How much complexity modern OSes hide from us
+- Why debugging kernel code requires patience
+
+### Challenges
+- Race conditions in the scheduler
+- Getting page table math right
+- The bootloader's 512-byte limit
+
+This project gave me deep appreciation for systems programming and the
+layers of abstraction we build on every day.

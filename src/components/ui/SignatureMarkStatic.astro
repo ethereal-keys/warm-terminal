@@ -1,0 +1,30 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["signature-mark", className]}>
+  <pre>╭─────╮
+│ · · │
+╰─────╯</pre>
+</div>
+
+<style>
+  .signature-mark {
+    font-size: 15px;
+    font-family: var(--font-mono);
+    line-height: 1.2;
+    color: #4A4540;
+  }
+
+  .signature-mark pre {
+    margin: 0;
+    font-family: inherit;
+    background: none;
+    padding: 0;
+    border: none;
+  }
+</style>

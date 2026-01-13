@@ -1,0 +1,123 @@
+---
+import { SITE } from '@/lib/config';
+import { SignatureMark } from '@/components/interactive/SignatureMark';
+import Annotation from '@/components/ui/Annotation.astro';
+---
+
+<footer class="footer">
+  <div class="divider" aria-hidden="true">
+    ────────────────────────────────────────────────────────────────────────────
+  </div>
+
+  <div class="content">
+    <div class="social-wrapper">
+      <Annotation rotate={-2} size="14px" color="var(--text-faded)" class="social-note">
+        don't be a stranger
+      </Annotation>
+
+      <div class="social-links">
+        {SITE.social.map(link => (
+          <a href={link.url} class="social-link" target="_blank" rel="noopener noreferrer">
+            [ {link.name} ]
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <div class="mark-wrapper">
+      <SignatureMark client:load />
+    </div>
+
+    <p class="copyright">
+      built with care · {new Date().getFullYear()}
+    </p>
+
+    <p class="tip">
+      tip: press <kbd>/</kbd> to navigate
+    </p>
+  </div>
+
+  <div class="divider" aria-hidden="true">
+    ────────────────────────────────────────────────────────────────────────────
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding: var(--space-5) var(--content-padding);
+    text-align: center;
+    background: linear-gradient(180deg, transparent 0%, rgba(235, 231, 222, 0.35) 100%);
+  }
+
+  .divider {
+    color: rgba(176, 170, 162, 0.25);
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: var(--text-sm);
+    user-select: none;
+  }
+
+  .content {
+    padding: var(--space-5) 0;
+  }
+
+  .social-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-bottom: var(--space-4);
+  }
+
+  .social-note {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    white-space: nowrap;
+  }
+
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+
+  .social-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.35);
+    transition: all 0.25s ease;
+  }
+
+  .social-link:hover {
+    border-color: var(--rust-warm);
+    color: var(--rust-warm);
+  }
+
+  .mark-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-2);
+  }
+
+  .copyright {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    margin: 0 0 var(--space-2) 0;
+  }
+
+  .tip {
+    color: var(--text-ghost);
+    font-size: 11px;
+    margin: 0;
+  }
+
+  .tip kbd {
+    background: rgba(138, 134, 128, 0.12);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+  }
+</style>

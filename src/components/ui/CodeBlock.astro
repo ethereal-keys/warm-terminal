@@ -1,0 +1,61 @@
+---
+interface Props {
+  filename?: string;
+  language?: string;
+  class?: string;
+}
+
+const { filename, language, class: className } = Astro.props;
+---
+
+<div class:list={["code-block", className]}>
+  {filename && (
+    <div class="code-block__header">
+      ┌── {filename} ───────────────────────────────────────────────────
+    </div>
+  )}
+  <div class="code-block__content">
+    <slot />
+  </div>
+  {filename && (
+    <div class="code-block__footer">
+      └───────────────────────────────────────────────────────────────────────┘
+    </div>
+  )}
+</div>
+
+<style>
+  .code-block {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    background: var(--syntax-bg);
+    margin: var(--space-3) 0;
+  }
+
+  .code-block__header,
+  .code-block__footer {
+    color: var(--text-ghost);
+    padding: 0 var(--space-2);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .code-block__header {
+    padding-top: var(--space-1);
+  }
+
+  .code-block__footer {
+    padding-bottom: var(--space-1);
+  }
+
+  .code-block__content {
+    padding: var(--space-2);
+  }
+
+  .code-block__content :global(pre) {
+    background: transparent;
+    padding: 0;
+    border: none;
+    margin: 0;
+  }
+</style>

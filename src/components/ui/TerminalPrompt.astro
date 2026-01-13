@@ -1,0 +1,33 @@
+---
+interface Props {
+  prefix?: string;
+  class?: string;
+}
+
+const { prefix = '>', class: className } = Astro.props;
+---
+
+<div class:list={["terminal-prompt", className]}>
+  <span class="terminal-prompt__prefix">{prefix}</span>
+  <span class="terminal-prompt__content">
+    <slot />
+  </span>
+</div>
+
+<style>
+  .terminal-prompt {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: var(--text-sm);
+  }
+
+  .terminal-prompt__prefix {
+    color: var(--text-muted);
+    user-select: none;
+  }
+
+  .terminal-prompt__content {
+    color: var(--text-secondary);
+  }
+</style>
