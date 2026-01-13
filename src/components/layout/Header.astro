@@ -12,12 +12,14 @@ interface Props {
 
 const { breadcrumb } = Astro.props;
 const currentPath = Astro.url.pathname;
+const isHomePage = currentPath === '/';
 ---
 
 <StickyNav
   client:load
   currentPath={currentPath}
   breadcrumb={breadcrumb}
+  alwaysVisible={!isHomePage}
 >
   <slot name="progress" />
 </StickyNav>

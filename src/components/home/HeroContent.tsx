@@ -5,10 +5,11 @@ import { SoundToggle } from '@/components/interactive/SoundToggle';
 import { TypedLine } from '@/components/interactive/TypedLine';
 import { TypedText } from '@/components/interactive/TypedText';
 import { useDelayedState } from '@/hooks/useDelayedState';
+import { useSound } from '@/hooks/useSound';
 import styles from './HeroContent.module.css';
 
 export default function HeroContent() {
-  const [soundOn, setSoundOn] = useState(false);
+  const { enabled: soundOn, toggle: toggleSound } = useSound();
   const showStatus = useDelayedState(false, TIMING.connectionDelay);
   const [lineWidth, setLineWidth] = useState(0);
 
@@ -36,7 +37,7 @@ export default function HeroContent() {
       <div className={styles.header}>
         <SignatureMark
           soundOn={soundOn}
-          onToggleSound={() => setSoundOn(!soundOn)}
+          onToggleSound={toggleSound}
         />
 
         <div className={styles.titleArea}>
@@ -48,7 +49,7 @@ export default function HeroContent() {
           <p className={styles.tagline}>{SITE.tagline}</p>
         </div>
 
-        <SoundToggle soundOn={soundOn} onToggle={() => setSoundOn(!soundOn)} />
+        <SoundToggle soundOn={soundOn} onToggle={toggleSound} />
       </div>
 
       {/* Terminal lines */}

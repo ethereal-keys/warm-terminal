@@ -1,5 +1,6 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
+import { useSound } from '@/hooks/useSound';
 import { SignatureMark } from './SignatureMark';
 import { SoundToggle } from './SoundToggle';
 import { CommandPalette } from './CommandPalette';
@@ -15,16 +16,19 @@ interface StickyNavProps {
   currentPath: string;
   breadcrumb?: BreadcrumbItem[];
   children?: ReactNode;
+  alwaysVisible?: boolean;
 }
 
 export default function StickyNav({
   currentPath,
   breadcrumb,
-  children
+  children,
+  alwaysVisible = false
 }: StickyNavProps) {
-  const [soundOn, setSoundOn] = useState(false);
+  const { enabled: soundOn, toggle: toggleSound } = useSound();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const isScrolled = useScrollPosition(100);
+  const isVisible = alwaysVisible || isScrolled;
 
   // Cmd/Ctrl + K
   useEffect(() => {
@@ -51,7 +55,7 @@ export default function StickyNav({
   return (
     <>
       <nav
-        className={`${styles.nav} ${isScrolled ? styles.visible : ''}`}
+        className={`${styles.nav} ${isVisible ? styles.visible : ''}`}
         aria-label="Main navigation"
       >
         <div className={styles.left}>
@@ -59,7 +63,6 @@ export default function StickyNav({
             <SignatureMark
               compact
               soundOn={soundOn}
-              onToggleSound={() => setSoundOn(!soundOn)}
             />
             <span className={styles.initials}>sk</span>
           </a>
@@ -96,7 +99,7 @@ export default function StickyNav({
         <div className={styles.right}>
           {children}
 
-          <SoundToggle soundOn={soundOn} onToggle={() => setSoundOn(!soundOn)} />
+          <SoundToggle soundOn={soundOn} onToggle={toggleSound} />
 
           {isDeep && (
             <a href={breadcrumb[0]?.path || '/'} className={styles.upButton} aria-label="Go back">

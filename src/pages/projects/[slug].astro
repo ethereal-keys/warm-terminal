@@ -89,7 +89,7 @@ const { Content } = await project.render();
   .project-page {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: var(--space-5) var(--content-padding);
+    padding: calc(var(--nav-height) + var(--space-5)) var(--content-padding) var(--space-5);
   }
 
   .project-content {

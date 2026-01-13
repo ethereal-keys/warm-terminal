@@ -27,7 +27,7 @@ export const SITE: SiteConfig = {
 
 export const TIMING = {
   breathCycle: 0.0016,
-  cursorPulse: 0.008,
+  cursorPulse: 0.02,
   typingSpeed: 38,
   connectionDelay: 800,
   typingDelay: 2400,

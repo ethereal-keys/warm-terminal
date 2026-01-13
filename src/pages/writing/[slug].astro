@@ -21,8 +21,8 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { Content, rawContent } = await post.render();
-const readingTime = calculateReadingTime(rawContent());
+const { Content } = await post.render();
+const readingTime = calculateReadingTime(post.body);
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 const relatedPosts = post.data.related
@@ -76,7 +76,7 @@ const relatedPosts = post.data.related
   .post-page {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: var(--space-5) var(--content-padding);
+    padding: calc(var(--nav-height) + var(--space-5)) var(--content-padding) var(--space-5);
   }
 
   .post-content {

@@ -23,7 +23,7 @@ const { title, description } = Astro.props;
   main {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: var(--space-5) var(--content-padding);
+    padding: calc(var(--nav-height) + var(--space-5)) var(--content-padding) var(--space-5);
     min-height: calc(100vh - 200px);
   }
 </style>

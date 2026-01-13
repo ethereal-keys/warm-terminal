@@ -21,6 +21,7 @@ export function SignatureMark({
   const noticed = useDelayedState(false, TIMING.markNoticeDelay);
   const breath = useAnimationPhase(TIMING.breathCycle, noticed);
   const { triggered: easterEggTriggered, handleClick: handleEasterEggClick } = useEasterEgg(7);
+  const isInteractive = !!onToggleSound;
 
   const breathVal = Math.sin(breath);
   const baseSpacing = compact ? 3 : 5;
@@ -28,11 +29,15 @@ export function SignatureMark({
 
   const spacing = !noticed ? 0
     : hovered ? baseSpacing * 0.15
-    : baseSpacing + breathVal * breathAmt;
+      : baseSpacing + breathVal * breathAmt;
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
     handleEasterEggClick();
-    onToggleSound?.();
+    if (isInteractive) {
+      e.stopPropagation();
+      e.preventDefault();
+      onToggleSound?.();
+    }
   };
 
   const dotsContent = (
@@ -72,23 +77,61 @@ export function SignatureMark({
   };
 
   if (compact) {
+    if (isInteractive) {
+      return (
+        <button
+          type="button"
+          className={`${styles.markCompact} ${easterEggTriggered ? styles.wiggle : ''}`}
+          style={markStyle}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          onClick={handleClick}
+          aria-label={soundOn ? 'Sound on, click to toggle' : 'Sound off, click to toggle'}
+        >
+          ({content})
+          {easterEggTriggered && <span className={styles.tooltip}>hi there :)</span>}
+        </button>
+      );
+    }
     return (
-      <button
+      <div
         className={`${styles.markCompact} ${easterEggTriggered ? styles.wiggle : ''}`}
         style={markStyle}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         onClick={handleClick}
-        aria-label={soundOn ? 'Sound on, click to toggle' : 'Sound off, click to toggle'}
       >
         ({content})
+        {easterEggTriggered && <span className={styles.tooltip}>hi there :)</span>}
+      </div>
+    );
+  }
+
+  // Full version
+  if (isInteractive) {
+    return (
+      <button
+        type="button"
+        className={`${styles.mark} ${easterEggTriggered ? styles.wiggle : ''}`}
+        style={{
+          ...markStyle,
+          transform: hovered ? 'scale(1.02)' : 'scale(1)',
+        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onClick={handleClick}
+        aria-label={soundOn ? 'Sound on, click to toggle' : 'Sound off, click to toggle'}
+      >
+        <pre className={styles.ascii}>{`╭─────╮
+│ `}<span className={styles.contentWrapper}>{content}</span>{` │
+╰─────╯`}</pre>
         {easterEggTriggered && <span className={styles.tooltip}>hi there :)</span>}
       </button>
     );
   }
 
   return (
-    <button
+    <div
       className={`${styles.mark} ${easterEggTriggered ? styles.wiggle : ''}`}
       style={{
         ...markStyle,
@@ -97,12 +140,11 @@ export function SignatureMark({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={handleClick}
-      aria-label={soundOn ? 'Sound on, click to toggle' : 'Sound off, click to toggle'}
     >
       <pre className={styles.ascii}>{`╭─────╮
 │ `}<span className={styles.contentWrapper}>{content}</span>{` │
 ╰─────╯`}</pre>
       {easterEggTriggered && <span className={styles.tooltip}>hi there :)</span>}
-    </button>
+    </div>
   );
 }

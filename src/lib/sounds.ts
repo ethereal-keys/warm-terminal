@@ -25,15 +25,42 @@ type HowlType = {
   state: () => string;
 };
 
-// Sound system singleton
+// Sound system singleton with event subscription
+type SoundStateListener = (enabled: boolean) => void;
+
+const STORAGE_KEY = 'warm-terminal-sound-enabled';
+
 class SoundSystem {
   private sounds: Map<SoundName, HowlType> = new Map();
   private enabled: boolean = true;
   private loaded: boolean = false;
   private masterVolume: number = 0.7;
+  private listeners: Set<SoundStateListener> = new Set();
+
+  constructor() {
+    // Initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored !== null) {
+        this.enabled = stored === 'true';
+      }
+    }
+  }
+
+  private saveState(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, String(this.enabled));
+    }
+  }
 
   async init(): Promise<void> {
     if (this.loaded || typeof window === 'undefined') return;
+
+    // Re-read from localStorage in case it changed
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored !== null) {
+      this.enabled = stored === 'true';
+    }
 
     // Dynamic import Howler only on client
     const { Howl } = await import('howler');
@@ -50,14 +77,28 @@ class SoundSystem {
     this.loaded = true;
   }
 
+  // Subscribe to sound state changes
+  subscribe(listener: SoundStateListener): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  private notifyListeners(): void {
+    this.listeners.forEach(listener => listener(this.enabled));
+  }
+
   enable(): void {
     this.enabled = true;
+    this.saveState();
     this.play('soundOn');
+    this.notifyListeners();
   }
 
   disable(): void {
     this.play('soundOff');
     this.enabled = false;
+    this.saveState();
+    this.notifyListeners();
   }
 
   toggle(): boolean {
