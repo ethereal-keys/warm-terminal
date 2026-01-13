@@ -72,7 +72,7 @@ export default function HeroContent() {
       {/* CTAs */}
       <div className={styles.ctas}>
         <a href="/projects" className="btn-primary">[ view projects ]</a>
-        <a href="/resume.pdf" className="btn-secondary">[ download resume ]</a>
+        <a href="/Sushanth_resume.pdf" download className="btn-secondary">[ download resume ]</a>
         <span className={styles.ctaAnnotation}>← jan '25</span>
       </div>
 
