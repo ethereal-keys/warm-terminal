@@ -28,6 +28,10 @@ interface Props {
 
 const { project, prevProject, nextProject } = Astro.props;
 const { Content } = await project.render();
+import YouTubeEmbed from '@/components/content/YouTubeEmbed.astro';
+import DemoEmbed from '@/components/content/DemoEmbed.astro';
+import Comic from '@/components/content/Comic.astro';
+import AsciiDiagram from '@/components/content/AsciiDiagram.astro';
 ---
 
 <BaseLayout title={project.data.title} description={project.data.description}>
@@ -74,8 +78,8 @@ const { Content } = await project.render();
 
       <ProjectTabs client:load>
         <div class="prose">
-          <Content />
-        </div>
+        <Content components={{ YouTubeEmbed, DemoEmbed, Comic, AsciiDiagram }} />
+      </div>
       </ProjectTabs>
     </article>
 

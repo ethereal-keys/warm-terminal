@@ -4,12 +4,21 @@ interface Props {
   alt: string;
   caption?: string;
   class?: string;
+  align?: 'left' | 'center' | 'right';
+  width?: string;
 }
 
-const { src, alt, caption, class: className } = Astro.props;
+const { 
+  src, 
+  alt, 
+  caption, 
+  class: className,
+  align = 'center',
+  width
+} = Astro.props;
 ---
 
-<figure class:list={["comic", className]}>
+<figure class:list={["comic", `align-${align}`, className]} style={width ? `width: ${width};` : ''}>
   <div class="comic-frame">
     <span class="corner corner--tl">┌</span>
     <span class="corner corner--tr">┐</span>
@@ -29,6 +38,25 @@ const { src, alt, caption, class: className } = Astro.props;
 <style>
   .comic {
     margin: var(--space-4) 0;
+    display: table; /* Robust shrink-wrapping */
+    max-width: 100%;
+  }
+
+  .comic.align-center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .comic.align-left {
+    float: left;
+    margin-right: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+
+  .comic.align-right {
+    float: right;
+    margin-left: var(--space-4);
+    margin-bottom: var(--space-2);
   }
 
   .comic-frame {

@@ -161,7 +161,13 @@
 
   .ctas {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .ctas :global(a) {
+    text-align: center;
+    justify-content: center;
   }
 
   .nav {

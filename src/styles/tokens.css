@@ -1,119 +1,141 @@
 :root {
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      COLORS - Backgrounds
      ───────────────────────────────────────────────────────────────────────── */
-  --bg-primary: #F8F5ED;
-  --bg-secondary: #F4F0E7;
-  --bg-tertiary: #F0ECE3;
-  --bg-card: rgba(238, 234, 225, 0.72);
-  --bg-card-hover: rgba(232, 227, 217, 0.92);
-  --bg-overlay: rgba(50, 46, 42, 0.4);
+   --bg-primary: #F8F5ED;
+   --bg-secondary: #F4F0E7;
+   --bg-tertiary: #F0ECE3;
+   --bg-card: rgba(238, 234, 225, 0.72);
+   --bg-card-hover: rgba(232, 227, 217, 0.92);
+   --bg-overlay: rgba(50, 46, 42, 0.4);
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      COLORS - Text
      ───────────────────────────────────────────────────────────────────────── */
-  --text-primary: #2B2926;
-  --text-secondary: #5C5954;
-  --text-tertiary: #6B675F;
-  --text-muted: #8A8680;
-  --text-faded: #9A958D;
-  --text-ghost: #AAA59D;
+   --text-primary: #2B2926;
+   --text-secondary: #5C5954;
+   --text-tertiary: #6B675F;
+   --text-muted: #8A8680;
+   --text-faded: #9A958D;
+   --text-ghost: #AAA59D;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      COLORS - Accent (Rust)
      ───────────────────────────────────────────────────────────────────────── */
-  --rust: #C25535;
-  --rust-dark: #B54A2D;
-  --rust-light: #D05E3D;
-  --rust-muted: #B8704C;
-  --rust-warm: #8B6B5A;
+   --rust: #C25535;
+   --rust-dark: #B54A2D;
+   --rust-light: #D05E3D;
+   --rust-muted: #B8704C;
+   --rust-warm: #8B6B5A;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      COLORS - UI Elements
      ───────────────────────────────────────────────────────────────────────── */
-  --border: #C5C0B8;
-  --border-light: #C0BAB0;
-  --border-hover: #7A756D;
-  --status-green: #8B9A6B;
+   --border: #C5C0B8;
+   --border-light: #C0BAB0;
+   --border-hover: #7A756D;
+   --status-green: #8B9A6B;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      COLORS - Syntax Highlighting
      ───────────────────────────────────────────────────────────────────────── */
-  --syntax-bg: #EBE8E1;
-  --syntax-text: #2B2926;
-  --syntax-keyword: #BF4D28;
-  --syntax-string: #5A7A5A;
-  --syntax-function: #6B5A4A;
-  --syntax-comment: #8A8680;
-  --syntax-number: #7A5A6A;
-  --syntax-operator: #5C5954;
+   --syntax-bg: #EBE8E1;
+   --syntax-text: #2B2926;
+   --syntax-keyword: #BF4D28;
+   --syntax-string: #5A7A5A;
+   --syntax-function: #6B5A4A;
+   --syntax-comment: #8A8680;
+   --syntax-number: #7A5A6A;
+   --syntax-operator: #5C5954;
 
-  /* Shiki CSS Variables theme mapping */
-  --astro-code-color-text: var(--syntax-text);
-  --astro-code-color-background: var(--syntax-bg);
-  --astro-code-token-constant: var(--syntax-number);
-  --astro-code-token-string: var(--syntax-string);
-  --astro-code-token-comment: var(--syntax-comment);
-  --astro-code-token-keyword: var(--syntax-keyword);
-  --astro-code-token-parameter: var(--syntax-text);
-  --astro-code-token-function: var(--syntax-function);
-  --astro-code-token-string-expression: var(--syntax-string);
-  --astro-code-token-punctuation: var(--syntax-operator);
+   /* Shiki CSS Variables theme mapping */
+   --astro-code-color-text: var(--syntax-text);
+   --astro-code-color-background: var(--syntax-bg);
+   --astro-code-token-constant: var(--syntax-number);
+   --astro-code-token-string: var(--syntax-string);
+   --astro-code-token-comment: var(--syntax-comment);
+   --astro-code-token-keyword: var(--syntax-keyword);
+   --astro-code-token-parameter: var(--syntax-text);
+   --astro-code-token-function: var(--syntax-function);
+   --astro-code-token-string-expression: var(--syntax-string);
+   --astro-code-token-punctuation: var(--syntax-operator);
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      TYPOGRAPHY
      ───────────────────────────────────────────────────────────────────────── */
-  --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
-  --font-annotation: 'Caveat', cursive;
-  --font-blog: 'Source Serif 4', 'Georgia', serif;
+   --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+   --font-annotation: 'Caveat', cursive;
+   --font-blog: 'Source Serif 4', 'Georgia', serif;
 
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 2rem;
+   --text-xs: 0.75rem;
+   --text-sm: 0.875rem;
+   --text-base: 1rem;
+   --text-lg: 1.125rem;
+   --text-xl: 1.25rem;
+   --text-2xl: 1.5rem;
+   --text-3xl: 2rem;
 
-  --leading-tight: 1.2;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.7;
+   --leading-tight: 1.2;
+   --leading-normal: 1.5;
+   --leading-relaxed: 1.7;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      SPACING
      ───────────────────────────────────────────────────────────────────────── */
-  --space-1: 0.5rem;
-  --space-2: 1rem;
-  --space-3: 1.5rem;
-  --space-4: 2rem;
-  --space-5: 3rem;
-  --space-6: 4rem;
-  --space-7: 6rem;
+   --space-1: 0.5rem;
+   --space-2: 1rem;
+   --space-3: 1.5rem;
+   --space-4: 2rem;
+   --space-5: 3rem;
+   --space-6: 4rem;
+   --space-7: 6rem;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      ANIMATION
      ───────────────────────────────────────────────────────────────────────── */
-  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+   --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  --duration-fast: 150ms;
-  --duration-normal: 200ms;
-  --duration-slow: 300ms;
-  --duration-breath: 4s;
+   --duration-fast: 150ms;
+   --duration-normal: 200ms;
+   --duration-slow: 300ms;
+   --duration-breath: 4s;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      LAYOUT
      ───────────────────────────────────────────────────────────────────────── */
-  --max-width: 820px;
-  --content-padding: 2.5rem;
-  --nav-height: 56px;
+   --max-width: 820px;
+   --content-padding: 2.5rem;
+   --nav-height: 56px;
 
-  /* ─────────────────────────────────────────────────────────────────────────
+   /* ─────────────────────────────────────────────────────────────────────────
      SHADOWS
      ───────────────────────────────────────────────────────────────────────── */
-  --shadow-sm: 0 2px 8px rgba(80, 70, 60, 0.04);
-  --shadow-md: 0 8px 24px rgba(80, 70, 60, 0.12);
-  --shadow-lg: 0 12px 40px rgba(50, 46, 42, 0.18);
-  --shadow-rust: 0 2px 8px rgba(178, 74, 45, 0.22);
-  --shadow-rust-hover: 0 8px 20px rgba(178, 74, 45, 0.35);
+   --shadow-sm: 0 2px 8px rgba(80, 70, 60, 0.04);
+   --shadow-md: 0 8px 24px rgba(80, 70, 60, 0.12);
+   --shadow-lg: 0 12px 40px rgba(50, 46, 42, 0.18);
+   --shadow-rust: 0 2px 8px rgba(178, 74, 45, 0.22);
+   --shadow-rust-hover: 0 8px 20px rgba(178, 74, 45, 0.35);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MOBILE OVERRIDES
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+   :root {
+      /* Reduce typography sizes */
+      --text-3xl: 1.5rem;
+      --text-2xl: 1.25rem;
+      --text-xl: 1.125rem;
+      --text-lg: 1rem;
+
+      /* Tighter spacing */
+      --space-3: 1rem;
+      --space-4: 1.5rem;
+      --space-5: 2rem;
+      --space-6: 3rem;
+
+      /* Layout adjustments */
+      --content-padding: 1.25rem;
+   }
 }

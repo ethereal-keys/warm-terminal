@@ -2,12 +2,37 @@
 interface Props {
   title?: string;
   class?: string;
+  align?: 'left' | 'center' | 'right';
+  width?: string;
+  fontSize?: string; // e.g. "12px", "0.8rem", "xs", "sm"
 }
 
-const { title, class: className } = Astro.props;
+const { 
+  title, 
+  class: className,
+  align = 'center',
+  width,
+  fontSize = '12px'
+} = Astro.props;
+
+// Map named sizes to CSS vars if needed, or pass through
+const sizeMap: Record<string, string> = {
+  xs: '10px',
+  sm: '12px',
+  base: '14px',
+  lg: '16px'
+};
+
+const finalFontSize = sizeMap[fontSize] || fontSize;
 ---
 
-<figure class:list={["ascii-diagram", className]}>
+<figure 
+  class:list={["ascii-diagram", `align-${align}`, className]} 
+  style={{ 
+    width: width, 
+    '--diagram-font-size': finalFontSize 
+  }}
+>
   <div class="diagram-frame">
     <span class="corner corner--tl">┌</span>
     <span class="corner corner--tr">┐</span>
@@ -22,14 +47,33 @@ const { title, class: className } = Astro.props;
 <style>
   .ascii-diagram {
     margin: var(--space-4) 0;
+    display: table;
+    max-width: 100%;
+  }
+
+  .ascii-diagram.align-center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ascii-diagram.align-left {
+    float: left;
+    margin-right: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+
+  .ascii-diagram.align-right {
+    float: right;
+    margin-left: var(--space-4);
+    margin-bottom: var(--space-2);
   }
 
   .diagram-frame {
     position: relative;
     background: var(--bg-secondary);
     border: 1px solid var(--border-light);
-    padding: var(--space-2) var(--space-3);
-    overflow-x: auto;
+    padding: var(--space-3); /* Increased padding */
+    overflow: hidden; /* Hide scrollbars, trust fit-content */
   }
 
   .corner {
@@ -49,13 +93,23 @@ const { title, class: className } = Astro.props;
   .diagram-content {
     margin: 0;
     font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    line-height: 1.4;
+    font-size: var(--diagram-font-size);
+    line-height: 1.3;
     color: var(--text-primary);
     background: transparent;
     padding: 0;
     border: none;
     white-space: pre;
+    overflow-x: auto; /* Allow scrolling */
+    scrollbar-width: none; /* Firefox hide scrollbar */
+    -ms-overflow-style: none; /* IE/Edge hide scrollbar */
+  }
+  
+  .diagram-content::-webkit-scrollbar {
+    display: none; /* Chrome/Safari hide scrollbar */
+    width: 0;
+    height: 0;
+    background: transparent;
   }
 
   .diagram-caption {

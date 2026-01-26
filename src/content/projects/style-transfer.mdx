@@ -38,6 +38,10 @@ The breakthrough came from Johnson et al.'s feed-forward approach. Instead of
 optimizing at runtime, we train a network to perform the transformation in a
 single forward pass.
 
+## Demo
+ 
+<YouTubeEmbed videoId="ad-yBz3aguA" title="Style Transfer Demo" />
+ 
 ## Technical Implementation
 
 The plugin integrates with Godot's rendering pipeline:
@@ -46,13 +50,30 @@ The plugin integrates with Godot's rendering pipeline:
 2. Pass through PyTorch model via C++ bindings
 3. Return stylized texture to viewport
 4. Maintain 60fps target
-
+ 
+<AsciiDiagram title="Pipeline Architecture">
+{`+-------------+      +-------------+      +-------------+
+|  Viewport   | ---> |  C++ Bind   | ---> |   PyTorch   |
+|   Texture   |      |   (GDExt)   |      |    Model    |
++-------------+      +-------------+      +-------------+
+       ^                                         |
+       |                                         |
+       +-----------------------------------------+
+                    Stylized Frame`}
+</AsciiDiagram>
+ 
 ## Reflections
 
 ### What Worked
 - The feed-forward architecture delivered real-time performance
 - C++ integration with Godot was cleaner than expected
 
+<Comic 
+  src="https://imgs.xkcd.com/comics/machine_learning.png" 
+  alt="XKCD Machine Learning" 
+  caption="relevant xkcd as always" 
+/>
+ 
 ### What I'd Do Differently
 - Start with a simpler style transfer model
 - Profile GPU memory usage earlier in development
