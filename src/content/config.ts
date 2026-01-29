@@ -13,6 +13,10 @@ const projectsCollection = defineCollection({
     demo: z.string().url().optional(),
     paper: z.string().url().optional(),
     order: z.number().default(0),
+    tabs: z.array(z.object({
+      label: z.string(),
+      id: z.string(),
+    })).optional(),
   }),
 });
 

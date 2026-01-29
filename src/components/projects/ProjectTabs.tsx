@@ -7,7 +7,8 @@ interface Tab {
   targetId: string; // The heading ID to scroll to
 }
 
-const TABS: Tab[] = [
+// Keep TABS as a fallback only
+const DEFAULT_TABS: Tab[] = [
   { id: 'overview', label: './overview', targetId: 'overview' },
   { id: 'technical', label: './technical', targetId: 'technical-implementation' },
   { id: 'demo', label: './demo', targetId: 'demo' },
@@ -16,10 +17,16 @@ const TABS: Tab[] = [
 
 interface ProjectTabsProps {
   children: ReactNode;
+  tabs?: { label: string; id: string }[];
 }
 
-export default function ProjectTabs({ children }: ProjectTabsProps) {
-  const [activeTab, setActiveTab] = useState('overview');
+export default function ProjectTabs({ children, tabs }: ProjectTabsProps) {
+  // Convert passed tabs to component format or use default
+  const activeTabs = tabs
+    ? tabs.map(t => ({ id: t.id, label: t.label, targetId: t.id }))
+    : DEFAULT_TABS;
+
+  const [activeTab, setActiveTab] = useState(activeTabs[0]?.id || 'overview');
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0 });
   const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
   const navRef = useRef<HTMLElement>(null);
@@ -55,10 +62,10 @@ export default function ProjectTabs({ children }: ProjectTabsProps) {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 150;
 
-      for (let i = TABS.length - 1; i >= 0; i--) {
-        const element = document.getElementById(TABS[i].targetId);
+      for (let i = activeTabs.length - 1; i >= 0; i--) {
+        const element = document.getElementById(activeTabs[i].targetId);
         if (element && element.offsetTop <= scrollPosition) {
-          setActiveTab(TABS[i].id);
+          setActiveTab(activeTabs[i].id);
           break;
         }
       }
@@ -66,12 +73,12 @@ export default function ProjectTabs({ children }: ProjectTabsProps) {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [activeTabs]);
 
   return (
     <div className={styles.tabs}>
       <nav className={styles.tabNav} ref={navRef}>
-        {TABS.map(tab => (
+        {activeTabs.map(tab => (
           <button
             key={tab.id}
             ref={el => { tabRefs.current[tab.id] = el; }}

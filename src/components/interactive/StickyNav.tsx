@@ -102,9 +102,13 @@ export default function StickyNav({
           <SoundToggle soundOn={soundOn} onToggle={toggleSound} />
 
           {isDeep && (
-            <a href={breadcrumb[0]?.path || '/'} className={styles.upButton} aria-label="Go back">
+            <button
+              className={styles.upButton}
+              aria-label="Scroll to top"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
               ↑
-            </a>
+            </button>
           )}
         </div>
       </nav>

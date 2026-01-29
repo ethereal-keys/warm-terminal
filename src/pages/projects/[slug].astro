@@ -30,6 +30,7 @@ const { project, prevProject, nextProject } = Astro.props;
 const { Content } = await project.render();
 import YouTubeEmbed from '@/components/content/YouTubeEmbed.astro';
 import DemoEmbed from '@/components/content/DemoEmbed.astro';
+import ReadingProgress from '@/components/interactive/ReadingProgress';
 import Comic from '@/components/content/Comic.astro';
 import AsciiDiagram from '@/components/content/AsciiDiagram.astro';
 ---
@@ -40,10 +41,12 @@ import AsciiDiagram from '@/components/content/AsciiDiagram.astro';
       { label: 'projects', path: '/projects' },
       { label: project.slug, path: `/projects/${project.slug}` }
     ]}
-  />
+  >
+    <ReadingProgress client:load slot="progress" />
+  </Header>
 
   <main id="main" class="project-page">
-    <article class="project-content">
+    <article class="project-content" id="post-content">
       <span class="corner corner--tl">┌</span>
       <span class="corner corner--tr">┐</span>
       <span class="corner corner--bl">└</span>
@@ -76,7 +79,7 @@ import AsciiDiagram from '@/components/content/AsciiDiagram.astro';
         </div>
       </header>
 
-      <ProjectTabs client:load>
+      <ProjectTabs client:load tabs={project.data.tabs}>
         <div class="prose">
         <Content components={{ YouTubeEmbed, DemoEmbed, Comic, AsciiDiagram }} />
       </div>
