@@ -1,15 +1,33 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+/**
+ * Command Palette with Sound Effects
+ * 
+ * Updated to trigger sounds on:
+ * - Open: paletteOpen
+ * - Close: paletteClose  
+ * - Navigate (arrow keys): paletteNav
+ * - Select: paletteSelect
+ * - No results: error
+ * - Easter egg found: easterEgg
+ */
+
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { SITE } from '@/lib/config';
-import type { CommandPaletteProps } from '@/types';
+import { useSound } from '@/hooks/useSound';
 import styles from './CommandPalette.module.css';
 
 interface PaletteItem {
   id: string;
-  type: 'navigation' | 'command' | 'recent';
+  type: 'navigation' | 'command';
   label: string;
   description: string;
   path?: string;
-  action?: () => void;
+}
+
+interface CommandPaletteProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onNavigate: (path: string) => void;
+  currentPath?: string;
 }
 
 const EASTER_EGGS: Record<string, string> = {
@@ -30,6 +48,8 @@ export function CommandPalette({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [easterEggMessage, setEasterEggMessage] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const prevOpenRef = useRef(isOpen);
+  const { play } = useSound();
 
   const navItems: PaletteItem[] = SITE.nav.map(item => ({
     id: item.id,
@@ -46,6 +66,18 @@ export function CommandPalette({
       )
     : navItems;
 
+  // Play open/close sounds
+  useEffect(() => {
+    if (isOpen && !prevOpenRef.current) {
+      // Just opened
+      play('paletteOpen');
+    } else if (!isOpen && prevOpenRef.current) {
+      // Just closed
+      play('paletteClose');
+    }
+    prevOpenRef.current = isOpen;
+  }, [isOpen, play]);
+
   useEffect(() => {
     if (isOpen) {
       setQuery('');
@@ -55,29 +87,53 @@ export function CommandPalette({
     }
   }, [isOpen]);
 
+  // Easter egg detection
   useEffect(() => {
     const lowerQuery = query.toLowerCase().trim();
     if (EASTER_EGGS[lowerQuery]) {
+      if (!easterEggMessage) {
+        play('easterEgg');
+      }
       setEasterEggMessage(EASTER_EGGS[lowerQuery]);
     } else {
       setEasterEggMessage(null);
     }
-  }, [query]);
+  }, [query, easterEggMessage, play]);
+
+  // Play error sound when no results
+  useEffect(() => {
+    if (query && filteredItems.length === 0 && !easterEggMessage) {
+      play('error');
+    }
+  }, [filteredItems.length, query, easterEggMessage, play]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex(i => Math.min(i + 1, filteredItems.length - 1));
+        if (filteredItems.length > 0) {
+          setSelectedIndex(i => {
+            const newIndex = Math.min(i + 1, filteredItems.length - 1);
+            if (newIndex !== i) play('paletteNav');
+            return newIndex;
+          });
+        }
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setSelectedIndex(i => Math.max(i - 1, 0));
+        if (filteredItems.length > 0) {
+          setSelectedIndex(i => {
+            const newIndex = Math.max(i - 1, 0);
+            if (newIndex !== i) play('paletteNav');
+            return newIndex;
+          });
+        }
         break;
       case 'Enter':
         e.preventDefault();
         const selected = filteredItems[selectedIndex];
         if (selected?.path) {
+          play('paletteSelect');
           onNavigate(selected.path);
           onClose();
         }
@@ -87,7 +143,7 @@ export function CommandPalette({
         onClose();
         break;
     }
-  }, [filteredItems, selectedIndex, onNavigate, onClose]);
+  }, [filteredItems, selectedIndex, onNavigate, onClose, play]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -159,11 +215,17 @@ export function CommandPalette({
                   className={`${styles.item} ${index === selectedIndex ? styles.selected : ''}`}
                   onClick={() => {
                     if (item.path) {
+                      play('paletteSelect');
                       onNavigate(item.path);
                       onClose();
                     }
                   }}
-                  onMouseEnter={() => setSelectedIndex(index)}
+                  onMouseEnter={() => {
+                    if (selectedIndex !== index) {
+                      play('paletteNav');
+                      setSelectedIndex(index);
+                    }
+                  }}
                 >
                   <span className={styles.itemMarker}>
                     {currentPath === item.path ? '◦' : '·'}

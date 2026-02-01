@@ -1,0 +1,39 @@
+/**
+ * LevelMeter Component Styles
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meter {
+  display: flex;
+  gap: 2px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.segment {
+  color: var(--text-tertiary, #8A8680);
+  transition: color 0.05s ease;
+}
+
+.segment.active {
+  color: var(--rust-muted, #C4674A);
+}
+
+.segment.high.active {
+  color: var(--rust, #BF4D28);
+}
+
+.labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-tertiary, #8A8680);
+  padding: 0 2px;
+}

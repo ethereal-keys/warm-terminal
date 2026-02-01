@@ -1,0 +1,152 @@
+/**
+ * SequenceTab Component Styles
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+}
+
+.container.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--panel-border, #C9C4B8);
+}
+
+.title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary, #2B2926);
+  margin: 0;
+}
+
+.duration {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-secondary, #5C5954);
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timelineHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary, #8A8680);
+}
+
+.timelineTrack {
+  background: var(--panel-inset, #D4CFC4);
+  border: 1px solid var(--panel-border, #C9C4B8);
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.timelineSvg {
+  display: block;
+  width: 100%;
+  height: 70px;
+}
+
+/* Note Editor */
+.noteEditor {
+  background: var(--panel-inset, #D4CFC4);
+  border: 1px solid var(--panel-border, #C9C4B8);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.noteHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--panel-border, #C9C4B8);
+}
+
+.noteLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary, #2B2926);
+}
+
+.noteActions {
+  display: flex;
+  gap: 8px;
+}
+
+.actionButton {
+  padding: 4px 10px;
+  background: var(--panel-bg, #E8E4D9);
+  border: 1px solid var(--panel-border, #C9C4B8);
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary, #5C5954);
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.actionButton:hover:not(:disabled) {
+  background: var(--cream, #F5F2EB);
+  border-color: var(--rust-muted, #C4674A);
+  color: var(--text-primary, #2B2926);
+}
+
+.actionButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: rgba(191, 77, 40, 0.1);
+  border-color: var(--rust, #BF4D28);
+  color: var(--rust, #BF4D28);
+}
+
+/* Note Parameters */
+.noteParams {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.noteRow {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.waveformRow {
+  display: flex;
+  justify-content: flex-start;
+}

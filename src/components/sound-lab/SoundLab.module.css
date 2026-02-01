@@ -1,0 +1,912 @@
+/**
+ * Sound Lab - Terminal aesthetic on aged graph paper
+ */
+
+.page {
+  min-height: 100vh;
+  background: #E8E4D9;
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+  font-family: 'JetBrains Mono', monospace;
+
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+.page *:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.page button {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page input[type="range"]:focus {
+  outline: none;
+}
+
+.paper {
+  width: 100%;
+  max-width: 720px;
+  background: #F5F2EB;
+  border-radius: 2px;
+  padding: 32px 40px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 6px 16px rgba(0, 0, 0, 0.04);
+
+  background-image:
+    radial-gradient(circle, rgba(201, 196, 184, 0.4) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+  background-size: 20px 20px, auto;
+  background-position: 10px 10px, 0 0;
+}
+
+.rule {
+  height: 1px;
+  margin: 20px 0;
+  background: repeating-linear-gradient(90deg, #C9C4B8 0px, #C9C4B8 6px, transparent 6px, transparent 12px);
+}
+
+/* ============================================= */
+/* HEADER                                        */
+/* ============================================= */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2B2926;
+  letter-spacing: -0.02em;
+}
+
+.headerTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.helpBtn {
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  color: #5C5954;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px dashed #C9C4B8;
+  border-radius: 4px;
+  /* Matches .back radius */
+  transition: all 0.15s;
+}
+
+.helpBtn:hover {
+  color: #BF4D28;
+  border-color: #BF4D28;
+  background: rgba(191, 77, 40, 0.05);
+}
+
+.scaleWrap {
+  position: relative;
+}
+
+.scaleBtn {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 11px;
+  color: #5C5954;
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.scaleBtn:hover {
+  color: #BF4D28;
+}
+
+.scaleMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #F5F2EB;
+  border: 1px solid #D4CFC4;
+  border-radius: 2px;
+  padding: 6px 0;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.scaleOption {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 11px;
+  color: #5C5954;
+  padding: 5px 14px;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.scaleOption:hover {
+  background: rgba(0, 0, 0, 0.03);
+  color: #2B2926;
+}
+
+/* Playful back button */
+.back {
+  font-size: 12px;
+  color: #5C5954;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px dashed #C9C4B8;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.back:hover {
+  color: #BF4D28;
+  border-color: #BF4D28;
+  background: rgba(191, 77, 40, 0.05);
+}
+
+.backIcon {
+  font-size: 14px;
+  transition: transform 0.15s;
+}
+
+.back:hover .backIcon {
+  transform: translateX(-3px);
+}
+
+/* ============================================= */
+/* SOUND INFO                                    */
+/* ============================================= */
+
+.soundInfo {
+  margin: 8px 0;
+}
+
+.soundLine {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.prompt {
+  color: #BF4D28;
+  font-weight: 500;
+}
+
+.soundName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2B2926;
+  cursor: pointer;
+  border-bottom: 1px dashed transparent;
+  transition: border-color 0.15s;
+}
+
+.soundName:hover {
+  border-bottom-color: #B8B3A8;
+}
+
+.nameInput {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2B2926;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #BF4D28;
+  outline: none;
+  padding: 0;
+  width: 150px;
+}
+
+.duration {
+  font-size: 11px;
+  color: #8A8680;
+  margin-left: 8px;
+}
+
+.modified {
+  margin-left: auto;
+  font-size: 11px;
+  color: #BF4D28;
+}
+
+.soundDesc {
+  font-size: 11px;
+  color: #5C5954;
+  margin-top: 4px;
+  margin-left: 16px;
+}
+
+/* ============================================= */
+/* DISPLAY ROW                                   */
+/* ============================================= */
+
+.displayRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.graphBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.canvas {
+  border: 1px solid #B8B3A8;
+  border-radius: 2px;
+  display: block;
+  background: #F5F2EB;
+}
+
+.graphLabel {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 11px;
+  color: #5C5954;
+  cursor: pointer;
+  padding: 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.graphLabel:hover {
+  color: #BF4D28;
+}
+
+.graphLabelStatic {
+  font-size: 11px;
+  color: #5C5954;
+  text-align: center;
+}
+
+/* ============================================= */
+/* ARC METER                                     */
+/* ============================================= */
+
+.arcMeter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.arcMeterCanvas {
+  display: block;
+}
+
+.arcMeterLabel {
+  font-size: 11px;
+  color: #5C5954;
+  text-align: center;
+}
+
+/* ============================================= */
+/* CONTROLS                                      */
+/* ============================================= */
+
+.controls {
+  min-height: 180px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.panelTitle {
+  font-size: 12px;
+  color: #2B2926;
+  font-weight: 500;
+}
+
+.panelInner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panelInner.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.meta {
+  color: #8A8680;
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+/* ============================================= */
+/* TERMINAL SLIDERS                              */
+/* ============================================= */
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 28px;
+}
+
+.sliderLabel {
+  width: 50px;
+  font-size: 12px;
+  color: #5C5954;
+  flex-shrink: 0;
+}
+
+.sliderTrack {
+  flex: 1;
+  position: relative;
+  height: 28px;
+}
+
+/* Double-line track */
+.sliderTrackLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 0;
+  border-top: 2px solid #8A8680;
+  border-bottom: 2px solid #8A8680;
+  padding: 1px 0;
+  pointer-events: none;
+}
+
+/* Hidden native input */
+.sliderInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+  z-index: 2;
+}
+
+.sliderInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  cursor: grab;
+}
+
+.sliderInput::-webkit-slider-thumb:active {
+  cursor: grabbing;
+}
+
+.sliderInput::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  border: none;
+  cursor: grab;
+}
+
+/* Visual thumb dot */
+.sliderThumb {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  background: #2B2926;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.sliderTrack:hover .sliderThumb {
+  background: #3D3A35;
+}
+
+.sliderInput:active~.sliderThumb {
+  background: #BF4D28;
+}
+
+/* Note tick marks */
+.tickContainer {
+  position: absolute;
+  top: calc(50% + 8px);
+  left: 0;
+  right: 0;
+  height: 10px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tick {
+  position: absolute;
+  width: 1px;
+  height: 5px;
+  background: #8A8580;
+  transform: translateX(-50%);
+}
+
+.sliderValue {
+  min-width: 100px;
+  font-size: 12px;
+  color: #2B2926;
+  text-align: right;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================= */
+/* WAVE SELECT                                   */
+/* ============================================= */
+
+.waveOptions {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+}
+
+.waveBtn {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 12px;
+  color: #8A8680;
+  cursor: pointer;
+  padding: 2px 0;
+  white-space: nowrap;
+  transition: color 0.1s;
+}
+
+.waveBtn:hover {
+  color: #5C5954;
+}
+
+.waveSel {
+  color: #2B2926;
+  font-weight: 500;
+}
+
+/* ============================================= */
+/* TOGGLE                                        */
+/* ============================================= */
+
+.toggle {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 12px;
+  color: #2B2926;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  font-weight: 500;
+}
+
+.toggle:hover {
+  color: #BF4D28;
+}
+
+/* ============================================= */
+/* TABS                                          */
+/* ============================================= */
+
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 12px;
+  color: #8A8680;
+  cursor: pointer;
+  padding: 0 0 4px 0;
+  transition: color 0.1s;
+  border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+  color: #5C5954;
+}
+
+.tabActive {
+  color: #2B2926;
+  font-weight: 500;
+  border-bottom-color: #2B2926;
+}
+
+.tabSpacer {
+  flex: 1;
+}
+
+.tabBtn {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 11px;
+  color: #8A8680;
+  cursor: pointer;
+  padding: 0;
+}
+
+.tabBtn:hover {
+  color: #BF4D28;
+}
+
+.tabBtnDisabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* ============================================= */
+/* SOUND GRID                                    */
+/* ============================================= */
+
+.soundGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.gridItemWrap {
+  position: relative;
+}
+
+.gridItem {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid #D4CFC4;
+  border-radius: 2px;
+  font: inherit;
+  font-size: 10px;
+  color: #5C5954;
+  cursor: pointer;
+  padding: 8px 4px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.1s;
+  min-height: 36px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gridItem:hover {
+  border-color: #B8B3A8;
+  color: #2B2926;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.gridItem.gridSel {
+  background: rgba(191, 77, 40, 0.1);
+  border-color: #BF4D28;
+  color: #BF4D28;
+  font-weight: 500;
+}
+
+.gridDelete {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  background: #F5F2EB;
+  border: 1px solid #D4CFC4;
+  border-radius: 50%;
+  font: inherit;
+  font-size: 11px;
+  line-height: 14px;
+  color: #8A8680;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.1s, color 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.gridItemWrap:hover .gridDelete {
+  opacity: 1;
+}
+
+.gridDelete:hover {
+  background: #BF4D28;
+  border-color: #BF4D28;
+  color: white;
+}
+
+.gridAdd {
+  background: none;
+  border: 1px dashed #C9C4B8;
+  border-radius: 2px;
+  font: inherit;
+  font-size: 14px;
+  color: #8A8680;
+  cursor: pointer;
+  padding: 8px 4px;
+  min-height: 36px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gridAdd:hover {
+  border-color: #BF4D28;
+  color: #BF4D28;
+}
+
+/* ============================================= */
+/* SEQUENCE                                      */
+/* ============================================= */
+
+.seqRow {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.seqNote {
+  background: #E8E4D9;
+  border: none;
+  border-radius: 2px;
+  font: inherit;
+  font-size: 11px;
+  color: #5C5954;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.seqNote:hover {
+  background: #DDD9D0;
+}
+
+.seqNote.seqSel {
+  background: #BF4D28;
+  color: white;
+}
+
+.seqBtn {
+  background: none;
+  border: 1px dashed #D4CFC4;
+  border-radius: 2px;
+  font: inherit;
+  font-size: 12px;
+  color: #8A8680;
+  cursor: pointer;
+  padding: 4px 10px;
+}
+
+.seqBtn:hover {
+  border-color: #BF4D28;
+  color: #BF4D28;
+}
+
+/* ============================================= */
+/* MODAL                                         */
+/* ============================================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 41, 38, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modalBox {
+  background: #F5F2EB;
+  padding: 24px 32px;
+  border-radius: 2px;
+  max-width: 360px;
+  min-width: 280px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+
+  background-image:
+    radial-gradient(circle, #D4CFC4 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+  background-size: 20px 20px, auto;
+  background-position: 10px 10px, 0 0;
+}
+
+.modalTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2B2926;
+}
+
+.modalBox p {
+  font-size: 12px;
+  color: #5C5954;
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.modalField {
+  margin: 16px 0;
+}
+
+.modalField label {
+  display: block;
+  font-size: 11px;
+  color: #5C5954;
+  margin-bottom: 6px;
+}
+
+.modalInput {
+  width: 100%;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #D4CFC4;
+  border-radius: 2px;
+  color: #2B2926;
+  box-sizing: border-box;
+}
+
+.modalInput:focus {
+  border-color: #BF4D28;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.modalOptions {
+  display: flex;
+  gap: 16px;
+}
+
+.modalOption {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 12px;
+  color: #5C5954;
+  cursor: pointer;
+  padding: 0;
+}
+
+.modalOption:hover {
+  color: #2B2926;
+}
+
+.modalOptionSel {
+  color: #2B2926;
+  font-weight: 500;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.modalActions button {
+  background: none;
+  border: 1px solid #D4CFC4;
+  font: inherit;
+  font-size: 11px;
+  color: #5C5954;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 2px;
+  transition: all 0.1s;
+}
+
+.modalActions button:hover {
+  border-color: #B8B3A8;
+  color: #2B2926;
+}
+
+.modalActions button:last-child {
+  background: rgba(191, 77, 40, 0.1);
+  border-color: #BF4D28;
+  color: #BF4D28;
+}
+
+.modalActions button:last-child:hover {
+  background: #BF4D28;
+  color: white;
+}
+
+.modalActions button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.helpGrid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 16px;
+  font-size: 12px;
+}
+
+.helpGrid span:nth-child(odd) {
+  color: #2B2926;
+  font-weight: 500;
+}
+
+.helpGrid span:nth-child(even) {
+  color: #5C5954;
+}
+
+/* ============================================= */
+/* RESPONSIVE                                    */
+/* ============================================= */
+
+@media (max-width: 640px) {
+  .paper {
+    padding: 24px 20px;
+  }
+
+  .displayRow {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .soundGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .sliderValue {
+    min-width: 80px;
+  }
+
+  .waveOptions {
+    gap: 8px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    gap: 8px 16px;
+  }
+}

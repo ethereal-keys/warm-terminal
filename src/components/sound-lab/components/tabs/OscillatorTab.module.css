@@ -1,0 +1,100 @@
+/**
+ * OscillatorTab Component Styles
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--panel-border, #C9C4B8);
+}
+
+.title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary, #2B2926);
+  margin: 0;
+}
+
+/* Sections */
+.section {
+  transition: opacity 0.2s ease;
+}
+
+.section.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary, #8A8680);
+}
+
+/* Layout */
+.row {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.knobGroup {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.knobRow {
+  display: flex;
+  gap: 20px;
+}
+
+/* Pitch Envelope */
+.pitchEnvelope {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: opacity 0.2s ease;
+}
+
+.pitchEnvelope.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Pitch Curve Preview */
+.pitchCurve {
+  background: var(--panel-inset, #D4CFC4);
+  border: 1px solid var(--panel-border, #C9C4B8);
+  border-radius: 4px;
+  padding: 8px;
+  max-width: 300px;
+}
+
+.curveSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+}

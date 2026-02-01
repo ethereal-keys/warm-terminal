@@ -49,7 +49,12 @@ export default function HeroContent() {
           <p className={styles.tagline}>{SITE.tagline}</p>
         </div>
 
-        <SoundToggle soundOn={soundOn} onToggle={toggleSound} />
+        <div className={styles.soundControl}>
+          <SoundToggle soundOn={soundOn} onToggle={toggleSound} />
+          <a href="/sound-lab" className={styles.advancedLink}>
+            [ advanced <span className={styles.settingsIcon}>⚙</span> ]
+          </a>
+        </div>
       </div>
 
       {/* Terminal lines */}
@@ -60,33 +65,36 @@ export default function HeroContent() {
             <TypedLine text={SITE.status} delay={TIMING.typingDelay} speed={TIMING.typingSpeed} />
           </span>
         </div>
-
-        {SITE.experience.map((line, i) => (
-          <div key={i} className={styles.terminalLine}>
-            <span className={styles.prompt}>{line.prefix}</span>
-            <span className={styles.output}>{line.text}</span>
-          </div>
-        ))}
+        {
+          SITE.experience.map((line, i) => (
+            <div key={i} className={styles.terminalLine}>
+              <span className={styles.prompt}>{line.prefix}</span>
+              <span className={styles.output}>{line.text}</span>
+            </div>
+          ))
+        }
       </div>
 
       {/* CTAs */}
-      <div className={styles.ctas}>
+      < div className={styles.ctas} >
         <a href="/projects" className="btn-primary">[ view projects ]</a>
         <a href="/Sushanth_resume.pdf" download className="btn-secondary">[ download resume ]</a>
         <span className={styles.ctaAnnotation}>← jan '25</span>
-      </div>
+      </div >
 
       {/* Navigation */}
-      <nav className={styles.nav}>
-        {SITE.nav.map((item, i) => (
-          <NavItem
-            key={item.id}
-            item={item}
-            isFirst={i === 0}
-          />
-        ))}
-      </nav>
-    </div>
+      < nav className={styles.nav} >
+        {
+          SITE.nav.map((item, i) => (
+            <NavItem
+              key={item.id}
+              item={item}
+              isFirst={i === 0}
+            />
+          ))
+        }
+      </nav >
+    </div >
   );
 }
 

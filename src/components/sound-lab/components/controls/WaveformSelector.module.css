@@ -1,0 +1,78 @@
+/**
+ * WaveformSelector Component Styles
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.container.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary, #8A8680);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-inset, #D4CFC4);
+  border: 1px solid var(--panel-border, #C9C4B8);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--panel-border, #C9C4B8);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary, #5C5954);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  text-align: left;
+}
+
+.option:last-child {
+  border-bottom: none;
+}
+
+.option:hover:not(:disabled) {
+  background: rgba(191, 77, 40, 0.05);
+  color: var(--text-primary, #2B2926);
+}
+
+.option.selected {
+  background: var(--panel-bg, #E8E4D9);
+  color: var(--rust, #BF4D28);
+}
+
+.option:focus {
+  outline: none;
+}
+
+.option:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--rust, #BF4D28);
+}
+
+.indicator {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.text {
+  font-weight: 500;
+}

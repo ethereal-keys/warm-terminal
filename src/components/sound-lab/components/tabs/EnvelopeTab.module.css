@@ -1,0 +1,73 @@
+/**
+ * EnvelopeTab Component Styles
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px;
+}
+
+.container.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--panel-border, #C9C4B8);
+}
+
+.title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary, #2B2926);
+  margin: 0;
+}
+
+.duration {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-secondary, #5C5954);
+}
+
+/* Curve Container */
+.curveContainer {
+  background: var(--panel-inset, #D4CFC4);
+  border: 1px solid var(--panel-border, #C9C4B8);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.curve {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 150px;
+}
+
+.curveLabels {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 20px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary, #5C5954);
+}
+
+/* Knobs */
+.knobs {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}

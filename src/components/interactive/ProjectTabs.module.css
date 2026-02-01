@@ -1,0 +1,74 @@
+/* ProjectTabs.module.css */
+
+.container {
+  width: 100%;
+}
+
+.tabList {
+  display: flex;
+  gap: var(--space-1, 8px);
+  border-bottom: 1px solid var(--border-light, #E0DCD3);
+  margin-bottom: var(--space-3, 24px);
+  padding-bottom: var(--space-1, 8px);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: var(--text-sm, 14px);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #5C5954);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--text-primary, #2B2926);
+}
+
+.tab.active {
+  color: var(--rust-muted, #C4674A);
+}
+
+.tabMarker {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.tab.active .tabMarker {
+  opacity: 1;
+}
+
+.panel {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .tabList {
+    gap: var(--space-0, 4px);
+  }
+  
+  .tab {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+}

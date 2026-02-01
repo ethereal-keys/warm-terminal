@@ -1,9 +1,17 @@
-import { useState } from 'react';
+/**
+ * Signature Mark with Sound Effects
+ * 
+ * Updated to play:
+ * - easterEgg: When clicking 7 times triggers the easter egg
+ */
+
+import { useState, useEffect, useRef } from 'react';
 import { useAnimationPhase } from '@/hooks/useAnimationPhase';
 import { useDelayedState } from '@/hooks/useDelayedState';
 import { useEasterEgg } from '@/hooks/useEasterEgg';
-import { Oscilloscope } from './Oscilloscope';
+import { useSound } from '@/hooks/useSound';
 import { TIMING, ANIMATION } from '@/lib/config';
+import { Oscilloscope } from './Oscilloscope';
 import styles from './SignatureMark.module.css';
 
 interface SignatureMarkProps {
@@ -21,7 +29,17 @@ export function SignatureMark({
   const noticed = useDelayedState(false, TIMING.markNoticeDelay);
   const breath = useAnimationPhase(TIMING.breathCycle, noticed);
   const { triggered: easterEggTriggered, handleClick: handleEasterEggClick } = useEasterEgg(7);
+  const prevTriggered = useRef(false);
+  const { play } = useSound();
   const isInteractive = !!onToggleSound;
+
+  // Play easter egg sound when triggered
+  useEffect(() => {
+    if (easterEggTriggered && !prevTriggered.current) {
+      play('easterEgg');
+    }
+    prevTriggered.current = easterEggTriggered;
+  }, [easterEggTriggered, play]);
 
   const breathVal = Math.sin(breath);
   const baseSpacing = compact ? 3 : 5;

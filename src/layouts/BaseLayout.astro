@@ -1,6 +1,8 @@
 ---
 import '@/styles/global.css';
+import GlobalSoundEffects from '@/components/GlobalSoundEffects';
 import { SITE } from '@/lib/config';
+import { ViewTransitions } from 'astro:transitions';
 
 interface Props {
   title?: string;
@@ -33,9 +35,12 @@ const fullTitle = title === SITE.name ? title : `${title} | ${SITE.name}`;
 
     <!-- Theme color -->
     <meta name="theme-color" content="#F8F5ED" />
+
+    <ViewTransitions />
   </head>
   <body>
     <a href="#main" class="visually-hidden">Skip to content</a>
+<GlobalSoundEffects client:only="react" />
     <slot />
   </body>
 </html>

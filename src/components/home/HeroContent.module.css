@@ -20,7 +20,34 @@
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
+  gap: var(--space-3);
   margin-bottom: 6px;
+}
+
+.soundControl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.advancedLink {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.settingsIcon {
+  font-size: 16px;
+  vertical-align: 0px;
+}
+
+.advancedLink:hover {
+  color: var(--rust);
 }
 
 .titleArea {

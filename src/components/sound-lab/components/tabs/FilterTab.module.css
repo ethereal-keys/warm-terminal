@@ -1,0 +1,156 @@
+/**
+ * FilterTab Component Styles
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--panel-border, #C9C4B8);
+}
+
+.title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary, #2B2926);
+  margin: 0;
+}
+
+/* Content */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  transition: opacity 0.2s ease;
+}
+
+.content.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Type Section */
+.typeSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary, #8A8680);
+}
+
+.typeOptions {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-inset, #D4CFC4);
+  border: 1px solid var(--panel-border, #C9C4B8);
+  border-radius: 4px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.typeButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--panel-border, #C9C4B8);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary, #5C5954);
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.typeButton:last-child {
+  border-bottom: none;
+}
+
+.typeButton:hover:not(:disabled) {
+  background: rgba(191, 77, 40, 0.05);
+  color: var(--text-primary, #2B2926);
+}
+
+.typeButton.selected {
+  background: var(--panel-bg, #E8E4D9);
+  color: var(--rust, #BF4D28);
+}
+
+.typeButton:focus {
+  outline: none;
+}
+
+.typeButton:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--rust, #BF4D28);
+}
+
+.indicator {
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* Frequency Response */
+.responseContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.responseLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary, #8A8680);
+}
+
+.response {
+  background: var(--panel-inset, #D4CFC4);
+  border: 1px solid var(--panel-border, #C9C4B8);
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.responseSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 100px;
+}
+
+.freqLabels {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 8px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-tertiary, #8A8680);
+}
+
+/* Knobs */
+.knobs {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}

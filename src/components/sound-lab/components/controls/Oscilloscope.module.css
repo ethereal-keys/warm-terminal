@@ -1,0 +1,15 @@
+/**
+ * Oscilloscope Component Styles
+ */
+
+.container {
+  border: 1px solid var(--bg-tertiary, #E0DCD3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
