@@ -11,6 +11,8 @@ import { play, stop, getWaveformData, renderToWav } from './lib/engine';
 import { DEFAULT_SOUNDS, createSound } from './lib/presets';
 import type { Sound, SimpleParams, SequenceParams, EnvelopeParams, FilterParams, OscillatorParams, SequenceNote, WaveformType } from './lib/types';
 import { generateId } from './lib/types';
+import { useSound } from '@/hooks/useSound';
+import { SoundToggle } from '@/components/interactive/SoundToggle';
 
 // =============================================================================
 // MUSICAL SCALES
@@ -77,6 +79,7 @@ function formatDuration(ms: number): string {
 // =============================================================================
 
 export default function SoundLab() {
+  const { enabled: soundOn, toggle: toggleSound } = useSound();
   const [sounds, setSounds] = useState<Record<string, Sound>>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -137,7 +140,11 @@ export default function SoundLab() {
   const allSounds = useMemo(() => Object.values(sounds), [sounds]);
 
   useEffect(() => {
-    try { localStorage.setItem('soundlab-sounds', JSON.stringify(sounds)); } catch { }
+    try {
+      localStorage.setItem('soundlab-sounds', JSON.stringify(sounds));
+      // Notify the global sound system
+      window.dispatchEvent(new Event('soundlab-update'));
+    } catch { }
   }, [sounds]);
 
   useEffect(() => {
@@ -319,10 +326,13 @@ export default function SoundLab() {
               )}
             </div>
           </div>
-          <a href="/" className={styles.back}>
-            <span className={styles.backIcon}>←</span>
-            <span>back to portfolio</span>
-          </a>
+          <div className={styles.headerRight}>
+            <a href="/" className={styles.back}>
+              <span className={styles.backIcon}>←</span>
+              <span>back to portfolio</span>
+            </a>
+            <SoundToggle soundOn={soundOn} onToggle={toggleSound} size="small" />
+          </div>
         </header>
 
         <div className={styles.rule} />

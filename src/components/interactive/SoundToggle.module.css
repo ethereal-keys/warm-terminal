@@ -16,3 +16,8 @@
   align-items: center;
   gap: 2px;
 }
+
+.small {
+  font-size: 10px;
+  gap: 4px;
+}
