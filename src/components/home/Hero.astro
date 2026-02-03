@@ -6,7 +6,10 @@ import HeroContent from './HeroContent';
 
 <section class="hero">
   <BoxFrame padding="40px 38px 36px" background="rgba(252, 250, 245, 0.5)">
-    <HeroContent client:load />
+    <!-- min-height wrapper prevents collapse while client:only hydrates -->
+    <div class="hero-content-wrapper">
+      <HeroContent client:only="react" />
+    </div>
   </BoxFrame>
 
   <div class="hero-annotation">
@@ -24,6 +27,11 @@ import HeroContent from './HeroContent';
     position: relative;
   }
 
+  /* Reserve space for HeroContent to prevent layout shift during hydration */
+  .hero-content-wrapper {
+    min-height: 340px; /* Approximate height of fully rendered HeroContent */
+  }
+
   .hero-annotation {
     position: absolute;
     right: 20px;
@@ -36,5 +44,12 @@ import HeroContent from './HeroContent';
     border-radius: 3px;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
+  }
+
+  /* Responsive min-height for mobile */
+  @media (max-width: 640px) {
+    .hero-content-wrapper {
+      min-height: 420px; /* Taller on mobile due to stacked layout */
+    }
   }
 </style>

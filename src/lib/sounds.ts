@@ -1,7 +1,7 @@
 /**
- * Warm Terminal Sound System
+ * Web Audio Synthesizer Sound System
  * 
- * Web Audio API synthesis engine matching the design doc specifications.
+ * All sounds are synthesized using Web Audio API - no audio files needed.
  * D major pentatonic tonal palette (D, E, F#, A, B) — notes that can't clash.
  * 
  * Drop-in replacement for the Howler.js version.
@@ -10,6 +10,7 @@
 import type { SoundName } from '@/types';
 import type { Sound } from '../components/sound-lab/lib/types';
 import { playCustomSound } from './sound-player';
+import { playStartupSound, cancelStartupSound, playWindDownSound } from './startup-sound';
 
 // =============================================================================
 // TONAL PALETTE - D Major Pentatonic
@@ -71,48 +72,46 @@ const SYNTHESIZERS: Record<SoundName, SoundSynthesizer> = {
     osc.frequency.value = NOTES.E4;
 
     gain.gain.setValueAtTime(volume * 0.15, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
 
     osc.connect(gain).connect(ctx.destination);
     osc.start();
-    osc.stop(ctx.currentTime + 0.03);
+    osc.stop(ctx.currentTime + 0.08);
   },
 
   tab: (ctx, volume) => {
-    // Light click - triangle wave
+    // Tab switch - soft click with slight pitch
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(600, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.05);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(NOTES.A4, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(NOTES.D4, ctx.currentTime + 0.06);
 
-    gain.gain.setValueAtTime(volume * 0.25, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+    gain.gain.setValueAtTime(volume * 0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
 
     osc.connect(gain).connect(ctx.destination);
     osc.start();
-    osc.stop(ctx.currentTime + 0.05);
+    osc.stop(ctx.currentTime + 0.06);
   },
 
   error: (ctx, volume) => {
-    // Low muted tone - B3 (resolution down)
+    // Error buzz - low frequency wobble
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    const filter = ctx.createBiquadFilter();
 
-    osc.type = 'sine';
-    osc.frequency.value = NOTES.B3;
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(NOTES.D3, ctx.currentTime);
+    osc.frequency.setValueAtTime(NOTES.E3, ctx.currentTime + 0.1);
+    osc.frequency.setValueAtTime(NOTES.D3, ctx.currentTime + 0.2);
 
-    filter.type = 'lowpass';
-    filter.frequency.value = 800;
+    gain.gain.setValueAtTime(volume * 0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
 
-    gain.gain.setValueAtTime(volume * 0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
-
-    osc.connect(filter).connect(gain).connect(ctx.destination);
+    osc.connect(gain).connect(ctx.destination);
     osc.start();
-    osc.stop(ctx.currentTime + 0.2);
+    osc.stop(ctx.currentTime + 0.3);
   },
 
   // ---------------------------------------------------------------------------
@@ -120,128 +119,88 @@ const SYNTHESIZERS: Record<SoundName, SoundSynthesizer> = {
   // ---------------------------------------------------------------------------
 
   pageTransition: (ctx, volume) => {
-    // Low warm tone + step - D3 base with A3 step
-    const now = ctx.currentTime;
-
-    // Base tone
-    const osc1 = ctx.createOscillator();
-    const gain1 = ctx.createGain();
-    osc1.type = 'sine';
-    osc1.frequency.value = NOTES.D3;
-    gain1.gain.setValueAtTime(volume * 0.2, now);
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-    osc1.connect(gain1).connect(ctx.destination);
-    osc1.start();
-    osc1.stop(now + 0.2);
-
-    // Step up
-    const osc2 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.value = NOTES.A3;
-    gain2.gain.setValueAtTime(0, now);
-    gain2.gain.linearRampToValueAtTime(volume * 0.15, now + 0.05);
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-    osc2.connect(gain2).connect(ctx.destination);
-    osc2.start();
-    osc2.stop(now + 0.2);
-  },
-
-  navShift: (ctx, volume) => {
-    // Subtle whoosh - filtered noise
-    const bufferSize = ctx.sampleRate * 0.15;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-
-    // Generate noise with envelope baked in
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.sin((i / bufferSize) * Math.PI);
-    }
-
-    const source = ctx.createBufferSource();
-    const filter = ctx.createBiquadFilter();
-    const gain = ctx.createGain();
-
-    source.buffer = buffer;
-    filter.type = 'bandpass';
-    filter.frequency.value = 1000;
-    filter.Q.value = 0.5;
-
-    gain.gain.setValueAtTime(volume * 0.1, ctx.currentTime);
-
-    source.connect(filter).connect(gain).connect(ctx.destination);
-    source.start();
-  },
-
-  // ---------------------------------------------------------------------------
-  // PALETTE (Command Palette)
-  // ---------------------------------------------------------------------------
-
-  paletteOpen: (ctx, volume) => {
-    // Two notes ascending - D4 → A4 (root + fifth)
-    const now = ctx.currentTime;
-
-    // First note: D4
-    const osc1 = ctx.createOscillator();
-    const gain1 = ctx.createGain();
-    osc1.type = 'sine';
-    osc1.frequency.value = NOTES.D4;
-    gain1.gain.setValueAtTime(volume * 0.25, now);
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-    osc1.connect(gain1).connect(ctx.destination);
-    osc1.start();
-    osc1.stop(now + 0.15);
-
-    // Second note: A4
-    const osc2 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.value = NOTES.A4;
-    gain2.gain.setValueAtTime(0, now + 0.1);
-    gain2.gain.linearRampToValueAtTime(volume * 0.25, now + 0.12);
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-    osc2.connect(gain2).connect(ctx.destination);
-    osc2.start(now + 0.1);
-    osc2.stop(now + 0.3);
-  },
-
-  paletteClose: (ctx, volume) => {
-    // Two notes descending - A4 → D4
-    const now = ctx.currentTime;
-
-    // First note: A4
-    const osc1 = ctx.createOscillator();
-    const gain1 = ctx.createGain();
-    osc1.type = 'sine';
-    osc1.frequency.value = NOTES.A4;
-    gain1.gain.setValueAtTime(volume * 0.25, now);
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-    osc1.connect(gain1).connect(ctx.destination);
-    osc1.start();
-    osc1.stop(now + 0.15);
-
-    // Second note: D4
-    const osc2 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.value = NOTES.D4;
-    gain2.gain.setValueAtTime(0, now + 0.1);
-    gain2.gain.linearRampToValueAtTime(volume * 0.2, now + 0.12);
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-    osc2.connect(gain2).connect(ctx.destination);
-    osc2.start(now + 0.1);
-    osc2.stop(now + 0.3);
-  },
-
-  paletteNav: (ctx, volume) => {
-    // Soft tick - F#4 sine
+    // Page transition - rising then settling tone
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.value = NOTES['F#4'];
+    osc.frequency.setValueAtTime(NOTES.D4, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(NOTES.A4, ctx.currentTime + 0.1);
+    osc.frequency.exponentialRampToValueAtTime(NOTES['F#4'], ctx.currentTime + 0.2);
+
+    gain.gain.setValueAtTime(volume * 0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.25);
+  },
+
+  navShift: (ctx, volume) => {
+    // Navigation shift - subtle sliding tone
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(NOTES.E4, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(NOTES.A4, ctx.currentTime + 0.12);
 
     gain.gain.setValueAtTime(volume * 0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.15);
+  },
+
+  // ---------------------------------------------------------------------------
+  // COMMAND PALETTE
+  // ---------------------------------------------------------------------------
+
+  paletteOpen: (ctx, volume) => {
+    // Opening chord - D4 + F#4 sine
+    [NOTES.D4, NOTES['F#4']].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+
+      gain.gain.setValueAtTime(volume * 0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.02);
+      osc.stop(ctx.currentTime + 0.2);
+    });
+  },
+
+  paletteClose: (ctx, volume) => {
+    // Closing - single soft thud
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(NOTES.D3, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.1);
+
+    gain.gain.setValueAtTime(volume * 0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.1);
+  },
+
+  paletteNav: (ctx, volume) => {
+    // Navigation tick - tiny click
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.value = NOTES.A4;
+
+    gain.gain.setValueAtTime(volume * 0.1, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
 
     osc.connect(gain).connect(ctx.destination);
@@ -250,82 +209,58 @@ const SYNTHESIZERS: Record<SoundName, SoundSynthesizer> = {
   },
 
   paletteSelect: (ctx, volume) => {
-    // Click + tonal confirm
-    const now = ctx.currentTime;
+    // Selection confirm - D4 to F#4 quick rise
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
 
-    // Click component
-    const clickOsc = ctx.createOscillator();
-    const clickGain = ctx.createGain();
-    clickOsc.type = 'square';
-    clickOsc.frequency.setValueAtTime(600, now);
-    clickOsc.frequency.exponentialRampToValueAtTime(200, now + 0.02);
-    clickGain.gain.setValueAtTime(volume * 0.15, now);
-    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
-    clickOsc.connect(clickGain).connect(ctx.destination);
-    clickOsc.start();
-    clickOsc.stop(now + 0.02);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(NOTES.D4, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(NOTES['F#4'], ctx.currentTime + 0.08);
 
-    // Tonal confirm - D4
-    const toneOsc = ctx.createOscillator();
-    const toneGain = ctx.createGain();
-    toneOsc.type = 'sine';
-    toneOsc.frequency.value = NOTES.D4;
-    toneGain.gain.setValueAtTime(0, now + 0.015);
-    toneGain.gain.linearRampToValueAtTime(volume * 0.2, now + 0.025);
-    toneGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-    toneOsc.connect(toneGain).connect(ctx.destination);
-    toneOsc.start(now + 0.015);
-    toneOsc.stop(now + 0.1);
+    gain.gain.setValueAtTime(volume * 0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.12);
   },
 
   // ---------------------------------------------------------------------------
-  // TOGGLE (Sound On/Off)
+  // TOGGLE SOUNDS
   // ---------------------------------------------------------------------------
 
   soundOn: (ctx, volume) => {
-    // Warm tone awakening - rising phrase D4 → F#4 → A4
-    const now = ctx.currentTime;
-    const notes = [NOTES.D4, NOTES['F#4'], NOTES.A4];
+    // Pleasant rising tone - D4 to A4
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
 
-    notes.forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(NOTES.D4, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(NOTES.A4, ctx.currentTime + 0.15);
 
-      const start = now + i * 0.1;
-      gain.gain.setValueAtTime(0, start);
-      gain.gain.linearRampToValueAtTime(volume * 0.2, start + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.15);
+    gain.gain.setValueAtTime(volume * 0.25, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
 
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(start);
-      osc.stop(start + 0.15);
-    });
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.2);
   },
 
   soundOff: (ctx, volume) => {
-    // Gentle fade/sigh - falling A4 → D3 with lowpass sweep
-    const now = ctx.currentTime;
-
+    // Soft descending tone - A4 to D4
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    const filter = ctx.createBiquadFilter();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(NOTES.A4, now);
-    osc.frequency.exponentialRampToValueAtTime(NOTES.D3, now + 0.4);
+    osc.frequency.setValueAtTime(NOTES.A4, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(NOTES.D4, ctx.currentTime + 0.15);
 
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(2000, now);
-    filter.frequency.exponentialRampToValueAtTime(200, now + 0.4);
+    gain.gain.setValueAtTime(volume * 0.25, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
 
-    gain.gain.setValueAtTime(volume * 0.2, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-
-    osc.connect(filter).connect(gain).connect(ctx.destination);
+    osc.connect(gain).connect(ctx.destination);
     osc.start();
-    osc.stop(now + 0.4);
+    osc.stop(ctx.currentTime + 0.2);
   },
 
   // ---------------------------------------------------------------------------
@@ -333,7 +268,7 @@ const SYNTHESIZERS: Record<SoundName, SoundSynthesizer> = {
   // ---------------------------------------------------------------------------
 
   easterEgg: (ctx, volume) => {
-    // Melodic phrase: D-F#-A-B-A (delight!)
+    // Melodic phrase: D-F#-A-B-A
     const now = ctx.currentTime;
     const melody = [NOTES.D4, NOTES['F#4'], NOTES.A4, NOTES.B4, NOTES.A4];
 
@@ -369,6 +304,14 @@ const SYNTHESIZERS: Record<SoundName, SoundSynthesizer> = {
     osc.connect(gain).connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.05);
+  },
+
+  startup: (ctx, volume) => {
+    playStartupSound(ctx, volume);
+  },
+
+  windDown: (ctx, volume) => {
+    playWindDownSound(ctx, volume);
   },
 };
 
@@ -477,6 +420,9 @@ class SoundSystem {
   }
 
   disable(): void {
+    // Cancel any playing startup sound before playing the "off" sound
+    cancelStartupSound();
+
     this.play('soundOff');
     this.enabled = false;
     this.saveState();
@@ -496,11 +442,39 @@ class SoundSystem {
     return this.enabled;
   }
 
+  /**
+   * Check if the AudioContext is ready for playback
+   */
+  isAudioReady(): boolean {
+    return this.audioContext?.state === 'running';
+  }
+
+  /**
+   * Unlock the AudioContext. Must be called directly from a user interaction
+   * handler (click, keydown, etc.) - NOT from a setTimeout or Promise callback.
+   */
+  unlockAudio(): void {
+    const ctx = this.getAudioContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume();
+    }
+  }
+
   play(name: SoundName): void {
     if (!this.enabled) return;
 
     const ctx = this.getAudioContext();
     if (!ctx) return;
+
+    // =========================================================================
+    // FIX: Don't schedule sounds if AudioContext is suspended
+    // This prevents sounds from "queuing up" and playing all at once
+    // when the context is finally resumed by user interaction.
+    // =========================================================================
+    if (ctx.state !== 'running') {
+      console.log(`[Sound] Skipping "${name}": AudioContext is ${ctx.state}`);
+      return;
+    }
 
     // Check for custom sound first
     if (this.customSounds[name]) {
@@ -530,6 +504,14 @@ class SoundSystem {
   getMasterVolume(): number {
     return this.masterVolume;
   }
+
+  /**
+   * Cancel any currently playing startup sound.
+   * Useful for cleanup on navigation.
+   */
+  cancelStartup(): void {
+    cancelStartupSound();
+  }
 }
 
 // =============================================================================
@@ -541,3 +523,6 @@ export const soundSystem = new SoundSystem();
 export function playSound(name: SoundName): void {
   soundSystem.play(name);
 }
+
+// Re-export for direct access if needed
+export { cancelStartupSound } from './startup-sound';

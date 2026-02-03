@@ -1,8 +1,9 @@
 /**
  * Signature Mark with Sound Effects
  * 
- * Updated to play:
+ * Updated to support:
  * - easterEgg: When clicking 7 times triggers the easter egg
+ * - windingDown: Visual wind-down animation before startup
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -18,12 +19,16 @@ interface SignatureMarkProps {
   compact?: boolean;
   soundOn?: boolean;
   onToggleSound?: () => void;
+  windingDown?: boolean;
+  poweringUp?: boolean;
 }
 
 export function SignatureMark({
   compact = false,
   soundOn = false,
-  onToggleSound
+  onToggleSound,
+  windingDown = false,
+  poweringUp = false
 }: SignatureMarkProps) {
   const [hovered, setHovered] = useState(false);
   const noticed = useDelayedState(false, TIMING.markNoticeDelay);
@@ -45,9 +50,11 @@ export function SignatureMark({
   const baseSpacing = compact ? 3 : 5;
   const breathAmt = compact ? 2.5 : 3.5;
 
-  const spacing = !noticed ? 0
-    : hovered ? baseSpacing * 0.15
-      : baseSpacing + breathVal * breathAmt;
+  // During wind-down, force spacing to 0 (dots collapse to center)
+  const spacing = windingDown ? 0
+    : !noticed ? 0
+      : hovered ? baseSpacing * 0.15
+        : baseSpacing + breathVal * breathAmt;
 
   const handleClick = (e: React.MouseEvent) => {
     handleEasterEggClick();
@@ -60,14 +67,16 @@ export function SignatureMark({
 
   const dotsContent = (
     <span
-      className={styles.dots}
+      className={`${styles.dots} ${windingDown ? styles.dotsWindingDown : ''}`}
       style={{ width: compact ? '26px' : '35px' }}
     >
       <span
         className={styles.dot}
         style={{
           transform: `translateX(${-spacing}px)`,
-          transition: noticed ? `transform 0.35s ${ANIMATION.spring}` : 'none'
+          transition: windingDown
+            ? 'transform 0.7s ease-in'
+            : noticed ? `transform 0.35s ${ANIMATION.spring}` : 'none'
         }}
       >
         ·
@@ -76,7 +85,9 @@ export function SignatureMark({
         className={styles.dot}
         style={{
           transform: `translateX(${spacing}px)`,
-          transition: noticed ? `transform 0.35s ${ANIMATION.spring}` : 'none'
+          transition: windingDown
+            ? 'transform 0.7s ease-in'
+            : noticed ? `transform 0.35s ${ANIMATION.spring}` : 'none'
         }}
       >
         ·
@@ -84,8 +95,14 @@ export function SignatureMark({
     </span>
   );
 
+  // During wind-down with sound on, show oscilloscope powering down
   const content = soundOn ? (
-    <Oscilloscope width={compact ? 24 : 30} height={compact ? 8 : 10} />
+    <Oscilloscope
+      width={compact ? 24 : 30}
+      height={compact ? 8 : 10}
+      poweringDown={windingDown}
+      poweringUp={poweringUp}
+    />
   ) : dotsContent;
 
   const markStyle = {

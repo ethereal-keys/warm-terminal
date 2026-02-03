@@ -82,7 +82,9 @@ export type SoundName =
   | 'soundOn'
   | 'soundOff'
   | 'easterEgg'
-  | 'markHover';
+  | 'markHover'
+  | 'startup'
+  | 'windDown';
 
 export interface SoundConfig {
   name: SoundName;
