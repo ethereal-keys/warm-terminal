@@ -68,7 +68,13 @@
 ├── package-lock.json
 ├── package.json
 ├── public
+│   ├── .DS_Store
 │   ├── favicon.svg
+│   ├── images
+│   │   ├── .DS_Store
+│   │   └── autocss
+│   │       ├── autocss-pipeline-static.jpg
+│   │       └── autocss-pipeline.gif
 │   └── Sushanth_resume.pdf
 ├── src
 │   ├── components
@@ -76,6 +82,7 @@
 │   │   │   ├── PostCard.astro
 │   │   │   └── RelatedPosts.astro
 │   │   ├── content
+│   │   │   ├── Animatedimage.astro
 │   │   │   ├── AsciiDiagram.astro
 │   │   │   ├── Callout.astro
 │   │   │   ├── Comic.astro
@@ -411,7 +418,9 @@ export default new Map([
 ["src/content/posts/building-style-transfer.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fposts%2Fbuilding-style-transfer.mdx&astroContentModuleFlag=true")],
 ["src/content/projects/swe-bench.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fprojects%2Fswe-bench.mdx&astroContentModuleFlag=true")],
 ["src/content/projects/walk-my-block.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fprojects%2Fwalk-my-block.mdx&astroContentModuleFlag=true")],
-["src/content/projects/xv6-kernel.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fprojects%2Fxv6-kernel.mdx&astroContentModuleFlag=true")]]);
+["src/content/projects/xv6-kernel.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fprojects%2Fxv6-kernel.mdx&astroContentModuleFlag=true")],
+["src/content/projects/auto-css.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fprojects%2Fauto-css.mdx&astroContentModuleFlag=true")],
+["src/content/projects/autocss.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Fprojects%2Fautocss.mdx&astroContentModuleFlag=true")]]);
 		
 ```
 
@@ -656,7 +665,7 @@ declare module 'astro:content' {
 ## .astro/data-store.json
 
 ````json
-[["Map",1,2,9,10,120,121],"meta::meta",["Map",3,4,5,6,7,8],"astro-version","5.16.9","content-config-digest","61432165faafee20","astro-config-digest","{\"root\":{},\"srcDir\":{},\"publicDir\":{},\"outDir\":{},\"cacheDir\":{},\"compressHTML\":true,\"base\":\"/\",\"trailingSlash\":\"ignore\",\"output\":\"static\",\"scopedStyleStrategy\":\"attribute\",\"build\":{\"format\":\"directory\",\"client\":{},\"server\":{},\"assets\":\"_astro\",\"serverEntry\":\"entry.mjs\",\"redirects\":true,\"inlineStylesheets\":\"auto\",\"concurrency\":1},\"server\":{\"open\":false,\"host\":false,\"port\":4321,\"streaming\":true,\"allowedHosts\":[]},\"redirects\":{},\"image\":{\"endpoint\":{\"route\":\"/_image\"},\"service\":{\"entrypoint\":\"astro/assets/services/sharp\",\"config\":{}},\"domains\":[],\"remotePatterns\":[],\"responsiveStyles\":false},\"devToolbar\":{\"enabled\":true},\"markdown\":{\"syntaxHighlight\":{\"type\":\"shiki\",\"excludeLangs\":[\"math\"]},\"shikiConfig\":{\"langs\":[],\"langAlias\":{},\"theme\":\"css-variables\",\"themes\":{},\"wrap\":false,\"transformers\":[]},\"remarkPlugins\":[],\"rehypePlugins\":[],\"remarkRehype\":{},\"gfm\":true,\"smartypants\":true},\"security\":{\"checkOrigin\":true,\"allowedDomains\":[]},\"env\":{\"schema\":{},\"validateSecrets\":false},\"experimental\":{\"clientPrerender\":false,\"contentIntellisense\":false,\"headingIdCompat\":false,\"preserveScriptOrder\":false,\"liveContentCollections\":false,\"csp\":false,\"staticImportMetaEnv\":false,\"chromeDevtoolsWorkspace\":false,\"failOnPrerenderConflict\":false,\"svgo\":false},\"legacy\":{\"collections\":false}}","projects",["Map",11,12,37,38,63,64,89,90],"xv6-kernel",{"id":11,"data":13,"body":33,"filePath":34,"digest":35,"legacyId":36,"deferredRender":21},{"title":14,"description":15,"tags":16,"publishedAt":20,"featured":21,"order":22,"tabs":23},"XV6 OS Kernel Modules","Implemented multithreading, on-demand paging, bootloading, and trap-and-emulate virtualization in xv6.",[17,18,19],"c","os","systems",["Date","2024-09-15T00:00:00.000Z"],true,4,[24,27,30],{"label":25,"id":26},"./overview","overview",{"label":28,"id":29},"./features","implemented-features",{"label":31,"id":32},"./reflections","reflections","## Overview\n\nExtended the xv6 educational operating system with production-grade features,\ndiving deep into how operating systems actually work under the hood.\n\n## Implemented Features\n\n### Multithreading\n\nAdded POSIX-style threading support to xv6:\n\n```c\nint thread_create(void (*fn)(void*), void *arg) {\n    struct proc *np;\n    struct proc *curproc = myproc();\n    \n    // Allocate process\n    if ((np = allocproc()) == 0)\n        return -1;\n    \n    // Share address space with parent\n    np->pgdir = curproc->pgdir;\n    np->sz = curproc->sz;\n    \n    // Set up stack and entry point\n    // ...\n}\n```\n\n### On-Demand Paging\n\nImplemented lazy page allocation—pages are only allocated when actually\naccessed, not when requested:\n\n- Page fault handler for missing pages\n- Copy-on-write for fork optimization\n- Swap space management\n\n### Bootloading\n\nWrote a custom bootloader that:\n- Loads kernel from disk\n- Sets up protected mode\n- Initializes page tables\n- Jumps to kernel entry point\n\n### Trap and Emulate Virtualization\n\nImplemented basic virtualization support allowing xv6 to host guest\noperating systems through trap-and-emulate:\n\n- Sensitive instruction trapping\n- Virtual memory management for guests\n- Device emulation layer\n\n## Reflections\n\n### What I Learned\n- The elegance of Unix's design decisions\n- How much complexity modern OSes hide from us\n- Why debugging kernel code requires patience\n\n### Challenges\n- Race conditions in the scheduler\n- Getting page table math right\n- The bootloader's 512-byte limit\n\nThis project gave me deep appreciation for systems programming and the\nlayers of abstraction we build on every day.","src/content/projects/xv6-kernel.mdx","2c21d01c036e6615","xv6-kernel.mdx","style-transfer",{"id":37,"data":39,"body":59,"filePath":60,"digest":61,"legacyId":62,"deferredRender":21},{"title":40,"description":41,"tags":42,"publishedAt":47,"featured":21,"github":48,"order":49,"tabs":50},"Real-Time Style Transfer Plugin","Godot engine plugin applying neural style transfer to viewport textures. Includes training pipeline and C++ integration.",[43,44,45,46],"c++","pytorch","godot","ml",["Date","2024-12-15T00:00:00.000Z"],"https://github.com/ethereal-keys/Godot-Style-Transfer",1,[51,52,55,58],{"label":25,"id":26},{"label":53,"id":54},"./demo","demo",{"label":56,"id":57},"./technical","technical-implementation",{"label":31,"id":32},"## Overview\n\nWhen I first started exploring neural style transfer, I didn't expect to end up\nknee deep in Godot's rendering pipeline. But here we are.\n\nThe goal was simple: make a game look like a painting in real-time. The execution\nwas anything but.\n\n## The First Attempt\n\nI started where anyone would: the original Gatys et al. paper. The results were\nbeautiful. The performance was not.\n\n```python\ndef style_transfer(content, style, iterations=500):\n    # This took 45 seconds per frame\n    for i in range(iterations):\n        optimize_step(content, style)\n    return content\n```\n\n45 seconds. Per frame. For a game targeting 60fps, I needed to be roughly\n2,700 times faster.\n\n## The Solution\n\nThe breakthrough came from Johnson et al.'s feed-forward approach. Instead of\noptimizing at runtime, we train a network to perform the transformation in a\nsingle forward pass.\n\n## Demo\n \n\u003CYouTubeEmbed videoId=\"ad-yBz3aguA\" title=\"Style Transfer Demo\" />\n \n## Technical Implementation\n\nThe plugin integrates with Godot's rendering pipeline:\n\n1. Capture viewport texture each frame\n2. Pass through PyTorch model via C++ bindings\n3. Return stylized texture to viewport\n4. Maintain 60fps target\n \n\u003CAsciiDiagram title=\"Pipeline Architecture\">\n{`+-------------+      +-------------+      +-------------+\n|  Viewport   | ---> |  C++ Bind   | ---> |   PyTorch   |\n|   Texture   |      |   (GDExt)   |      |    Model    |\n+-------------+      +-------------+      +-------------+\n       ^                                         |\n       |                                         |\n       +-----------------------------------------+\n                    Stylized Frame`}\n\u003C/AsciiDiagram>\n \n## Reflections\n\n### What Worked\n- The feed-forward architecture delivered real-time performance\n- C++ integration with Godot was cleaner than expected\n\n\u003CComic \n  src=\"https://imgs.xkcd.com/comics/machine_learning.png\" \n  alt=\"XKCD Machine Learning\" \n  caption=\"relevant xkcd as always\" \n/>\n \n### What I'd Do Differently\n- Start with a simpler style transfer model\n- Profile GPU memory usage earlier in development\n\n### Future Directions\n- Multi-style interpolation\n- Video temporal consistency","src/content/projects/style-transfer.mdx","63951fa5b6b7f87e","style-transfer.mdx","walk-my-block",{"id":63,"data":65,"body":85,"filePath":86,"digest":87,"legacyId":88,"deferredRender":21},{"title":66,"description":67,"tags":68,"publishedAt":72,"featured":21,"order":73,"tabs":74},"Walk My Block","Walking audio tour with watercolor map overlay. Share audio logs tagged to locations that others discover by visiting.",[69,70,71],"web","maps","community",["Date","2024-10-05T00:00:00.000Z"],3,[75,76,79,81,84],{"label":25,"id":26},{"label":77,"id":78},"./concept","the-concept",{"label":80,"id":57},"./tech",{"label":82,"id":83},"./hackathon","the-hackathon",{"label":31,"id":32},"## Overview\n\nWalk My Block creates a living museum of your city. Users share audio logs\nor polaroids tagged to their current location—content that only others\ncan discover by physically stumbling onto that spot.\n\n## The Concept\n\nImagine walking down a quiet street and your phone buzzes. Someone recorded\na memory here three months ago. You listen. A stranger's voice tells you\nabout the coffee shop that used to be on this corner, or the time they\nproposed right where you're standing.\n\n## Technical Implementation\n\nBuilt as a web application with Stadia Maps, featuring:\n\n- Beautiful watercolor map overlay aesthetic\n- Location-tagged audio recording and playback\n- Polaroid-style photo uploads\n- Proximity-based content discovery\n- Offline-first architecture for spotty coverage areas\n\n## The Hackathon\n\nPrototyped for Hacks-for-Humanity hackathon, where it was selected as an\norg favourite. The judges loved the emphasis on human connection and\nthe way it encourages people to explore their neighborhoods.\n\n## Reflections\n\n### What Made It Special\n- The serendipity of discovery\n- Low-friction content creation\n- The watercolor aesthetic softened the digital experience\n\n### Future Possibilities\n- Curated walking tours by local historians\n- Integration with city archives\n- Ambient soundscapes for areas without user content","src/content/projects/walk-my-block.mdx","45d6dde8ecf6f22c","walk-my-block.mdx","swe-bench",{"id":89,"data":91,"body":116,"filePath":117,"digest":118,"legacyId":119,"deferredRender":21},{"title":92,"description":93,"tags":94,"publishedAt":98,"featured":21,"github":99,"order":100,"tabs":101},"SWE-Bench Agent Fine-tuning","ML training pipeline processing 11,000+ conversation turns from successful code solutions, implementing custom tokenization for function-calling fine-tuning.",[95,46,96,97],"python","transformers","nlp",["Date","2024-11-20T00:00:00.000Z"],"https://github.com/ethereal-keys/NLP-Project",2,[102,103,106,109,112,115],{"label":25,"id":26},{"label":104,"id":105},"./problem","the-problem",{"label":107,"id":108},"./pipeline","data-processing-pipeline",{"label":110,"id":111},"./architecture","model-architecture",{"label":113,"id":114},"./results","results",{"label":31,"id":32},"## Overview\n\nBuilt an ML training pipeline for fine-tuning open-source LLMs on automated\ncode generation tasks, benchmarking against commercial models.\n\n## The Problem\n\nCurrent AI coding assistants show significant performance gaps between\ncommercial and open-source solutions. This project aimed to understand\nand close that gap through targeted fine-tuning.\n\n## Data Processing Pipeline\n\nProcessed 11,000+ conversation turns from successful SWE-Bench solutions:\n\n```python\ndef process_conversation(conv):\n    # Extract function calls and responses\n    turns = extract_turns(conv)\n    \n    # Custom tokenization for function-calling\n    tokens = tokenize_with_functions(turns)\n    \n    return format_for_training(tokens)\n```\n\n## Model Architecture\n\nImplemented custom tokenization for function-calling patterns on:\n- Qwen2.5-Coder\n- Mistral-7B\n\n## Results\n\nIdentified critical performance gaps between commercial and open-source\nAI coding assistants, particularly in:\n- Multi-file context handling\n- Error recovery strategies\n- Code explanation quality\n\n## Reflections\n\nThe biggest challenge was handling the diversity of coding patterns across\ndifferent repositories and languages. Future work would focus on\ndomain-specific fine-tuning strategies.","src/content/projects/swe-bench.mdx","df9e166db14b5d78","swe-bench.mdx","posts",["Map",122,123],"building-style-transfer",{"id":122,"data":124,"body":132,"filePath":133,"digest":134,"legacyId":135,"deferredRender":21},{"title":125,"description":126,"tags":127,"publishedAt":129,"related":130,"draft":131},"Building a Style Transfer Plugin for Godot","A deep dive into integrating neural networks with game engine architecture.",[43,45,46,128],"tutorial",["Date","2025-01-08T00:00:00.000Z"],[],false,"When I first started exploring neural style transfer, I didn't expect to end up\nknee deep in Godot's rendering pipeline. But here we are.\n\nThe goal was simple: make a game look like a painting in real-time. The execution\nwas anything but.\n\n## The First Attempt\n\nI started where anyone would: the original Gatys et al. paper¹. The results were\nbeautiful. The performance was not.\n\n> \"The best optimization is the one you don't have to do.\"\n>\n> This kept echoing in my head as I stared at the profiler output.\n\n```python\ndef style_transfer(content, style, iterations=500):\n    # This took 45 seconds per frame\n    for i in range(iterations):\n        optimize_step(content, style)\n    return content\n```\n\n45 seconds. Per frame. For a game targeting 60fps, I needed to be roughly\n2,700 times faster.\n\n## The Breakthrough\n\nThe solution came from Johnson et al.'s feed-forward approach². Instead of\nrunning an optimization loop at runtime, we train a neural network to perform\nthe style transformation in a single forward pass.\n\nThe tradeoff: we lose flexibility (one network per style) but gain\nreal-time performance.\n\n## Integrating with Godot\n\nGodot's architecture made this surprisingly clean:\n\n1. **Viewport Capture**: Hook into the rendering pipeline to grab frames\n2. **PyTorch Bridge**: C++ bindings to call the trained model\n3. **Texture Injection**: Push stylized frames back to the renderer\n\nThe trickiest part was managing GPU memory—both Godot and PyTorch want\nto own the graphics card.\n\n## Performance Tuning\n\nGetting to 60fps required several optimizations:\n\n- Half-precision inference (FP16)\n- Async texture transfers\n- Resolution scaling based on GPU load\n- Frame interpolation for slower hardware\n\n## What I Learned\n\nBuilding this taught me that game development is all about constraints.\nYou don't need the perfect algorithm—you need one that's fast enough\nand looks good enough.\n\n---\n\n¹ Gatys, Ecker, Bethge. \"A Neural Algorithm of Artistic Style.\" 2015.\n\n² Johnson et al. \"Perceptual Losses for Real-Time Style Transfer.\" 2016.","src/content/posts/building-style-transfer.mdx","a22a72364ee46ec5","building-style-transfer.mdx"]
+[["Map",1,2,9,10,157,158],"meta::meta",["Map",3,4,5,6,7,8],"astro-version","5.16.9","content-config-digest","61432165faafee20","astro-config-digest","{\"root\":{},\"srcDir\":{},\"publicDir\":{},\"outDir\":{},\"cacheDir\":{},\"compressHTML\":true,\"base\":\"/\",\"trailingSlash\":\"ignore\",\"output\":\"static\",\"scopedStyleStrategy\":\"attribute\",\"build\":{\"format\":\"directory\",\"client\":{},\"server\":{},\"assets\":\"_astro\",\"serverEntry\":\"entry.mjs\",\"redirects\":true,\"inlineStylesheets\":\"auto\",\"concurrency\":1},\"server\":{\"open\":false,\"host\":false,\"port\":4321,\"streaming\":true,\"allowedHosts\":[]},\"redirects\":{},\"image\":{\"endpoint\":{\"route\":\"/_image\"},\"service\":{\"entrypoint\":\"astro/assets/services/sharp\",\"config\":{}},\"domains\":[],\"remotePatterns\":[],\"responsiveStyles\":false},\"devToolbar\":{\"enabled\":true},\"markdown\":{\"syntaxHighlight\":{\"type\":\"shiki\",\"excludeLangs\":[\"math\"]},\"shikiConfig\":{\"langs\":[],\"langAlias\":{},\"theme\":\"css-variables\",\"themes\":{},\"wrap\":false,\"transformers\":[]},\"remarkPlugins\":[],\"rehypePlugins\":[],\"remarkRehype\":{},\"gfm\":true,\"smartypants\":true},\"security\":{\"checkOrigin\":true,\"allowedDomains\":[]},\"env\":{\"schema\":{},\"validateSecrets\":false},\"experimental\":{\"clientPrerender\":false,\"contentIntellisense\":false,\"headingIdCompat\":false,\"preserveScriptOrder\":false,\"liveContentCollections\":false,\"csp\":false,\"staticImportMetaEnv\":false,\"chromeDevtoolsWorkspace\":false,\"failOnPrerenderConflict\":false,\"svgo\":false},\"legacy\":{\"collections\":false}}","projects",["Map",11,12,37,38,63,64,89,90,120,121],"xv6-kernel",{"id":11,"data":13,"body":33,"filePath":34,"digest":35,"legacyId":36,"deferredRender":21},{"title":14,"description":15,"tags":16,"publishedAt":20,"featured":21,"order":22,"tabs":23},"XV6 OS Kernel Modules","Implemented multithreading, on-demand paging, bootloading, and trap-and-emulate virtualization in xv6.",[17,18,19],"c","os","systems",["Date","2024-09-15T00:00:00.000Z"],true,4,[24,27,30],{"label":25,"id":26},"./overview","overview",{"label":28,"id":29},"./features","implemented-features",{"label":31,"id":32},"./reflections","reflections","## Overview\n\nExtended the xv6 educational operating system with production-grade features,\ndiving deep into how operating systems actually work under the hood.\n\n## Implemented Features\n\n### Multithreading\n\nAdded POSIX-style threading support to xv6:\n\n```c\nint thread_create(void (*fn)(void*), void *arg) {\n    struct proc *np;\n    struct proc *curproc = myproc();\n    \n    // Allocate process\n    if ((np = allocproc()) == 0)\n        return -1;\n    \n    // Share address space with parent\n    np->pgdir = curproc->pgdir;\n    np->sz = curproc->sz;\n    \n    // Set up stack and entry point\n    // ...\n}\n```\n\n### On-Demand Paging\n\nImplemented lazy page allocation—pages are only allocated when actually\naccessed, not when requested:\n\n- Page fault handler for missing pages\n- Copy-on-write for fork optimization\n- Swap space management\n\n### Bootloading\n\nWrote a custom bootloader that:\n- Loads kernel from disk\n- Sets up protected mode\n- Initializes page tables\n- Jumps to kernel entry point\n\n### Trap and Emulate Virtualization\n\nImplemented basic virtualization support allowing xv6 to host guest\noperating systems through trap-and-emulate:\n\n- Sensitive instruction trapping\n- Virtual memory management for guests\n- Device emulation layer\n\n## Reflections\n\n### What I Learned\n- The elegance of Unix's design decisions\n- How much complexity modern OSes hide from us\n- Why debugging kernel code requires patience\n\n### Challenges\n- Race conditions in the scheduler\n- Getting page table math right\n- The bootloader's 512-byte limit\n\nThis project gave me deep appreciation for systems programming and the\nlayers of abstraction we build on every day.","src/content/projects/xv6-kernel.mdx","2c21d01c036e6615","xv6-kernel.mdx","style-transfer",{"id":37,"data":39,"body":59,"filePath":60,"digest":61,"legacyId":62,"deferredRender":21},{"title":40,"description":41,"tags":42,"publishedAt":47,"featured":21,"github":48,"order":49,"tabs":50},"Real-Time Style Transfer Plugin","Godot engine plugin applying neural style transfer to viewport textures. Includes training pipeline and C++ integration.",[43,44,45,46],"c++","pytorch","godot","ml",["Date","2024-12-15T00:00:00.000Z"],"https://github.com/ethereal-keys/Godot-Style-Transfer",1,[51,52,55,58],{"label":25,"id":26},{"label":53,"id":54},"./demo","demo",{"label":56,"id":57},"./technical","technical-implementation",{"label":31,"id":32},"## Overview\n\nWhen I first started exploring neural style transfer, I didn't expect to end up\nknee deep in Godot's rendering pipeline. But here we are.\n\nThe goal was simple: make a game look like a painting in real-time. The execution\nwas anything but.\n\n## The First Attempt\n\nI started where anyone would: the original Gatys et al. paper. The results were\nbeautiful. The performance was not.\n\n```python\ndef style_transfer(content, style, iterations=500):\n    # This took 45 seconds per frame\n    for i in range(iterations):\n        optimize_step(content, style)\n    return content\n```\n\n45 seconds. Per frame. For a game targeting 60fps, I needed to be roughly\n2,700 times faster.\n\n## The Solution\n\nThe breakthrough came from Johnson et al.'s feed-forward approach. Instead of\noptimizing at runtime, we train a network to perform the transformation in a\nsingle forward pass.\n\n## Demo\n \n\u003CYouTubeEmbed videoId=\"ad-yBz3aguA\" title=\"Style Transfer Demo\" />\n \n## Technical Implementation\n\nThe plugin integrates with Godot's rendering pipeline:\n\n1. Capture viewport texture each frame\n2. Pass through PyTorch model via C++ bindings\n3. Return stylized texture to viewport\n4. Maintain 60fps target\n \n\u003CAsciiDiagram title=\"Pipeline Architecture\">\n{`+-------------+      +-------------+      +-------------+\n|  Viewport   | ---> |  C++ Bind   | ---> |   PyTorch   |\n|   Texture   |      |   (GDExt)   |      |    Model    |\n+-------------+      +-------------+      +-------------+\n       ^                                         |\n       |                                         |\n       +-----------------------------------------+\n                    Stylized Frame`}\n\u003C/AsciiDiagram>\n \n## Reflections\n\n### What Worked\n- The feed-forward architecture delivered real-time performance\n- C++ integration with Godot was cleaner than expected\n\n\u003CComic \n  src=\"https://imgs.xkcd.com/comics/machine_learning.png\" \n  alt=\"XKCD Machine Learning\" \n  caption=\"relevant xkcd as always\" \n/>\n \n### What I'd Do Differently\n- Start with a simpler style transfer model\n- Profile GPU memory usage earlier in development\n\n### Future Directions\n- Multi-style interpolation\n- Video temporal consistency","src/content/projects/style-transfer.mdx","63951fa5b6b7f87e","style-transfer.mdx","walk-my-block",{"id":63,"data":65,"body":85,"filePath":86,"digest":87,"legacyId":88,"deferredRender":21},{"title":66,"description":67,"tags":68,"publishedAt":72,"featured":21,"order":73,"tabs":74},"Walk My Block","Walking audio tour with watercolor map overlay. Share audio logs tagged to locations that others discover by visiting.",[69,70,71],"web","maps","community",["Date","2024-10-05T00:00:00.000Z"],3,[75,76,79,81,84],{"label":25,"id":26},{"label":77,"id":78},"./concept","the-concept",{"label":80,"id":57},"./tech",{"label":82,"id":83},"./hackathon","the-hackathon",{"label":31,"id":32},"## Overview\n\nWalk My Block creates a living museum of your city. Users share audio logs\nor polaroids tagged to their current location—content that only others\ncan discover by physically stumbling onto that spot.\n\n## The Concept\n\nImagine walking down a quiet street and your phone buzzes. Someone recorded\na memory here three months ago. You listen. A stranger's voice tells you\nabout the coffee shop that used to be on this corner, or the time they\nproposed right where you're standing.\n\n## Technical Implementation\n\nBuilt as a web application with Stadia Maps, featuring:\n\n- Beautiful watercolor map overlay aesthetic\n- Location-tagged audio recording and playback\n- Polaroid-style photo uploads\n- Proximity-based content discovery\n- Offline-first architecture for spotty coverage areas\n\n## The Hackathon\n\nPrototyped for Hacks-for-Humanity hackathon, where it was selected as an\norg favourite. The judges loved the emphasis on human connection and\nthe way it encourages people to explore their neighborhoods.\n\n## Reflections\n\n### What Made It Special\n- The serendipity of discovery\n- Low-friction content creation\n- The watercolor aesthetic softened the digital experience\n\n### Future Possibilities\n- Curated walking tours by local historians\n- Integration with city archives\n- Ambient soundscapes for areas without user content","src/content/projects/walk-my-block.mdx","45d6dde8ecf6f22c","walk-my-block.mdx","swe-bench",{"id":89,"data":91,"body":116,"filePath":117,"digest":118,"legacyId":119,"deferredRender":21},{"title":92,"description":93,"tags":94,"publishedAt":98,"featured":21,"github":99,"order":100,"tabs":101},"SWE-Bench Agent Fine-tuning","ML training pipeline processing 11,000+ conversation turns from successful code solutions, implementing custom tokenization for function-calling fine-tuning.",[95,46,96,97],"python","transformers","nlp",["Date","2024-11-20T00:00:00.000Z"],"https://github.com/ethereal-keys/NLP-Project",2,[102,103,106,109,112,115],{"label":25,"id":26},{"label":104,"id":105},"./problem","the-problem",{"label":107,"id":108},"./pipeline","data-processing-pipeline",{"label":110,"id":111},"./architecture","model-architecture",{"label":113,"id":114},"./results","results",{"label":31,"id":32},"## Overview\n\nBuilt an ML training pipeline for fine-tuning open-source LLMs on automated\ncode generation tasks, benchmarking against commercial models.\n\n## The Problem\n\nCurrent AI coding assistants show significant performance gaps between\ncommercial and open-source solutions. This project aimed to understand\nand close that gap through targeted fine-tuning.\n\n## Data Processing Pipeline\n\nProcessed 11,000+ conversation turns from successful SWE-Bench solutions:\n\n```python\ndef process_conversation(conv):\n    # Extract function calls and responses\n    turns = extract_turns(conv)\n    \n    # Custom tokenization for function-calling\n    tokens = tokenize_with_functions(turns)\n    \n    return format_for_training(tokens)\n```\n\n## Model Architecture\n\nImplemented custom tokenization for function-calling patterns on:\n- Qwen2.5-Coder\n- Mistral-7B\n\n## Results\n\nIdentified critical performance gaps between commercial and open-source\nAI coding assistants, particularly in:\n- Multi-file context handling\n- Error recovery strategies\n- Code explanation quality\n\n## Reflections\n\nThe biggest challenge was handling the diversity of coding patterns across\ndifferent repositories and languages. Future work would focus on\ndomain-specific fine-tuning strategies.","src/content/projects/swe-bench.mdx","df9e166db14b5d78","swe-bench.mdx","autocss",{"id":120,"data":122,"body":153,"filePath":154,"digest":155,"legacyId":156,"deferredRender":21},{"title":123,"description":124,"tags":125,"publishedAt":129,"featured":21,"github":130,"order":100,"tabs":131},"AutoCSS: A Hackathon Retrospective","In 2017, I built a tool to convert hand-drawn wireframes to HTML using OpenCV contour detection. Seven years later, VLMs do this with a single API call. A love letter to scrappy engineering.",[95,126,127,128],"opencv","hackathon","retrospective",["Date","2026-02-05T00:00:00.000Z"],"https://github.com/ethereal-keys/AutoCSS",[132,135,138,141,144,147,150],{"label":133,"id":134},"./the-pitch","the-pitch",{"label":136,"id":137},"./the-hack","the-hack",{"label":139,"id":140},"./the-insight","the-insight",{"label":142,"id":143},"./edge-cases","edge-cases",{"label":145,"id":146},"./circa-2017","circa-2017",{"label":148,"id":149},"./plot-twist","plot-twist",{"label":151,"id":152},"./coda","coda","## The Pitch\n\nIn 2017, at a hackathon somewhere in my early undergrad, I had what felt like a\nbrilliant idea: what if you could sketch a website layout on paper, point a\ncamera at it, and have working HTML pop out the other end?\n\n\u003CComic \n  src=\"https://imgs.xkcd.com/comics/tasks.png\" \n  alt=\"XKCD 1425: Tasks\" \n  caption=\"'In the 60s, Marvin Minsky assigned a couple of undergrads to spend the summer programming a computer to use a camera to identify objects in a scene. He figured they'd have the problem solved by the end of the summer. Half a century later, we're still working on it.'\"\n/>\n\nThe comic's punchline is that identifying whether a photo contains a bird \nrequires a research team and five years. Converting hand-drawn wireframes \nto code? That's also a bird.\n\nBut we were undergrads with 48 hours, a laptop, and the unwavering confidence\nthat comes from not knowing what you don't know.\n\nSo we built it anyway.\n\n## The Hack\n\nHere's what we were trying to do:\n\n\u003CAsciiDiagram title=\"The Dream\">\n{`\n    ┌─────────────┐         ┌─────────────┐\n    │  ┌───────┐  │         │   \u003Cdiv>     │\n    │  │ ███   │  │         │     \u003Cdiv>   │\n    │  ├───┬───┤  │   ───▶  │       ...   │\n    │  │ █ │ █ │  │         │     \u003C/div>  │\n    │  └───┴───┘  │         │   \u003C/div>    │\n    └─────────────┘         └─────────────┘\n      hand-drawn               HTML output\n`}\n\u003C/AsciiDiagram>\n\nThe key insight: **OpenCV already knows how to find nested shapes.** We just\nhad to convince it that rectangles-inside-rectangles is the same thing as\ndivs-inside-divs.\n\n### The Pipeline\n\n\u003CAsciiDiagram title=\"Processing Pipeline\">\n{`\n  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐\n  │  Input   │    │ Cleanup  │    │  Edges   │    │ Contours │    │  Output  │\n  │ ──────── │    │ ──────── │    │ ──────── │    │ ──────── │    │ ──────── │\n  │  photo   │───▶│threshold │───▶│  canny   │───▶│RETR_TREE │───▶│   HTML   │\n  │  of      │    │  + blur  │    │  edge    │    │ hierarchy│    │   DOM    │\n  │ drawing  │    │          │    │detection │    │          │    │   tree   │\n  └──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘\n`}\n\u003C/AsciiDiagram>\n\nAnd here's what that actually looked like:\n\n\u003CAnimatedImage \n  src=\"/images/autocss/autocss-pipeline.gif\"\n  staticSrc=\"/images/autocss/autocss-pipeline-static.jpg\"\n  alt=\"AutoCSS processing pipeline animation\"\n  caption=\"Click to play — from paper sketch to detected contours in 5 steps\"\n/>\n\nEach frame shows a real intermediate output from the pipeline:\n\n1. **Input** — The hand-drawn wireframe on paper\n2. **Binarized** — Threshold to clean black-on-white\n3. **Edges** — Canny edge detection finds the lines\n4. **Contours** — OpenCV traces every closed shape (notice the double lines!)\n5. **Output** — Clean bounding rectangles, ready for DOM conversion\n\nThe magic happens in step 4. Let me show you.\n\n## The Insight\n\nWhen you call `cv2.findContours()`, you can choose how to organize the results.\nMost tutorials use `RETR_EXTERNAL` (just outer shapes) or `RETR_LIST` (flat list).\n\nWe used `RETR_TREE`. And that changed everything.\n\n\u003CAsciiDiagram title=\"What RETR_TREE Gives You\">\n{`\n  The drawing:                 The hierarchy array:\n  ┌─────────────────────┐\n  │         0           │      index │ Next  Prev  Child  Parent\n  │  ┌─────┐  ┌─────┐   │      ──────┼────────────────────────────\n  │  │  1  │  │  2  │   │        0   │  -1    -1     1      -1    ← root (no parent)\n  │  │     │  │ ┌─┐ │   │        1   │   2    -1    -1       0    ← child of 0\n  │  └─────┘  │ │3│ │   │        2   │  -1     1     3       0    ← sibling of 1\n  │           │ └─┘ │   │        3   │  -1    -1    -1       2    ← child of 2\n  │           └─────┘   │\n  └─────────────────────┘      Parent links form a tree!\n`}\n\u003C/AsciiDiagram>\n\nSee that `Parent` column? Contour 1's parent is 0. Contour 3's parent is 2.\n**The parent-child relationships are already computed for us.**\n\nThis maps directly to how the DOM works:\n\n\u003CAsciiDiagram title=\"Contours → DOM\">\n{`\n  Contour hierarchy:              HTML DOM:\n\n         ┌───┐                    \u003Cdiv>              \u003C!-- contour 0 -->\n         │ 0 │                      │\n         └─┬─┘                      ├─ \u003Cdiv/>        \u003C!-- contour 1 -->\n           │                        │\n      ┌────┴────┐                   └─ \u003Cdiv>         \u003C!-- contour 2 -->\n    ┌─┴─┐     ┌─┴─┐                      │\n    │ 1 │     │ 2 │                      └─ \u003Cdiv/>   \u003C!-- contour 3 -->\n    └───┘     └─┬─┘                    \n             ┌─┴─┐                 \u003C/div>\n             │ 3 │\n             └───┘\n\n  Same structure. Different syntax.\n`}\n\u003C/AsciiDiagram>\n\nThe recursive function to walk this tree is tiny:\n\n```python\ndef build_dom(contour_idx, hierarchy):\n    \"\"\"Walk contour tree, emit nested divs.\"\"\"\n    node = hierarchy[0][contour_idx]\n    child_idx = node[2]  # First child\n    \n    if child_idx == -1:\n        return \"\u003Cp>content\u003C/p>\"  # Leaf node\n    \n    html = \"\"\n    while child_idx != -1:\n        html += f\"\u003Cdiv>{build_dom(child_idx, hierarchy)}\u003C/div>\"\n        child_idx = hierarchy[0][child_idx][0]  # Next sibling\n    \n    return html\n```\n\nThat's it. That's the whole DOM generation. Ten lines.\n\n\u003CComic \n  src=\"https://imgs.xkcd.com/comics/machine_learning.png\" \n  alt=\"XKCD 1838: Machine Learning\" \n  caption=\"People kept asking if we used machine learning. We didn't even have a pile.\"\n/>\n\n## Edge Cases\n\nOf course, nothing is that simple. Hand-drawn lines aren't perfect geometric\nshapes. Edge detection on thick marker strokes produces... interesting results.\n\n### The Double Contour Problem\n\nWhen Canny runs on a hand-drawn line, it finds *two* edges—one on each side\nof the ink stroke. This means every rectangle becomes two nested contours:\n\n\u003CAsciiDiagram title=\"The Double Contour Problem\">\n{`\n  What you draw:          What OpenCV sees:\n\n      ████████                ┌──────────┐  ← outer edge of ink\n      █      █                │ ┌──────┐ │  ← inner edge of ink\n      █      █       ───▶     │ │      │ │\n      █      █                │ │      │ │\n      ████████                │ └──────┘ │\n                              └──────────┘\n\n   One rectangle            Two nested contours!\n`}\n\u003C/AsciiDiagram>\n\nWithout fixing this, every `\u003Cdiv>` would have a useless wrapper div inside it.\n\n### The Fix: Skip Single Children\n\nThe solution is elegant: if a contour has exactly one child, and that child\nis roughly the same size, skip the parent and promote the grandchildren:\n\n\u003CAsciiDiagram title=\"The dup_tree Fix\">\n{`\n  Before:                        After:\n\n       ┌───┐                         ┌───┐\n       │ 0 │                         │ 0 │\n       └─┬─┘                         └─┬─┘\n         │                             │\n       ┌─┴─┐ ← single child,      ┌───┴────┐\n       │ 1 │   same size          │        │\n       └─┬─┘   (duplicate!)     ┌─┴─┐    ┌─┴─┐\n         │                      │ 2 │    │ 3 │\n    ┌────┴────┐                 └───┘    └───┘\n  ┌─┴─┐     ┌─┴─┐\n  │ 2 │     │ 3 │               Grandchildren promoted!\n  └───┘     └───┘\n`}\n\u003C/AsciiDiagram>\n\n```python\ndef remove_duplicates(tree):\n    \"\"\"Skip single-child nodes (they're contour duplicates).\"\"\"\n    if not tree:\n        return {}\n    if len(tree) == 1:\n        # Only one child? Skip this level.\n        only_child = list(tree.values())[0]\n        return remove_duplicates(only_child)\n    # Multiple children? Keep this node, recurse into children.\n    return {k: remove_duplicates(v) for k, v in tree.items()}\n```\n\n### What Actually Worked\n\nWhen the conditions were right—clean paper, thick marker, good lighting,\nno overlapping boxes—it actually worked:\n\n\u003CAsciiDiagram title=\"Success Case\">\n{`\n  Input:                    Output HTML:\n\n  ┌─────────────────┐       \u003Cdiv class=\"root\">\n  │ ┌─────────────┐ │         \u003Cdiv class=\"header\">\u003C/div>\n  │ │   header    │ │         \u003Cdiv class=\"body\">\n  │ └─────────────┘ │           \u003Cdiv class=\"sidebar\">\u003C/div>\n  │ ┌────┐ ┌──────┐ │           \u003Cdiv class=\"content\">\u003C/div>\n  │ │side│ │ main │ │         \u003C/div>\n  │ └────┘ └──────┘ │       \u003C/div>\n  └─────────────────┘\n                            (structure correct, names added manually)\n`}\n\u003C/AsciiDiagram>\n\nWhat we couldn't do:\n- Tell buttons from text inputs (both are rectangles)\n- Read handwritten labels\n- Generate any CSS beyond structure\n- Handle overlapping or touching shapes\n\nBut for 48 hours? Nested boxes became nested divs. That's not nothing.\n\n## Circa 2017\n\nTo understand why this approach made sense, you need to understand what the\nworld looked like in 2017.\n\n\u003CAsciiDiagram title=\"The 2017 AI Landscape\">\n{`\n  ┌─────────────────────────────────────────────────────────────────┐\n  │                    WHAT WAS HOT IN 2017                         │\n  ├─────────────────────────────────────────────────────────────────┤\n  │                                                                 │\n  │  GANs ████████████████████████████  CycleGAN, pix2pix          │\n  │  CNNs ███████████████████████       \"ImageNet is solved\"        │\n  │  RNNs ██████████████                Seq2seq, attention          │\n  │  RL   █████████                     AlphaGo hype                │\n  │                                                                 │\n  │  Transformers █                     (just published, ignored)   │\n  │                                                                 │\n  └─────────────────────────────────────────────────────────────────┘\n`}\n\u003C/AsciiDiagram>\n\nThe transformer paper—\"Attention Is All You Need\"—was published **June 12, 2017**.\nThe same summer we were probably building this. Nobody knew what it would become.\n\nAt a hackathon in 2017, you used **OpenCV**:\n- Ran on any laptop (no GPU required)\n- Excellent Python bindings\n- Thousands of tutorials\n- Actually worked in 48 hours\n\nDeep learning meant training CNNs for days on a GPU cluster. Not hackathon-friendly.\n\n### What Others Were Building\n\nWe weren't alone in trying sketch-to-code:\n\n| Project | Approach | Result |\n|---------|----------|--------|\n| **Pix2Code** (2017) | CNN + LSTM | 77% accuracy on 16 synthetic tokens |\n| **Airbnb** (2017) | Component classifier | Only worked with their 150 pre-defined components |\n| **Microsoft Sketch2Code** (2018) | Azure CV + rules | Supported 5 element types |\n\nEveryone had the same idea. Nobody cracked it.\n\n\u003CComic \n  src=\"https://imgs.xkcd.com/comics/automation.png\" \n  alt=\"XKCD 1319: Automation\" \n  caption=\"We spent 48 hours automating something that takes 30 minutes by hand.\"\n/>\n\n## Plot Twist\n\nMarch 2023. The GPT-4 Developer Livestream. Greg Brockman photographs a hand-drawn\nsketch on a napkin. Seconds later: a working website.\n\n\u003CYouTubeEmbed videoId=\"outcGtbnMuQ\" title=\"GPT-4 Developer Livestream\" start={982} />\n\nThe exact project we built in 2017. But working perfectly, instantly, with no\nedge detection, no RETR_TREE, no \"draw with thick marker in good lighting.\"\n\n### The Difference\n\n\u003CAsciiDiagram title=\"2017 vs 2024\">\n{`\n  AutoCSS (2017):                    GPT-4V (2024):\n\n  ┌──────────┐                       ┌──────────┐\n  │ pixels   │                       │ pixels   │\n  └────┬─────┘                       └────┬─────┘\n       │                                  │\n       ▼                                  │\n  ┌──────────┐                            │\n  │ edges    │                            │\n  └────┬─────┘                            │\n       │                                  │\n       ▼                                  ▼\n  ┌──────────┐                       ┌──────────┐\n  │ contours │                       │\"I see a  │\n  └────┬─────┘                       │ search   │\n       │                             │ bar and  │\n       ▼                             │ a nav    │\n  ┌──────────┐                       │ menu...\" │\n  │hierarchy │                       └────┬─────┘\n  └────┬─────┘                            │\n       │                                  ▼\n       ▼                             ┌──────────┐\n  ┌──────────┐                       │ working  │\n  │nested    │                       │ React +  │\n  │divs      │                       │ Tailwind │\n  └──────────┘                       └──────────┘\n\n  Geometry                           Understanding\n`}\n\u003C/AsciiDiagram>\n\nWhere we saw \"rectangle at (100,200) with width 300,\" a VLM sees \"search bar\nin header, probably e-commerce, needs placeholder text.\"\n\nThe Stanford Design2Code benchmark (2024): GPT-4V generated pages that could\n**replace originals 49% of the time** on 484 real websites.\n\nNot 77% on 16 synthetic tokens. Near-majority replacement on arbitrary sites.\n\n### The Modern Toolkit\n\n- **tldraw Make Real**: Draw → HTML/Tailwind. ~$0.04 per generation.\n- **screenshot-to-code**: 71K+ GitHub stars. Any mockup → React/Vue/HTML.\n- **v0.dev**: 6M+ developers. Production components from sketches.\n\nOne API call. No contour detection required.\n\n## Coda\n\n\u003CComic \n  src=\"https://imgs.xkcd.com/comics/wanna_see_the_code.png\" \n  alt=\"XKCD 2138: Wanna See the Code?\" \n  caption=\"Opening the repo after 7 years felt exactly like this.\"\n/>\n\nI recently opened the AutoCSS repository for the first time in seven years.\n\nThe code is exactly what you'd expect:\n- Jupyter notebooks as the main codebase\n- Variables named `heirarchy` (typo preserved for posterity)\n- Commented-out print statements everywhere\n- Hardcoded paths to `lay6.png`\n\nIt's a mess. It's also a time capsule.\n\n### What Hackathons Are For\n\nHackathons aren't about production code. They're about asking \"what if?\"\n\nWhat if contour hierarchies mapped to DOM trees? They do.\nWhat if you could draw a website and have it appear? You can.\nWhat if the weird idea could work? Sometimes.\n\n### The Right Idea, Wrong Time\n\nThe core insight—visual layouts should convert directly to code—was right.\nThe industry spent seven years proving it.\n\nWe were just too early, with tools too primitive.\n\nThere's something satisfying about that. Building something that anticipated\nwhere the field was going, even if we couldn't get there ourselves.\n\n### The Code Is Still There\n\nThe repository is public. The contours still detect on clean drawings.\n\nIt's not useful anymore. But it's mine.\n\nAnd somewhere in those nested loops and misspelled variables is proof that\nI once spent 48 hours turning hand-drawn boxes into HTML because I thought\nit would be cool.\n\nIt was.","src/content/projects/autocss.mdx","3ac37a638b253208","autocss.mdx","posts",["Map",159,160],"building-style-transfer",{"id":159,"data":161,"body":169,"filePath":170,"digest":171,"legacyId":172,"deferredRender":21},{"title":162,"description":163,"tags":164,"publishedAt":166,"related":167,"draft":168},"Building a Style Transfer Plugin for Godot","A deep dive into integrating neural networks with game engine architecture.",[43,45,46,165],"tutorial",["Date","2025-01-08T00:00:00.000Z"],[],false,"When I first started exploring neural style transfer, I didn't expect to end up\nknee deep in Godot's rendering pipeline. But here we are.\n\nThe goal was simple: make a game look like a painting in real-time. The execution\nwas anything but.\n\n## The First Attempt\n\nI started where anyone would: the original Gatys et al. paper¹. The results were\nbeautiful. The performance was not.\n\n> \"The best optimization is the one you don't have to do.\"\n>\n> This kept echoing in my head as I stared at the profiler output.\n\n```python\ndef style_transfer(content, style, iterations=500):\n    # This took 45 seconds per frame\n    for i in range(iterations):\n        optimize_step(content, style)\n    return content\n```\n\n45 seconds. Per frame. For a game targeting 60fps, I needed to be roughly\n2,700 times faster.\n\n## The Breakthrough\n\nThe solution came from Johnson et al.'s feed-forward approach². Instead of\nrunning an optimization loop at runtime, we train a neural network to perform\nthe style transformation in a single forward pass.\n\nThe tradeoff: we lose flexibility (one network per style) but gain\nreal-time performance.\n\n## Integrating with Godot\n\nGodot's architecture made this surprisingly clean:\n\n1. **Viewport Capture**: Hook into the rendering pipeline to grab frames\n2. **PyTorch Bridge**: C++ bindings to call the trained model\n3. **Texture Injection**: Push stylized frames back to the renderer\n\nThe trickiest part was managing GPU memory—both Godot and PyTorch want\nto own the graphics card.\n\n## Performance Tuning\n\nGetting to 60fps required several optimizations:\n\n- Half-precision inference (FP16)\n- Async texture transfers\n- Resolution scaling based on GPU load\n- Frame interpolation for slower hardware\n\n## What I Learned\n\nBuilding this taught me that game development is all about constraints.\nYou don't need the perfect algorithm—you need one that's fast enough\nand looks good enough.\n\n---\n\n¹ Gatys, Ecker, Bethge. \"A Neural Algorithm of Artistic Style.\" 2015.\n\n² Johnson et al. \"Perceptual Losses for Real-Time Style Transfer.\" 2016.","src/content/posts/building-style-transfer.mdx","a22a72364ee46ec5","building-style-transfer.mdx"]
 ````
 
 
@@ -8562,6 +8571,174 @@ const { posts } = Astro.props;
 ```
 
 
+## src/components/content/Animatedimage.astro
+
+```astro
+---
+interface Props {
+  src: string;           // Path to animated GIF
+  staticSrc: string;     // Path to static first frame
+  alt: string;
+  caption?: string;
+  class?: string;
+}
+
+const { src, staticSrc, alt, caption, class: className } = Astro.props;
+---
+
+<div class:list={["animated-image-wrapper", className]}>
+  <figure class="animated-image">
+    <div class="image-frame">
+      <span class="corner corner--tl">┌</span>
+      <span class="corner corner--tr">┐</span>
+      <span class="corner corner--bl">└</span>
+      <span class="corner corner--br">┘</span>
+
+      <div class="image-container" data-static={staticSrc} data-animated={src}>
+        <img
+          src={staticSrc}
+          alt={alt}
+          class="display-image"
+          loading="lazy"
+        />
+        <button class="play-button" aria-label="Play animation">
+          <span class="play-icon">▶</span>
+          <span class="play-text">Play</span>
+        </button>
+      </div>
+    </div>
+
+    {caption && (
+      <figcaption class="image-caption">
+        <span class="annotation">{caption}</span>
+      </figcaption>
+    )}
+  </figure>
+</div>
+
+<script>
+  document.querySelectorAll('.animated-image .image-container').forEach(container => {
+    const button = container.querySelector('.play-button') as HTMLButtonElement;
+    const img = container.querySelector('.display-image') as HTMLImageElement;
+    const staticSrc = container.getAttribute('data-static')!;
+    const animatedSrc = container.getAttribute('data-animated')!;
+    let isPlaying = false;
+
+    button?.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      
+      if (isPlaying) {
+        img.src = animatedSrc;
+        button.classList.add('is-playing');
+        button.querySelector('.play-text')!.textContent = 'Stop';
+        button.querySelector('.play-icon')!.textContent = '■';
+      } else {
+        img.src = staticSrc;
+        button.classList.remove('is-playing');
+        button.querySelector('.play-text')!.textContent = 'Play';
+        button.querySelector('.play-icon')!.textContent = '▶';
+      }
+    });
+  });
+</script>
+
+<style>
+  .animated-image-wrapper {
+    margin: var(--space-4) 0;
+    text-align: center;
+  }
+
+  .animated-image {
+    display: inline-block;
+    text-align: center;
+    margin: 0;
+  }
+
+  .image-frame {
+    position: relative;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    padding: var(--space-2);
+    display: inline-block;
+  }
+
+  .corner {
+    position: absolute;
+    font-size: var(--text-sm);
+    line-height: 1;
+    color: var(--text-ghost);
+    background: var(--bg-primary);
+    padding: 0 3px;
+    z-index: 1;
+  }
+
+  .corner--tl { top: -1px; left: -1px; }
+  .corner--tr { top: -1px; right: -1px; }
+  .corner--bl { bottom: -1px; left: -1px; }
+  .corner--br { bottom: -1px; right: -1px; }
+
+  .image-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .display-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .play-button {
+    position: absolute;
+    bottom: var(--space-2);
+    right: var(--space-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-medium);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    opacity: 0.9;
+  }
+
+  .play-button:hover {
+    background: var(--bg-secondary);
+    border-color: var(--border-heavy);
+    opacity: 1;
+  }
+
+  .play-button.is-playing {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+  }
+
+  .play-icon {
+    font-size: 0.7em;
+  }
+
+  .image-caption {
+    margin-top: var(--space-2);
+    text-align: center;
+  }
+
+  .annotation {
+    font-family: var(--font-annotation);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    display: inline-block;
+    line-height: 1.4;
+  }
+</style>
+```
+
+
 ## src/components/content/AsciiDiagram.astro
 
 ```astro
@@ -8614,7 +8791,9 @@ const finalFontSize = sizeMap[fontSize] || fontSize;
 <style>
   .ascii-diagram {
     margin: var(--space-4) 0;
-    display: table;
+    display: block;
+    width: fit-content;
+    clear: both;
     max-width: 100%;
   }
 
@@ -8786,7 +8965,9 @@ const {
 <style>
   .comic {
     margin: var(--space-4) 0;
-    display: table; /* Robust shrink-wrapping */
+    display: block;
+    width: fit-content;
+    clear: both;
     max-width: 100%;
   }
 
@@ -9105,7 +9286,7 @@ export { default as AsciiDiagram } from './AsciiDiagram.astro';
 export { default as DemoEmbed } from './DemoEmbed.astro';
 export { default as YouTubeEmbed } from './YouTubeEmbed.astro';
 export { default as Comic } from './Comic.astro';
-export { default as Callout } from './Callout.astro';
+export { default as AnimatedImage } from './AnimatedImage.astro';
 ```
 
 
@@ -10299,7 +10480,10 @@ import HeroContent from './HeroContent';
 
 <section class="hero">
   <BoxFrame padding="40px 38px 36px" background="rgba(252, 250, 245, 0.5)">
-    <HeroContent client:only="react" />
+    <!-- min-height wrapper prevents collapse while client:only hydrates -->
+    <div class="hero-content-wrapper">
+      <HeroContent client:only="react" />
+    </div>
   </BoxFrame>
 
   <div class="hero-annotation">
@@ -10317,6 +10501,11 @@ import HeroContent from './HeroContent';
     position: relative;
   }
 
+  /* Reserve space for HeroContent to prevent layout shift during hydration */
+  .hero-content-wrapper {
+    min-height: 340px; /* Approximate height of fully rendered HeroContent */
+  }
+
   .hero-annotation {
     position: absolute;
     right: 20px;
@@ -10329,6 +10518,13 @@ import HeroContent from './HeroContent';
     border-radius: 3px;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
+  }
+
+  /* Responsive min-height for mobile */
+  @media (max-width: 640px) {
+    .hero-content-wrapper {
+      min-height: 420px; /* Taller on mobile due to stacked layout */
+    }
   }
 </style>
 ```
@@ -10370,10 +10566,118 @@ import HeroContent from './HeroContent';
   display: flex;
   align-items: center;
   gap: 8px;
+  /* Keep space reserved during wind-down to prevent layout shift */
+  min-height: 1.5em;
+}
+
+/* Hidden but preserving layout space */
+.statusHidden {
+  visibility: hidden;
 }
 
 .statusDot {
   color: var(--status-green);
+  transition: color 0.15s ease;
+}
+
+/* Wind-down LED states */
+.statusDotAmber {
+  color: #D4A844;
+  /* warm amber */
+}
+
+.statusDotRed {
+  color: var(--rust-warm, #BF4D28);
+  /* on-brand rust red */
+}
+
+.statusDotOff {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Wind-down status animation */
+.statusWindingDown {
+  animation: statusFadeOut 200ms ease-in forwards;
+  animation-delay: 750ms;
+}
+
+@keyframes statusFadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* Glitch effect for status */
+.statusGlitch {
+  animation: statusGlitchAnim 100ms steps(1) 1;
+}
+
+@keyframes statusGlitchAnim {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  20% {
+    opacity: 0.6;
+    transform: translateX(-3px);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translateX(2px);
+  }
+
+  60% {
+    opacity: 0.4;
+    transform: translateX(-2px);
+  }
+
+  80% {
+    opacity: 0.8;
+    transform: translateX(3px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Text glitch effect - slight scramble feel */
+.textGlitch {
+  animation: textGlitchAnim 80ms steps(1) 1;
+}
+
+@keyframes textGlitchAnim {
+
+  0%,
+  100% {
+    filter: none;
+    transform: translateX(0);
+  }
+
+  25% {
+    filter: blur(0.5px);
+    transform: translateX(-1px);
+  }
+
+  50% {
+    filter: none;
+    transform: translateX(1px);
+  }
+
+  75% {
+    filter: blur(0.3px);
+    transform: translateX(0);
+  }
 }
 
 /* =============================================================================
@@ -10433,6 +10737,22 @@ import HeroContent from './HeroContent';
   transition: width 0.6s var(--ease-out);
 }
 
+/* Wind-down line retraction animation */
+.lineWindingDown {
+  animation: lineRetract 500ms ease-in forwards;
+  animation-delay: 400ms;
+}
+
+@keyframes lineRetract {
+  0% {
+    width: 160px;
+  }
+
+  100% {
+    width: 0;
+  }
+}
+
 .tagline {
   margin: 12px 0 0 0;
   color: var(--text-secondary);
@@ -10467,6 +10787,16 @@ import HeroContent from './HeroContent';
 
 .output {
   color: var(--text-secondary);
+}
+
+/* Terminal text scramble effect */
+.terminalScramble {
+  font-family: var(--font-mono);
+}
+
+.scrambleText {
+  color: var(--rust-warm, #BF4D28);
+  letter-spacing: 0.02em;
 }
 
 /* =============================================================================
@@ -10608,11 +10938,84 @@ function debugLog(...args: unknown[]) {
   }
 }
 
+// Wind-down duration in ms - should match the sound and CSS animations
+const WIND_DOWN_DURATION = 900;
+
+// Characters for text scramble effect
+const SCRAMBLE_CHARS = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+// Hook for text scramble effect
+function useTextScramble(originalText: string, isScrambling: boolean, duration: number = 700) {
+  const [displayText, setDisplayText] = useState(originalText);
+  const frameRef = useRef<number | undefined>(undefined);
+  const wasScrambling = useRef<boolean>(false);
+
+  useEffect(() => {
+    // If not scrambling, only reset if we were previously scrambling
+    if (!isScrambling) {
+      if (wasScrambling.current) {
+        setDisplayText(originalText);
+        wasScrambling.current = false;
+      }
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = undefined;
+      }
+      return;
+    }
+
+    wasScrambling.current = true;
+    const startTime = Date.now();
+    const textLength = originalText.length;
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // As progress increases, more characters become scrambled, then blank
+      let result = '';
+      for (let i = 0; i < textLength; i++) {
+        const charProgress = progress + (i / textLength) * 0.3; // Stagger effect
+
+        if (charProgress > 0.85) {
+          // Fade to blank
+          result += ' ';
+        } else if (charProgress > 0.15) {
+          // Scrambled - change character each frame for glitchy effect
+          result += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+        } else {
+          // Original
+          result += originalText[i];
+        }
+      }
+
+      setDisplayText(result);
+
+      if (progress < 1) {
+        frameRef.current = requestAnimationFrame(animate);
+      } else {
+        frameRef.current = undefined;
+      }
+    };
+
+    frameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = undefined;
+      }
+    };
+  }, [isScrambling, originalText, duration]);
+
+  return displayText;
+}
+
 export default function HeroContent() {
   const { enabled: soundOn, initialized: soundInitialized, toggle: toggleSound, play } = useSound();
 
-  // Animation mode: 'quick' = fade-in (default), 'full' = typing animation with sound
-  const [animationMode, setAnimationMode] = useState<'full' | 'quick'>('quick');
+  // Animation mode: 'quick' = fade-in (default), 'full' = typing animation with sound, 'winding-down' = transition
+  const [animationMode, setAnimationMode] = useState<'full' | 'quick' | 'winding-down'>('quick');
 
   // Counter to trigger new animations (incrementing forces effects to re-run)
   const [animationTrigger, setAnimationTrigger] = useState(0);
@@ -10624,17 +11027,33 @@ export default function HeroContent() {
   const hasPlayedStartup = useRef(false);
 
   const isFullAnimation = animationMode === 'full';
+  const isWindingDown = animationMode === 'winding-down';
 
-  // Show status - managed manually for proper reset on re-trigger
-  const [showStatus, setShowStatus] = useState(true);
+  // Status visibility (separate from content visibility to prevent layout shift)
+  const [statusVisible, setStatusVisible] = useState(true);
+  const [showTypedStatus, setShowTypedStatus] = useState(false); // Controls if status shows typed content
   const [lineWidth, setLineWidth] = useState(160);
+
+  // Wind-down status LED state: 'green' | 'amber' | 'red' | 'off'
+  const [statusLedState, setStatusLedState] = useState<'green' | 'amber' | 'red' | 'off'>('green');
+
+  // Wind-down status text state
+  const [statusText, setStatusText] = useState(SITE.connectionMessage);
+  const [statusGlitching, setStatusGlitching] = useState(false);
+
+  // Terminal line scramble state
+  const [terminalScrambling, setTerminalScrambling] = useState(false);
+  const scrambledTerminalText = useTextScramble(SITE.status, terminalScrambling, 700);
+
+  // Oscilloscope power state
+  const [oscilloscopePoweringUp, setOscilloscopePoweringUp] = useState(false);
 
   // Use a ref to track the component instance for debugging
   const mountId = useRef(Math.random().toString(36).slice(2, 6));
 
   // =========================================================================
   // SIGNATURE MARK CLICK HANDLER
-  // Triggers the full animation with startup sound
+  // Triggers the wind-down, then the full animation with startup sound
   // =========================================================================
   const handleSignatureClick = useCallback(() => {
     debugLog(`[${mountId.current}] SignatureMark clicked`, { isAnimating, animationMode });
@@ -10645,21 +11064,80 @@ export default function HeroContent() {
       return;
     }
 
-    debugLog(`[${mountId.current}] Starting animation sequence`);
+    debugLog(`[${mountId.current}] Starting wind-down sequence`);
 
     // CRITICAL: Unlock AudioContext immediately during click event
     soundSystem.unlockAudio();
 
-    // Reset state for new animation
-    hasPlayedStartup.current = false;
-    setLineWidth(0);
-    setShowStatus(false); // Hide status, will show after delay
-
-    // Trigger new animation
-    setAnimationMode('full');
+    // Start the wind-down phase
     setIsAnimating(true);
-    setAnimationTrigger(prev => prev + 1); // Increment to force effects to re-run
-  }, [isAnimating, animationMode]);
+    setAnimationMode('winding-down');
+
+    // Play wind-down sound after a small delay to ensure AudioContext is ready
+    setTimeout(() => {
+      if (soundSystem.isEnabled()) {
+        play('windDown');
+      }
+    }, 50);
+
+    // Wind-down LED sequence: green -> amber -> red -> off
+    // 0ms: Start (green)
+    setStatusLedState('green');
+
+    // 80ms: First glitch + start terminal scramble
+    setTimeout(() => {
+      setStatusGlitching(true);
+      setTerminalScrambling(true);
+      setTimeout(() => setStatusGlitching(false), 100);
+    }, 80);
+
+    // 200ms: Amber + text change
+    setTimeout(() => {
+      setStatusLedState('amber');
+      setStatusText('[RESETTING...]');
+    }, 200);
+
+    // 400ms: Second glitch
+    setTimeout(() => {
+      setStatusGlitching(true);
+      setTimeout(() => setStatusGlitching(false), 100);
+    }, 400);
+
+    // 550ms: Red
+    setTimeout(() => {
+      setStatusLedState('red');
+    }, 550);
+
+    // 750ms: Begin fade out (handled by CSS)
+    setTimeout(() => {
+      setStatusLedState('off');
+    }, 750);
+
+    // After wind-down completes, start the startup sequence
+    setTimeout(() => {
+      debugLog(`[${mountId.current}] Wind-down complete, starting startup`);
+
+      // Reset state for new animation
+      hasPlayedStartup.current = false;
+      setLineWidth(0);
+      setStatusVisible(false); // Now hide status (will reappear with typing)
+      setShowTypedStatus(true); // Next time status shows, use typed animation
+      setTerminalScrambling(false);
+
+      // Reset status for when it reappears
+      setStatusLedState('green');
+      setStatusText(SITE.connectionMessage);
+      setStatusGlitching(false);
+
+      // Start oscilloscope power-up
+      setOscilloscopePoweringUp(true);
+
+      // Trigger new animation
+      setAnimationMode('full');
+      setAnimationTrigger(prev => prev + 1);
+    }, WIND_DOWN_DURATION);
+
+  }, [isAnimating, animationMode, play]);
 
   // =========================================================================
   // PLAY STARTUP SOUND
@@ -10694,11 +11172,25 @@ export default function HeroContent() {
     if (animationMode !== 'full') return;
 
     const timeout = setTimeout(() => {
-      setShowStatus(true);
+      setStatusVisible(true);
     }, TIMING.connectionDelay);
 
     return () => clearTimeout(timeout);
   }, [animationTrigger, animationMode]);
+
+  // =========================================================================
+  // OSCILLOSCOPE POWER-UP COMPLETE
+  // Reset power-up state after animation completes
+  // =========================================================================
+  useEffect(() => {
+    if (!oscilloscopePoweringUp) return;
+
+    const timeout = setTimeout(() => {
+      setOscilloscopePoweringUp(false);
+    }, 500); // Power-up animation duration
+
+    return () => clearTimeout(timeout);
+  }, [oscilloscopePoweringUp]);
 
   // =========================================================================
   // ANIMATION COMPLETION
@@ -10706,6 +11198,7 @@ export default function HeroContent() {
   // =========================================================================
   useEffect(() => {
     if (!isAnimating) return;
+    if (animationMode === 'winding-down') return; // Wind-down handles its own timing
 
     // Total animation duration (adjust based on your TIMING values)
     // connectionDelay + typingDelay + typing time + buffer
@@ -10714,10 +11207,11 @@ export default function HeroContent() {
     const timeout = setTimeout(() => {
       debugLog(`[${mountId.current}] Animation complete`);
       setIsAnimating(false);
+      setShowTypedStatus(false); // Reset for next cycle
     }, animationDuration);
 
     return () => clearTimeout(timeout);
-  }, [isAnimating]);
+  }, [isAnimating, animationMode]);
 
   // =========================================================================
   // CLEANUP
@@ -10752,27 +11246,47 @@ export default function HeroContent() {
   }, [animationMode, animationTrigger]);
 
   // =========================================================================
+  // STATUS LED CLASS
+  // =========================================================================
+  const getStatusDotClass = () => {
+    const classes = [styles.statusDot];
+    if (isWindingDown) {
+      if (statusLedState === 'amber') classes.push(styles.statusDotAmber);
+      if (statusLedState === 'red') classes.push(styles.statusDotRed);
+      if (statusLedState === 'off') classes.push(styles.statusDotOff);
+    }
+    return classes.join(' ');
+  };
+
+  // =========================================================================
   // RENDER
   // =========================================================================
   return (
     <div className={`${styles.hero} ${animationMode === 'quick' ? styles.fadeIn : ''}`}>
-      {/* Connection status */}
-      {showStatus && (
-        <div className={styles.status}>
-          <span className={styles.statusDot}>◉</span>
-          {isFullAnimation ? (
-            <TypedText
-              key={`typed-status-${animationTrigger}`}
-              text={SITE.connectionMessage}
-              delay={200}
-              speed={35}
-              showCursor={false}
-            />
-          ) : (
-            <span>{SITE.connectionMessage}</span>
-          )}
-        </div>
-      )}
+      {/* Connection status - always in DOM to prevent layout shift */}
+      <div
+        className={`
+          ${styles.status} 
+          ${isWindingDown ? styles.statusWindingDown : ''}
+          ${statusGlitching ? styles.statusGlitch : ''}
+          ${!statusVisible && !isWindingDown ? styles.statusHidden : ''}
+        `}
+      >
+        <span className={getStatusDotClass()}>◉</span>
+        {statusVisible && showTypedStatus && isFullAnimation ? (
+          <TypedText
+            key={`typed-status-${animationTrigger}`}
+            text={SITE.connectionMessage}
+            delay={200}
+            speed={35}
+            showCursor={false}
+          />
+        ) : (
+          <span className={statusGlitching ? styles.textGlitch : ''}>
+            {statusText}
+          </span>
+        )}
+      </div>
 
       {/* Header row */}
       <div className={styles.header}>
@@ -10780,13 +11294,15 @@ export default function HeroContent() {
         <SignatureMark
           soundOn={soundOn}
           onToggleSound={handleSignatureClick}
+          windingDown={isWindingDown}
+          poweringUp={oscilloscopePoweringUp}
         />
 
         <div className={styles.titleArea}>
           <h1 className={styles.name}>{SITE.name}</h1>
           <div
-            className={styles.titleLine}
-            style={{ width: `${lineWidth}px` }}
+            className={`${styles.titleLine} ${isWindingDown ? styles.lineWindingDown : ''}`}
+            style={{ width: isWindingDown ? undefined : `${lineWidth}px` }}
           />
           <p className={styles.tagline}>{SITE.tagline}</p>
         </div>
@@ -10803,7 +11319,7 @@ export default function HeroContent() {
       <div className={styles.terminal}>
         <div className={styles.terminalLine}>
           <span className={styles.prompt}>&gt;</span>
-          <span className={styles.command}>
+          <span className={`${styles.command} ${terminalScrambling ? styles.terminalScramble : ''}`}>
             {isFullAnimation ? (
               <TypedLine
                 key={`typed-line-${animationTrigger}`}
@@ -10811,6 +11327,8 @@ export default function HeroContent() {
                 delay={TIMING.typingDelay}
                 speed={TIMING.typingSpeed}
               />
+            ) : terminalScrambling ? (
+              <span className={styles.scrambleText}>{scrambledTerminalText}</span>
             ) : (
               <span>
                 {SITE.status}
@@ -10848,6 +11366,7 @@ export default function HeroContent() {
   );
 }
 
+// NavItem component - matches original implementation
 function NavItem({ item, isFirst }: { item: typeof SITE.nav[0]; isFirst: boolean }) {
   const [hovered, setHovered] = useState(false);
 
@@ -11386,8 +11905,20 @@ export function FooterMark() {
 
 ```css
 .oscilloscope {
-  display: block;
-  overflow: visible;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* During power-down, add subtle color shift */
+.poweringDown {
+  transition: filter 0.7s ease-in;
+  filter: saturate(0.5);
+}
+
+/* During power-up, saturate back to normal */
+.poweringUp {
+  transition: filter 0.5s ease-out;
+  filter: saturate(1);
 }
 ```
 
@@ -11396,33 +11927,98 @@ export function FooterMark() {
 
 ```tsx
 import { useAnimationPhase } from '@/hooks/useAnimationPhase';
+import { useState, useEffect } from 'react';
 import styles from './Oscilloscope.module.css';
 
 interface OscilloscopeProps {
   width?: number;
   height?: number;
   className?: string;
+  poweringDown?: boolean;
+  poweringUp?: boolean;
 }
 
 export function Oscilloscope({
   width = 32,
   height = 10,
-  className
+  className,
+  poweringDown = false,
+  poweringUp = false
 }: OscilloscopeProps) {
   const phase = useAnimationPhase(0.14);
 
+  // Track the power animation progress (0 = flat line, 1 = full wave)
+  const [powerLevel, setPowerLevel] = useState(1); // Start at full power
+
+  useEffect(() => {
+    if (poweringDown) {
+      // Animate from current level to 0 over 700ms
+      const startTime = Date.now();
+      const startLevel = powerLevel;
+      const duration = 700;
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // Use ease-in curve for more dramatic ending
+        const easedProgress = progress * progress;
+        setPowerLevel(startLevel * (1 - easedProgress));
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+
+      requestAnimationFrame(animate);
+    }
+  }, [poweringDown]);
+
+  useEffect(() => {
+    if (poweringUp) {
+      // Animate from 0 to 1 over 500ms
+      const startTime = Date.now();
+      const duration = 500;
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // Use ease-out curve for quick start, smooth finish
+        const easedProgress = 1 - Math.pow(1 - progress, 2);
+        setPowerLevel(easedProgress);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+
+      // Start from 0
+      setPowerLevel(0);
+      requestAnimationFrame(animate);
+    }
+  }, [poweringUp]);
+
+  // Calculate amplitude based on power level
+  const amplitudeMultiplier = powerLevel;
+
   const points = Array.from({ length: 21 }, (_, i) => {
     const x = (i / 20) * width;
-    const y = height / 2 + Math.sin((i * 50 + phase * 180 / Math.PI) * Math.PI / 180) * (height / 2 - 1);
+    const baseAmplitude = (height / 2 - 1) * amplitudeMultiplier;
+    const y = height / 2 + Math.sin((i * 50 + phase * 180 / Math.PI) * Math.PI / 180) * baseAmplitude;
     return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
   }).join(' ');
+
+  // Fade out opacity during power-down, fade in during power-up
+  const opacity = poweringDown ? 0.5 + (powerLevel * 0.5) : 1;
+
+  const isPowerTransition = poweringDown || poweringUp;
 
   return (
     <svg
       width={width}
       height={height}
-      className={`${styles.oscilloscope} ${className || ''}`}
+      className={`${styles.oscilloscope} ${className || ''} ${poweringDown ? styles.poweringDown : ''} ${poweringUp ? styles.poweringUp : ''}`}
       aria-hidden="true"
+      style={{ opacity: isPowerTransition ? opacity : 1 }}
     >
       <path
         d={points}
@@ -11715,6 +12311,26 @@ export default function ReadingProgress() {
   display: inline-block;
 }
 
+/* Wind-down: dots merge animation is handled by inline styles,
+   but we can add a subtle opacity pulse here */
+.dotsWindingDown .dot {
+  animation: dotPulse 0.4s ease-in;
+}
+
+@keyframes dotPulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
 .contentWrapper {
   display: inline-flex;
   width: 3ch;
@@ -11726,9 +12342,19 @@ export default function ReadingProgress() {
 }
 
 @keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-3deg); }
-  75% { transform: rotate(3deg); }
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-3deg);
+  }
+
+  75% {
+    transform: rotate(3deg);
+  }
 }
 
 .tooltip {
@@ -11744,8 +12370,15 @@ export default function ReadingProgress() {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 ```
 
@@ -11756,8 +12389,9 @@ export default function ReadingProgress() {
 /**
  * Signature Mark with Sound Effects
  * 
- * Updated to play:
+ * Updated to support:
  * - easterEgg: When clicking 7 times triggers the easter egg
+ * - windingDown: Visual wind-down animation before startup
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -11773,12 +12407,16 @@ interface SignatureMarkProps {
   compact?: boolean;
   soundOn?: boolean;
   onToggleSound?: () => void;
+  windingDown?: boolean;
+  poweringUp?: boolean;
 }
 
 export function SignatureMark({
   compact = false,
   soundOn = false,
-  onToggleSound
+  onToggleSound,
+  windingDown = false,
+  poweringUp = false
 }: SignatureMarkProps) {
   const [hovered, setHovered] = useState(false);
   const noticed = useDelayedState(false, TIMING.markNoticeDelay);
@@ -11800,9 +12438,11 @@ export function SignatureMark({
   const baseSpacing = compact ? 3 : 5;
   const breathAmt = compact ? 2.5 : 3.5;
 
-  const spacing = !noticed ? 0
-    : hovered ? baseSpacing * 0.15
-      : baseSpacing + breathVal * breathAmt;
+  // During wind-down, force spacing to 0 (dots collapse to center)
+  const spacing = windingDown ? 0
+    : !noticed ? 0
+      : hovered ? baseSpacing * 0.15
+        : baseSpacing + breathVal * breathAmt;
 
   const handleClick = (e: React.MouseEvent) => {
     handleEasterEggClick();
@@ -11815,14 +12455,16 @@ export function SignatureMark({
 
   const dotsContent = (
     <span
-      className={styles.dots}
+      className={`${styles.dots} ${windingDown ? styles.dotsWindingDown : ''}`}
       style={{ width: compact ? '26px' : '35px' }}
     >
       <span
         className={styles.dot}
         style={{
           transform: `translateX(${-spacing}px)`,
-          transition: noticed ? `transform 0.35s ${ANIMATION.spring}` : 'none'
+          transition: windingDown
+            ? 'transform 0.7s ease-in'
+            : noticed ? `transform 0.35s ${ANIMATION.spring}` : 'none'
         }}
       >
         ·
@@ -11831,7 +12473,9 @@ export function SignatureMark({
         className={styles.dot}
         style={{
           transform: `translateX(${spacing}px)`,
-          transition: noticed ? `transform 0.35s ${ANIMATION.spring}` : 'none'
+          transition: windingDown
+            ? 'transform 0.7s ease-in'
+            : noticed ? `transform 0.35s ${ANIMATION.spring}` : 'none'
         }}
       >
         ·
@@ -11839,8 +12483,14 @@ export function SignatureMark({
     </span>
   );
 
+  // During wind-down with sound on, show oscilloscope powering down
   const content = soundOn ? (
-    <Oscilloscope width={compact ? 24 : 30} height={compact ? 8 : 10} />
+    <Oscilloscope
+      width={compact ? 24 : 30}
+      height={compact ? 8 : 10}
+      poweringDown={windingDown}
+      poweringUp={poweringUp}
+    />
   ) : dotsContent;
 
   const markStyle = {
@@ -11921,7 +12571,6 @@ export function SignatureMark({
     </div>
   );
 }
-
 ```
 
 
@@ -19952,7 +20601,7 @@ function createFilter(
 import type { SoundName } from '@/types';
 import type { Sound } from '../components/sound-lab/lib/types';
 import { playCustomSound } from './sound-player';
-import { playStartupSound, cancelStartupSound } from './startup-sound';
+import { playStartupSound, cancelStartupSound, playWindDownSound } from './startup-sound';
 
 // =============================================================================
 // TONAL PALETTE - D Major Pentatonic
@@ -20251,6 +20900,10 @@ const SYNTHESIZERS: Record<SoundName, SoundSynthesizer> = {
   startup: (ctx, volume) => {
     playStartupSound(ctx, volume);
   },
+
+  windDown: (ctx, volume) => {
+    playWindDownSound(ctx, volume);
+  },
 };
 
 // =============================================================================
@@ -20471,9 +21124,15 @@ export { cancelStartupSound } from './startup-sound';
 
 ```ts
 /**
- * Startup Sound v4 - Refined
+ * Startup Sound v5 - With Wind-Down
  * 
- * Timeline:
+ * Wind-Down Timeline (~900ms):
+ * - 0ms:    Click acknowledgment - soft confirmation
+ * - 80ms:   Descending sweep begins (A4 → F#4 → D4 → A3 → D3)
+ * - 500ms:  Low settle (D2 hum) - system going quiet
+ * - ~900ms: Silence, ready for startup
+ * 
+ * Startup Timeline (existing):
  * - 400ms:  Punch (line draws) - satisfying thock
  * - 800ms:  Bloom (status appears) - with extended tail
  * - 2000ms: Zoooop - long rising sweep (~2s)
@@ -20504,11 +21163,21 @@ const N = {
 let activeStartupNodes: AudioNode[] = [];
 let isStartupPlaying = false;
 
+let activeWindDownNodes: AudioNode[] = [];
+let isWindDownPlaying = false;
+
 /**
- * Register a node for potential cancellation
+ * Register a node for potential cancellation (startup)
  */
 function trackNode(node: AudioNode): void {
     activeStartupNodes.push(node);
+}
+
+/**
+ * Register a node for potential cancellation (wind-down)
+ */
+function trackWindDownNode(node: AudioNode): void {
+    activeWindDownNodes.push(node);
 }
 
 /**
@@ -20533,10 +21202,180 @@ export function cancelStartupSound(): void {
 }
 
 /**
+ * Cancel wind-down sound
+ */
+export function cancelWindDownSound(): void {
+    if (!isWindDownPlaying) return;
+
+    activeWindDownNodes.forEach(node => {
+        try {
+            if (node instanceof OscillatorNode || node instanceof AudioBufferSourceNode) {
+                node.stop();
+            }
+            node.disconnect();
+        } catch (e) {
+            // Node may have already stopped - ignore
+        }
+    });
+
+    activeWindDownNodes = [];
+    isWindDownPlaying = false;
+}
+
+/**
  * Check if startup sound is currently playing
  */
 export function isStartupSoundPlaying(): boolean {
     return isStartupPlaying;
+}
+
+// =============================================================================
+// WIND-DOWN SOUND (~500ms)
+// Character: System gracefully powering down, closing connection
+// =============================================================================
+
+/**
+ * Play the wind-down sound sequence
+ * Timeline synced with visual animations (~900ms):
+ * - 0ms: Click ack
+ * - 80ms: Sweep begins
+ * - 500ms: Low settle
+ * - 900ms: Silence
+ */
+export function playWindDownSound(ctx: AudioContext, volume: number = 0.7): number {
+    cancelWindDownSound();
+
+    const now = ctx.currentTime;
+    isWindDownPlaying = true;
+
+    // ===== CLICK ACKNOWLEDGMENT (0ms) =====
+    // Quick confirmation that the click registered
+    const clickOsc = ctx.createOscillator();
+    const clickGain = ctx.createGain();
+    const clickFilter = ctx.createBiquadFilter();
+
+    clickOsc.type = 'sine';
+    clickOsc.frequency.value = N.D4;
+
+    clickFilter.type = 'lowpass';
+    clickFilter.frequency.value = 2000;
+
+    clickGain.gain.setValueAtTime(0, now);
+    clickGain.gain.linearRampToValueAtTime(volume * 0.12, now + 0.01);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+    clickOsc.connect(clickFilter).connect(clickGain).connect(ctx.destination);
+    clickOsc.start(now);
+    clickOsc.stop(now + 0.1);
+
+    trackWindDownNode(clickOsc);
+    trackWindDownNode(clickGain);
+    trackWindDownNode(clickFilter);
+
+    // ===== DESCENDING SWEEP (80ms - 700ms) =====
+    // "Connection closing" - slower, more deliberate falling pitch
+    const sweepStart = now + 0.08;
+
+    const sweepOsc = ctx.createOscillator();
+    const sweepGain = ctx.createGain();
+    const sweepFilter = ctx.createBiquadFilter();
+
+    sweepOsc.type = 'sine';
+    sweepOsc.frequency.setValueAtTime(N.A4, sweepStart);
+    sweepOsc.frequency.exponentialRampToValueAtTime(N['F#4'], sweepStart + 0.15);
+    sweepOsc.frequency.exponentialRampToValueAtTime(N.D4, sweepStart + 0.30);
+    sweepOsc.frequency.exponentialRampToValueAtTime(N.A3, sweepStart + 0.45);
+    sweepOsc.frequency.exponentialRampToValueAtTime(N.D3, sweepStart + 0.62);
+
+    sweepFilter.type = 'lowpass';
+    sweepFilter.frequency.setValueAtTime(2500, sweepStart);
+    sweepFilter.frequency.exponentialRampToValueAtTime(1800, sweepStart + 0.15);
+    sweepFilter.frequency.exponentialRampToValueAtTime(1200, sweepStart + 0.30);
+    sweepFilter.frequency.exponentialRampToValueAtTime(600, sweepStart + 0.45);
+    sweepFilter.frequency.exponentialRampToValueAtTime(250, sweepStart + 0.62);
+    sweepFilter.Q.value = 0.6;
+
+    sweepGain.gain.setValueAtTime(0, sweepStart);
+    sweepGain.gain.linearRampToValueAtTime(volume * 0.1, sweepStart + 0.04);
+    sweepGain.gain.linearRampToValueAtTime(volume * 0.09, sweepStart + 0.20);
+    sweepGain.gain.linearRampToValueAtTime(volume * 0.07, sweepStart + 0.35);
+    sweepGain.gain.linearRampToValueAtTime(volume * 0.04, sweepStart + 0.50);
+    sweepGain.gain.exponentialRampToValueAtTime(0.001, sweepStart + 0.65);
+
+    sweepOsc.connect(sweepFilter).connect(sweepGain).connect(ctx.destination);
+    sweepOsc.start(sweepStart);
+    sweepOsc.stop(sweepStart + 0.7);
+
+    trackWindDownNode(sweepOsc);
+    trackWindDownNode(sweepGain);
+    trackWindDownNode(sweepFilter);
+
+    // ===== SUB HARMONIC (parallel to sweep) =====
+    // Adds weight to the descent
+    const subOsc = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    const subFilter = ctx.createBiquadFilter();
+
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(N.D3, sweepStart);
+    subOsc.frequency.exponentialRampToValueAtTime(N.A3, sweepStart + 0.20);
+    subOsc.frequency.exponentialRampToValueAtTime(N.D3, sweepStart + 0.40);
+    subOsc.frequency.exponentialRampToValueAtTime(N.D2, sweepStart + 0.60);
+
+    subFilter.type = 'lowpass';
+    subFilter.frequency.value = 250;
+
+    subGain.gain.setValueAtTime(0, sweepStart);
+    subGain.gain.linearRampToValueAtTime(volume * 0.08, sweepStart + 0.06);
+    subGain.gain.linearRampToValueAtTime(volume * 0.06, sweepStart + 0.30);
+    subGain.gain.linearRampToValueAtTime(volume * 0.04, sweepStart + 0.50);
+    subGain.gain.exponentialRampToValueAtTime(0.001, sweepStart + 0.65);
+
+    subOsc.connect(subFilter).connect(subGain).connect(ctx.destination);
+    subOsc.start(sweepStart);
+    subOsc.stop(sweepStart + 0.7);
+
+    trackWindDownNode(subOsc);
+    trackWindDownNode(subGain);
+    trackWindDownNode(subFilter);
+
+    // ===== LOW SETTLE (500ms - 900ms) =====
+    // Final "system off" tone - quiet D2 that fades slowly
+    const settleStart = now + 0.5;
+
+    const settleOsc = ctx.createOscillator();
+    const settleGain = ctx.createGain();
+    const settleFilter = ctx.createBiquadFilter();
+
+    settleOsc.type = 'sine';
+    settleOsc.frequency.value = N.D2;
+
+    settleFilter.type = 'lowpass';
+    settleFilter.frequency.value = 150;
+    settleFilter.Q.value = 0.7;
+
+    settleGain.gain.setValueAtTime(0, settleStart);
+    settleGain.gain.linearRampToValueAtTime(volume * 0.07, settleStart + 0.06);
+    settleGain.gain.linearRampToValueAtTime(volume * 0.05, settleStart + 0.15);
+    settleGain.gain.linearRampToValueAtTime(volume * 0.02, settleStart + 0.30);
+    settleGain.gain.exponentialRampToValueAtTime(0.001, settleStart + 0.40);
+
+    settleOsc.connect(settleFilter).connect(settleGain).connect(ctx.destination);
+    settleOsc.start(settleStart);
+    settleOsc.stop(settleStart + 0.45);
+
+    trackWindDownNode(settleOsc);
+    trackWindDownNode(settleGain);
+    trackWindDownNode(settleFilter);
+
+    // Auto-cleanup after wind-down completes
+    const WIND_DOWN_DURATION = 900;
+    setTimeout(() => {
+        activeWindDownNodes = [];
+        isWindDownPlaying = false;
+    }, WIND_DOWN_DURATION + 100);
+
+    return WIND_DOWN_DURATION;
 }
 
 // =============================================================================
@@ -20978,8 +21817,10 @@ function playComplete(ctx: AudioContext, startTime: number, volume: number): voi
 }
 
 // =============================================================================
-// MAIN EXPORT
+// MAIN EXPORTS
 // =============================================================================
+
+const STARTUP_SOUND_DURATION = 5000; // Total duration in ms
 
 export function playStartupSound(ctx: AudioContext, volume: number = 0.7): number {
     // Cancel any existing startup sound
@@ -21001,8 +21842,6 @@ export function playStartupSound(ctx: AudioContext, volume: number = 0.7): numbe
 
     return STARTUP_SOUND_DURATION;
 }
-
-export const STARTUP_SOUND_DURATION = 5000; // ms until shimmer fades
 ```
 
 
@@ -21658,6 +22497,7 @@ import DemoEmbed from '@/components/content/DemoEmbed.astro';
 import ReadingProgress from '@/components/interactive/ReadingProgress';
 import Comic from '@/components/content/Comic.astro';
 import AsciiDiagram from '@/components/content/AsciiDiagram.astro';
+import AnimatedImage from '@/components/content/AnimatedImage.astro';
 ---
 
 <BaseLayout title={project.data.title} description={project.data.description}>
@@ -21706,7 +22546,7 @@ import AsciiDiagram from '@/components/content/AsciiDiagram.astro';
 
       <ProjectTabs client:load tabs={project.data.tabs}>
         <div class="prose">
-        <Content components={{ YouTubeEmbed, DemoEmbed, Comic, AsciiDiagram }} />
+        <Content components={{ YouTubeEmbed, DemoEmbed, Comic, AsciiDiagram, AnimatedImage }} />
       </div>
       </ProjectTabs>
     </article>
@@ -22712,7 +23552,8 @@ export type SoundName =
   | 'soundOff'
   | 'easterEgg'
   | 'markHover'
-  | 'startup';
+  | 'startup'
+  | 'windDown';
 
 export interface SoundConfig {
   name: SoundName;

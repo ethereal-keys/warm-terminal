@@ -1,0 +1,430 @@
+---
+title: "AutoCSS: A Hackathon Retrospective"
+description: "In 2017, I built a tool to convert hand-drawn wireframes to HTML using OpenCV contour detection. Seven years later, VLMs do this with a single API call. A love letter to scrappy engineering."
+tags:
+  - python
+  - opencv
+  - hackathon
+  - retrospective
+publishedAt: 2026-02-05T00:00:00.000Z
+featured: true
+github: "https://github.com/ethereal-keys/AutoCSS"
+order: 2
+tabs:
+  - label: "./the-pitch"
+    id: "the-pitch"
+  - label: "./the-hack"
+    id: "the-hack"
+  - label: "./the-insight"
+    id: "the-insight"
+  - label: "./edge-cases"
+    id: "edge-cases"
+  - label: "./circa-2017"
+    id: "circa-2017"
+  - label: "./plot-twist"
+    id: "plot-twist"
+  - label: "./coda"
+    id: "coda"
+---
+
+## The Pitch
+
+In 2017, at a hackathon somewhere in my early undergrad, I had what felt like a
+brilliant idea: what if you could sketch a website layout on paper, point a
+camera at it, and have working HTML pop out the other end?
+
+<Comic 
+  src="https://imgs.xkcd.com/comics/tasks.png" 
+  alt="XKCD 1425: Tasks" 
+  caption="'In the 60s, Marvin Minsky assigned a couple of undergrads to spend the summer programming a computer to use a camera to identify objects in a scene. He figured they'd have the problem solved by the end of the summer. Half a century later, we're still working on it.'"
+/>
+
+The comic's punchline is that identifying whether a photo contains a bird 
+requires a research team and five years. Converting hand-drawn wireframes 
+to code? That's also a bird.
+
+But we were undergrads with 48 hours, a laptop, and the unwavering confidence
+that comes from not knowing what you don't know.
+
+So we built it anyway.
+
+## The Hack
+
+Here's what we were trying to do:
+
+<AsciiDiagram title="The Dream">
+{`
+    ┌─────────────┐         ┌─────────────┐
+    │  ┌───────┐  │         │   <div>     │
+    │  │ ███   │  │         │     <div>   │
+    │  ├───┬───┤  │   ───▶  │       ...   │
+    │  │ █ │ █ │  │         │     </div>  │
+    │  └───┴───┘  │         │   </div>    │
+    └─────────────┘         └─────────────┘
+      hand-drawn               HTML output
+`}
+</AsciiDiagram>
+
+The key insight: **OpenCV already knows how to find nested shapes.** We just
+had to convince it that rectangles-inside-rectangles is the same thing as
+divs-inside-divs.
+
+### The Pipeline
+
+<AsciiDiagram title="Processing Pipeline">
+{`
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │  Input   │    │ Cleanup  │    │  Edges   │    │ Contours │    │  Output  │
+  │ ──────── │    │ ──────── │    │ ──────── │    │ ──────── │    │ ──────── │
+  │  photo   │───▶│threshold │───▶│  canny   │───▶│RETR_TREE │───▶│   HTML   │
+  │  of      │    │  + blur  │    │  edge    │    │ hierarchy│    │   DOM    │
+  │ drawing  │    │          │    │detection │    │          │    │   tree   │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘
+`}
+</AsciiDiagram>
+
+And here's what that actually looked like:
+
+<AnimatedImage 
+  src="/images/autocss/autocss-pipeline.gif"
+  staticSrc="/images/autocss/autocss-pipeline-static.jpg"
+  alt="AutoCSS processing pipeline animation"
+  caption="Click to play — from paper sketch to detected contours in 5 steps"
+/>
+
+Each frame shows a real intermediate output from the pipeline:
+
+1. **Input** — The hand-drawn wireframe on paper
+2. **Binarized** — Threshold to clean black-on-white
+3. **Edges** — Canny edge detection finds the lines
+4. **Contours** — OpenCV traces every closed shape (notice the double lines!)
+5. **Output** — Clean bounding rectangles, ready for DOM conversion
+
+The magic happens in step 4. Let me show you.
+
+## The Insight
+
+When you call `cv2.findContours()`, you can choose how to organize the results.
+Most tutorials use `RETR_EXTERNAL` (just outer shapes) or `RETR_LIST` (flat list).
+
+We used `RETR_TREE`. And that changed everything.
+
+<AsciiDiagram title="What RETR_TREE Gives You">
+{`
+  The drawing:                 The hierarchy array:
+  ┌─────────────────────┐
+  │         0           │      index │ Next  Prev  Child  Parent
+  │  ┌─────┐  ┌─────┐   │      ──────┼────────────────────────────
+  │  │  1  │  │  2  │   │        0   │  -1    -1     1      -1    ← root (no parent)
+  │  │     │  │ ┌─┐ │   │        1   │   2    -1    -1       0    ← child of 0
+  │  └─────┘  │ │3│ │   │        2   │  -1     1     3       0    ← sibling of 1
+  │           │ └─┘ │   │        3   │  -1    -1    -1       2    ← child of 2
+  │           └─────┘   │
+  └─────────────────────┘      Parent links form a tree!
+`}
+</AsciiDiagram>
+
+See that `Parent` column? Contour 1's parent is 0. Contour 3's parent is 2.
+**The parent-child relationships are already computed for us.**
+
+This maps directly to how the DOM works:
+
+<AsciiDiagram title="Contours → DOM">
+{`
+  Contour hierarchy:              HTML DOM:
+
+         ┌───┐                    <div>              <!-- contour 0 -->
+         │ 0 │                      │
+         └─┬─┘                      ├─ <div/>        <!-- contour 1 -->
+           │                        │
+      ┌────┴────┐                   └─ <div>         <!-- contour 2 -->
+    ┌─┴─┐     ┌─┴─┐                      │
+    │ 1 │     │ 2 │                      └─ <div/>   <!-- contour 3 -->
+    └───┘     └─┬─┘                    
+             ┌─┴─┐                 </div>
+             │ 3 │
+             └───┘
+
+  Same structure. Different syntax.
+`}
+</AsciiDiagram>
+
+The recursive function to walk this tree is tiny:
+
+```python
+def build_dom(contour_idx, hierarchy):
+    """Walk contour tree, emit nested divs."""
+    node = hierarchy[0][contour_idx]
+    child_idx = node[2]  # First child
+    
+    if child_idx == -1:
+        return "<p>content</p>"  # Leaf node
+    
+    html = ""
+    while child_idx != -1:
+        html += f"<div>{build_dom(child_idx, hierarchy)}</div>"
+        child_idx = hierarchy[0][child_idx][0]  # Next sibling
+    
+    return html
+```
+
+That's it. That's the whole DOM generation. Ten lines.
+
+<Comic 
+  src="https://imgs.xkcd.com/comics/machine_learning.png" 
+  alt="XKCD 1838: Machine Learning" 
+  caption="People kept asking if we used machine learning. We didn't even have a pile."
+/>
+
+## Edge Cases
+
+Of course, nothing is that simple. Hand-drawn lines aren't perfect geometric
+shapes. Edge detection on thick marker strokes produces... interesting results.
+
+### The Double Contour Problem
+
+When Canny runs on a hand-drawn line, it finds *two* edges—one on each side
+of the ink stroke. This means every rectangle becomes two nested contours:
+
+<AsciiDiagram title="The Double Contour Problem">
+{`
+  What you draw:          What OpenCV sees:
+
+      ████████                ┌──────────┐  ← outer edge of ink
+      █      █                │ ┌──────┐ │  ← inner edge of ink
+      █      █       ───▶     │ │      │ │
+      █      █                │ │      │ │
+      ████████                │ └──────┘ │
+                              └──────────┘
+
+   One rectangle            Two nested contours!
+`}
+</AsciiDiagram>
+
+Without fixing this, every `<div>` would have a useless wrapper div inside it.
+
+### The Fix: Skip Single Children
+
+The solution is elegant: if a contour has exactly one child, and that child
+is roughly the same size, skip the parent and promote the grandchildren:
+
+<AsciiDiagram title="The dup_tree Fix">
+{`
+  Before:                        After:
+
+       ┌───┐                         ┌───┐
+       │ 0 │                         │ 0 │
+       └─┬─┘                         └─┬─┘
+         │                             │
+       ┌─┴─┐ ← single child,      ┌───┴────┐
+       │ 1 │   same size          │        │
+       └─┬─┘   (duplicate!)     ┌─┴─┐    ┌─┴─┐
+         │                      │ 2 │    │ 3 │
+    ┌────┴────┐                 └───┘    └───┘
+  ┌─┴─┐     ┌─┴─┐
+  │ 2 │     │ 3 │               Grandchildren promoted!
+  └───┘     └───┘
+`}
+</AsciiDiagram>
+
+```python
+def remove_duplicates(tree):
+    """Skip single-child nodes (they're contour duplicates)."""
+    if not tree:
+        return {}
+    if len(tree) == 1:
+        # Only one child? Skip this level.
+        only_child = list(tree.values())[0]
+        return remove_duplicates(only_child)
+    # Multiple children? Keep this node, recurse into children.
+    return {k: remove_duplicates(v) for k, v in tree.items()}
+```
+
+### What Actually Worked
+
+When the conditions were right—clean paper, thick marker, good lighting,
+no overlapping boxes—it actually worked:
+
+<AsciiDiagram title="Success Case">
+{`
+  Input:                    Output HTML:
+
+  ┌─────────────────┐       <div class="root">
+  │ ┌─────────────┐ │         <div class="header"></div>
+  │ │   header    │ │         <div class="body">
+  │ └─────────────┘ │           <div class="sidebar"></div>
+  │ ┌────┐ ┌──────┐ │           <div class="content"></div>
+  │ │side│ │ main │ │         </div>
+  │ └────┘ └──────┘ │       </div>
+  └─────────────────┘
+                            (structure correct, names added manually)
+`}
+</AsciiDiagram>
+
+What we couldn't do:
+- Tell buttons from text inputs (both are rectangles)
+- Read handwritten labels
+- Generate any CSS beyond structure
+- Handle overlapping or touching shapes
+
+But for 48 hours? Nested boxes became nested divs. That's not nothing.
+
+## Circa 2017
+
+To understand why this approach made sense, you need to understand what the
+world looked like in 2017.
+
+<AsciiDiagram title="The 2017 AI Landscape">
+{`
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                    WHAT WAS HOT IN 2017                         │
+  ├─────────────────────────────────────────────────────────────────┤
+  │                                                                 │
+  │  GANs ████████████████████████████  CycleGAN, pix2pix          │
+  │  CNNs ███████████████████████       "ImageNet is solved"        │
+  │  RNNs ██████████████                Seq2seq, attention          │
+  │  RL   █████████                     AlphaGo hype                │
+  │                                                                 │
+  │  Transformers █                     (just published, ignored)   │
+  │                                                                 │
+  └─────────────────────────────────────────────────────────────────┘
+`}
+</AsciiDiagram>
+
+The transformer paper—"Attention Is All You Need"—was published **June 12, 2017**.
+The same summer we were probably building this. Nobody knew what it would become.
+
+At a hackathon in 2017, you used **OpenCV**:
+- Ran on any laptop (no GPU required)
+- Excellent Python bindings
+- Thousands of tutorials
+- Actually worked in 48 hours
+
+Deep learning meant training CNNs for days on a GPU cluster. Not hackathon-friendly.
+
+### What Others Were Building
+
+We weren't alone in trying sketch-to-code:
+
+| Project | Approach | Result |
+|---------|----------|--------|
+| **Pix2Code** (2017) | CNN + LSTM | 77% accuracy on 16 synthetic tokens |
+| **Airbnb** (2017) | Component classifier | Only worked with their 150 pre-defined components |
+| **Microsoft Sketch2Code** (2018) | Azure CV + rules | Supported 5 element types |
+
+Everyone had the same idea. Nobody cracked it.
+
+<Comic 
+  src="https://imgs.xkcd.com/comics/automation.png" 
+  alt="XKCD 1319: Automation" 
+  caption="We spent 48 hours automating something that takes 30 minutes by hand."
+/>
+
+## Plot Twist
+
+March 2023. The GPT-4 Developer Livestream. Greg Brockman photographs a hand-drawn
+sketch on a napkin. Seconds later: a working website.
+
+<YouTubeEmbed videoId="outcGtbnMuQ" title="GPT-4 Developer Livestream" start={982} />
+
+The exact project we built in 2017. But working perfectly, instantly, with no
+edge detection, no RETR_TREE, no "draw with thick marker in good lighting."
+
+### The Difference
+
+<AsciiDiagram title="2017 vs 2024">
+{`
+  AutoCSS (2017):                    GPT-4V (2024):
+
+  ┌──────────┐                       ┌──────────┐
+  │ pixels   │                       │ pixels   │
+  └────┬─────┘                       └────┬─────┘
+       │                                  │
+       ▼                                  │
+  ┌──────────┐                            │
+  │ edges    │                            │
+  └────┬─────┘                            │
+       │                                  │
+       ▼                                  ▼
+  ┌──────────┐                       ┌──────────┐
+  │ contours │                       │"I see a  │
+  └────┬─────┘                       │ search   │
+       │                             │ bar and  │
+       ▼                             │ a nav    │
+  ┌──────────┐                       │ menu..." │
+  │hierarchy │                       └────┬─────┘
+  └────┬─────┘                            │
+       │                                  ▼
+       ▼                             ┌──────────┐
+  ┌──────────┐                       │ working  │
+  │nested    │                       │ React +  │
+  │divs      │                       │ Tailwind │
+  └──────────┘                       └──────────┘
+
+  Geometry                           Understanding
+`}
+</AsciiDiagram>
+
+Where we saw "rectangle at (100,200) with width 300," a VLM sees "search bar
+in header, probably e-commerce, needs placeholder text."
+
+The Stanford Design2Code benchmark (2024): GPT-4V generated pages that could
+**replace originals 49% of the time** on 484 real websites.
+
+Not 77% on 16 synthetic tokens. Near-majority replacement on arbitrary sites.
+
+### The Modern Toolkit
+
+- **tldraw Make Real**: Draw → HTML/Tailwind. ~$0.04 per generation.
+- **screenshot-to-code**: 71K+ GitHub stars. Any mockup → React/Vue/HTML.
+- **v0.dev**: 6M+ developers. Production components from sketches.
+
+One API call. No contour detection required.
+
+## Coda
+
+<Comic 
+  src="https://imgs.xkcd.com/comics/wanna_see_the_code.png" 
+  alt="XKCD 2138: Wanna See the Code?" 
+  caption="Opening the repo after 7 years felt exactly like this."
+/>
+
+I recently opened the AutoCSS repository for the first time in seven years.
+
+The code is exactly what you'd expect:
+- Jupyter notebooks as the main codebase
+- Variables named `heirarchy` (typo preserved for posterity)
+- Commented-out print statements everywhere
+- Hardcoded paths to `lay6.png`
+
+It's a mess. It's also a time capsule.
+
+### What Hackathons Are For
+
+Hackathons aren't about production code. They're about asking "what if?"
+
+What if contour hierarchies mapped to DOM trees? They do.
+What if you could draw a website and have it appear? You can.
+What if the weird idea could work? Sometimes.
+
+### The Right Idea, Wrong Time
+
+The core insight—visual layouts should convert directly to code—was right.
+The industry spent seven years proving it.
+
+We were just too early, with tools too primitive.
+
+There's something satisfying about that. Building something that anticipated
+where the field was going, even if we couldn't get there ourselves.
+
+### The Code Is Still There
+
+The repository is public. The contours still detect on clean drawings.
+
+It's not useful anymore. But it's mine.
+
+And somewhere in those nested loops and misspelled variables is proof that
+I once spent 48 hours turning hand-drawn boxes into HTML because I thought
+it would be cool.
+
+It was.

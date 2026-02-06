@@ -33,6 +33,8 @@ import DemoEmbed from '@/components/content/DemoEmbed.astro';
 import ReadingProgress from '@/components/interactive/ReadingProgress';
 import Comic from '@/components/content/Comic.astro';
 import AsciiDiagram from '@/components/content/AsciiDiagram.astro';
+import AnimatedImage from '@/components/content/AnimatedImage.astro';
+import ImageShowcase from '@/components/content/ImageShowcase.astro';
 ---
 
 <BaseLayout title={project.data.title} description={project.data.description}>
@@ -81,7 +83,7 @@ import AsciiDiagram from '@/components/content/AsciiDiagram.astro';
 
       <ProjectTabs client:load tabs={project.data.tabs}>
         <div class="prose">
-        <Content components={{ YouTubeEmbed, DemoEmbed, Comic, AsciiDiagram }} />
+        <Content components={{ YouTubeEmbed, DemoEmbed, Comic, AsciiDiagram, AnimatedImage, ImageShowcase }} />
       </div>
       </ProjectTabs>
     </article>

@@ -3,9 +3,10 @@ interface Props {
   videoId: string;
   title?: string;
   class?: string;
+  start?: number;
 }
 
-const { videoId, title = 'YouTube video', class: className } = Astro.props;
+const { videoId, title = 'YouTube video', class: className, start } = Astro.props;
 const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
 ---
 
@@ -16,7 +17,7 @@ const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
     <span class="corner corner--bl">└</span>
     <span class="corner corner--br">┘</span>
 
-    <div class="video-wrapper" data-video-id={videoId}>
+    <div class="video-wrapper" data-video-id={videoId} data-start={start}>
       <img
         src={thumbnailUrl}
         alt={title}
@@ -40,8 +41,13 @@ const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
     const button = wrapper.querySelector('.play-button');
     button?.addEventListener('click', () => {
       const videoId = wrapper.getAttribute('data-video-id');
+      const start = wrapper.getAttribute('data-start');
       const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`;
+      let src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`;
+      if (start) {
+        src += `&start=${start}`;
+      }
+      iframe.src = src;
       iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
       iframe.allowFullscreen = true;
       iframe.className = 'video-iframe';

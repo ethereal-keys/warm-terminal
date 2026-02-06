@@ -1,0 +1,195 @@
+---
+interface ImageItem {
+  src: string;
+  label: string;
+}
+
+interface Props {
+  images: ImageItem[];
+  caption?: string;
+  featured?: string;       
+  featuredLabel?: string;  
+  columns?: 2 | 3 | 4;
+  class?: string;
+}
+
+const { 
+  images, 
+  caption,
+  featured,
+  featuredLabel,
+  columns = 2, 
+  class: className 
+} = Astro.props;
+---
+
+<figure class:list={["image-showcase", className]}>
+  <div class="showcase-frame">
+    <span class="corner corner--tl">┌</span>
+    <span class="corner corner--tr">┐</span>
+    <span class="corner corner--bl">└</span>
+    <span class="corner corner--br">┘</span>
+
+    {featured && (
+      <div class="featured-image">
+        <img src={featured} alt={featuredLabel || ''} loading="lazy" />
+        {featuredLabel && (
+          <span class="image-label featured-label">{featuredLabel}</span>
+        )}
+      </div>
+    )}
+
+    {featured && images.length > 0 && (
+      <div class="divider" aria-hidden="true">
+        ────────────────────────────────────────────────
+      </div>
+    )}
+
+    {images.length > 0 && (
+      <div class={`image-grid cols-${columns}`}>
+        {images.map((img) => (
+          <div class="grid-item">
+            <img src={img.src} alt={img.label} loading="lazy" />
+            <span class="image-label">{img.label}</span>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+
+  {caption && (
+    <figcaption class="showcase-caption">
+      <span class="annotation">{caption}</span>
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  .image-showcase {
+    margin: var(--space-4) 0;
+  }
+
+  .showcase-frame {
+    position: relative;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    padding: var(--space-3);
+  }
+
+  .corner {
+    position: absolute;
+    font-size: var(--text-sm);
+    line-height: 1;
+    color: var(--text-ghost);
+    background: var(--bg-secondary);
+    padding: 0 3px;
+    z-index: 1;
+  }
+
+  .corner--tl { top: -1px; left: -1px; }
+  .corner--tr { top: -1px; right: -1px; }
+  .corner--bl { bottom: -1px; left: -1px; }
+  .corner--br { bottom: -1px; right: -1px; }
+
+  /* Featured / single image */
+  .featured-image {
+    position: relative;
+    text-align: center;
+  }
+
+  .featured-image img {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+    margin: 0 auto;
+    border: 1px solid var(--border-light);
+  }
+
+  /* Divider between featured and grid */
+  .divider {
+    color: rgba(176, 170, 162, 0.25);
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: var(--text-xs);
+    user-select: none;
+    text-align: center;
+    margin: var(--space-3) 0;
+  }
+
+  /* Grid layout */
+  .image-grid {
+    display: grid;
+    gap: var(--space-2);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .image-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .image-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .image-grid.cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    .image-grid.cols-3,
+    .image-grid.cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .grid-item {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .grid-item img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border: 1px solid var(--border-light);
+    transition: transform 0.3s ease;
+  }
+
+  .grid-item:hover img {
+    transform: scale(1.02);
+  }
+
+  /* Labels */
+  .image-label {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .featured-label {
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  /* Caption */
+  .showcase-caption {
+    margin-top: var(--space-2);
+    text-align: center;
+  }
+
+  .annotation {
+    font-family: var(--font-annotation);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    display: inline-block;
+    transform: rotate(-0.5deg);
+  }
+</style>

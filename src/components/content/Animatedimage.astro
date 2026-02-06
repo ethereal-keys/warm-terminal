@@ -1,0 +1,162 @@
+---
+interface Props {
+  src: string;           // Path to animated GIF
+  staticSrc: string;     // Path to static first frame
+  alt: string;
+  caption?: string;
+  class?: string;
+}
+
+const { src, staticSrc, alt, caption, class: className } = Astro.props;
+---
+
+<div class:list={["animated-image-wrapper", className]}>
+  <figure class="animated-image">
+    <div class="image-frame">
+      <span class="corner corner--tl">┌</span>
+      <span class="corner corner--tr">┐</span>
+      <span class="corner corner--bl">└</span>
+      <span class="corner corner--br">┘</span>
+
+      <div class="image-container" data-static={staticSrc} data-animated={src}>
+        <img
+          src={staticSrc}
+          alt={alt}
+          class="display-image"
+          loading="lazy"
+        />
+        <button class="play-button" aria-label="Play animation">
+          <span class="play-icon">▶</span>
+          <span class="play-text">Play</span>
+        </button>
+      </div>
+    </div>
+
+    {caption && (
+      <figcaption class="image-caption">
+        <span class="annotation">{caption}</span>
+      </figcaption>
+    )}
+  </figure>
+</div>
+
+<script>
+  document.querySelectorAll('.animated-image .image-container').forEach(container => {
+    const button = container.querySelector('.play-button') as HTMLButtonElement;
+    const img = container.querySelector('.display-image') as HTMLImageElement;
+    const staticSrc = container.getAttribute('data-static')!;
+    const animatedSrc = container.getAttribute('data-animated')!;
+    let isPlaying = false;
+
+    button?.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      
+      if (isPlaying) {
+        img.src = animatedSrc;
+        button.classList.add('is-playing');
+        button.querySelector('.play-text')!.textContent = 'Stop';
+        button.querySelector('.play-icon')!.textContent = '■';
+      } else {
+        img.src = staticSrc;
+        button.classList.remove('is-playing');
+        button.querySelector('.play-text')!.textContent = 'Play';
+        button.querySelector('.play-icon')!.textContent = '▶';
+      }
+    });
+  });
+</script>
+
+<style>
+  .animated-image-wrapper {
+    margin: var(--space-4) 0;
+    text-align: center;
+  }
+
+  .animated-image {
+    display: inline-block;
+    text-align: center;
+    margin: 0;
+  }
+
+  .image-frame {
+    position: relative;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    padding: var(--space-2);
+    display: inline-block;
+  }
+
+  .corner {
+    position: absolute;
+    font-size: var(--text-sm);
+    line-height: 1;
+    color: var(--text-ghost);
+    background: var(--bg-primary);
+    padding: 0 3px;
+    z-index: 1;
+  }
+
+  .corner--tl { top: -1px; left: -1px; }
+  .corner--tr { top: -1px; right: -1px; }
+  .corner--bl { bottom: -1px; left: -1px; }
+  .corner--br { bottom: -1px; right: -1px; }
+
+  .image-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .display-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .play-button {
+    position: absolute;
+    bottom: var(--space-2);
+    right: var(--space-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-medium);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    opacity: 0.9;
+  }
+
+  .play-button:hover {
+    background: var(--bg-secondary);
+    border-color: var(--border-heavy);
+    opacity: 1;
+  }
+
+  .play-button.is-playing {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+  }
+
+  .play-icon {
+    font-size: 0.7em;
+  }
+
+  .image-caption {
+    margin-top: var(--space-2);
+    text-align: center;
+  }
+
+  .annotation {
+    font-family: var(--font-annotation);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    display: inline-block;
+    line-height: 1.4;
+  }
+</style>
