@@ -6,12 +6,12 @@
 import React, { useState } from 'react';
 import styles from './SequenceTab.module.css';
 import { Knob, WaveformSelector } from '../controls';
-import type { SequenceNote, SequenceSoundParams } from '../../lib/types';
+import type { SequenceNote, SequenceParams } from '../../lib/types';
 import { frequencyToNote, generateId } from '../../lib/types';
 
 interface SequenceTabProps {
-  params: SequenceSoundParams;
-  onChange: (params: SequenceSoundParams) => void;
+  params: SequenceParams;
+  onChange: (params: SequenceParams) => void;
   disabled?: boolean;
 }
 
@@ -21,7 +21,7 @@ export function SequenceTab({ params, onChange, disabled = false }: SequenceTabP
   );
 
   const selectedNote = params.notes.find(n => n.id === selectedNoteId);
-  
+
   // Calculate total duration
   const totalDuration = Math.max(
     ...params.notes.map(n => n.delay + n.duration),
@@ -31,7 +31,7 @@ export function SequenceTab({ params, onChange, disabled = false }: SequenceTabP
   const updateNote = (noteId: string, updates: Partial<SequenceNote>) => {
     onChange({
       ...params,
-      notes: params.notes.map(n => 
+      notes: params.notes.map(n =>
         n.id === noteId ? { ...n, ...updates } : n
       )
     });
@@ -40,7 +40,7 @@ export function SequenceTab({ params, onChange, disabled = false }: SequenceTabP
   const addNote = () => {
     const lastNote = params.notes[params.notes.length - 1];
     const newDelay = lastNote ? lastNote.delay + lastNote.duration + 50 : 0;
-    
+
     const newNote: SequenceNote = {
       id: generateId(),
       delay: newDelay,
@@ -49,7 +49,7 @@ export function SequenceTab({ params, onChange, disabled = false }: SequenceTabP
       level: 0.7,
       waveform: 'sine',
     };
-    
+
     onChange({
       ...params,
       notes: [...params.notes, newNote]
@@ -59,10 +59,10 @@ export function SequenceTab({ params, onChange, disabled = false }: SequenceTabP
 
   const deleteNote = (noteId: string) => {
     if (params.notes.length <= 1) return; // Keep at least one note
-    
+
     const newNotes = params.notes.filter(n => n.id !== noteId);
     onChange({ ...params, notes: newNotes });
-    
+
     if (selectedNoteId === noteId) {
       setSelectedNoteId(newNotes[0]?.id || null);
     }
@@ -81,8 +81,8 @@ export function SequenceTab({ params, onChange, disabled = false }: SequenceTabP
           <span className={styles.timeLabel}>TIMELINE</span>
         </div>
         <div className={styles.timelineTrack}>
-          <svg 
-            viewBox={`0 0 400 60`} 
+          <svg
+            viewBox={`0 0 400 60`}
             className={styles.timelineSvg}
             preserveAspectRatio="xMinYMid meet"
           >
@@ -92,11 +92,11 @@ export function SequenceTab({ params, onChange, disabled = false }: SequenceTabP
               return (
                 <g key={i}>
                   <line x1={x} y1="5" x2={x} y2="55" stroke="#D4CFC4" strokeWidth="0.5" />
-                  <text 
-                    x={x} 
-                    y="62" 
-                    fontSize="8" 
-                    fill="#8A8680" 
+                  <text
+                    x={x}
+                    y="62"
+                    fontSize="8"
+                    fill="#8A8680"
                     textAnchor="middle"
                     fontFamily="JetBrains Mono"
                   >
@@ -105,16 +105,16 @@ export function SequenceTab({ params, onChange, disabled = false }: SequenceTabP
                 </g>
               );
             })}
-            
+
             {/* Notes */}
             {params.notes.map((note, index) => {
               const startX = 10 + (note.delay / totalDuration) * 380;
               const width = Math.max((note.duration / totalDuration) * 380, 20);
               const isSelected = note.id === selectedNoteId;
-              
+
               return (
-                <g 
-                  key={note.id} 
+                <g
+                  key={note.id}
                   onClick={() => setSelectedNoteId(note.id)}
                   style={{ cursor: 'pointer' }}
                 >
@@ -165,14 +165,14 @@ export function SequenceTab({ params, onChange, disabled = false }: SequenceTabP
               SELECTED: Note {params.notes.findIndex(n => n.id === selectedNoteId) + 1}
             </span>
             <div className={styles.noteActions}>
-              <button 
-                className={styles.actionButton} 
+              <button
+                className={styles.actionButton}
                 onClick={addNote}
                 disabled={disabled}
               >
                 + ADD
               </button>
-              <button 
+              <button
                 className={`${styles.actionButton} ${styles.deleteButton}`}
                 onClick={() => deleteNote(selectedNote.id)}
                 disabled={disabled || params.notes.length <= 1}
