@@ -1,0 +1,97 @@
+---
+interface Props {
+  tags: string[];
+  role?: string;
+  timeline?: string;
+  status?: string;
+  readingTime: number;
+}
+
+const { tags, role, timeline, status, readingTime } = Astro.props;
+
+const statusLabels: Record<string, string> = {
+  'shipped': '● shipped',
+  'prototype': '○ prototype',
+  'archived': '◌ archived',
+  'in-progress': '◐ in progress',
+};
+
+const statusColors: Record<string, string> = {
+  'shipped': 'var(--status-green)',
+  'prototype': 'var(--rust-muted)',
+  'archived': 'var(--text-muted)',
+  'in-progress': '#B8860B',
+};
+
+// Only render if there's at least something beyond tags
+const hasExtras = role || timeline || status;
+---
+
+{hasExtras && (
+  <div class="glance">
+    <div class="glance-items">
+      {status && (
+        <div class="glance-item">
+          <span class="glance-label">status</span>
+          <span class="glance-value" style={`color: ${statusColors[status]}`}>
+            {statusLabels[status]}
+          </span>
+        </div>
+      )}
+      {timeline && (
+        <div class="glance-item">
+          <span class="glance-label">timeline</span>
+          <span class="glance-value">{timeline}</span>
+        </div>
+      )}
+      {role && (
+        <div class="glance-item">
+          <span class="glance-label">role</span>
+          <span class="glance-value">{role}</span>
+        </div>
+      )}
+      <div class="glance-item">
+        <span class="glance-label">read</span>
+        <span class="glance-value">{readingTime} min</span>
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .glance {
+    margin-top: var(--space-2);
+    padding: var(--space-2) 0;
+    border-top: 1px dashed var(--border-light);
+  }
+
+  .glance-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .glance-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .glance-label {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    text-transform: lowercase;
+    letter-spacing: 0.03em;
+  }
+
+  .glance-value {
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 640px) {
+    .glance-items {
+      gap: var(--space-2);
+    }
+  }
+</style>

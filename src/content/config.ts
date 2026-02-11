@@ -13,6 +13,10 @@ const projectsCollection = defineCollection({
     demo: z.string().url().optional(),
     paper: z.string().url().optional(),
     order: z.number().default(0),
+    // At-a-glance metadata
+    role: z.string().optional(),
+    timeline: z.string().optional(),
+    status: z.enum(['shipped', 'prototype', 'archived', 'in-progress']).optional(),
     tabs: z.array(z.object({
       label: z.string(),
       id: z.string(),

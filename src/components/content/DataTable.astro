@@ -1,0 +1,206 @@
+---
+/**
+ * DataTable - Warm Terminal styled table embed
+ * 
+ * Usage in MDX:
+ *   import DataTable from '@/components/content/DataTable.astro';
+ *   
+ *   <DataTable caption="Model Benchmark Results">
+ *   
+ *   | Metric | Slim Model | Normal Model |
+ *   |--------|-----------|--------------|
+ *   | **Disk Size** | 110 kB | 196 kB |
+ *   
+ *   </DataTable>
+ */
+
+interface Props {
+  caption?: string;
+  class?: string;
+  align?: 'left' | 'center' | 'right';
+  compact?: boolean;
+}
+
+const { 
+  caption, 
+  class: className,
+  align = 'center',
+  compact = false,
+} = Astro.props;
+---
+
+<figure class:list={["data-table", `align-${align}`, { compact }, className]}>
+  <div class="table-frame">
+    <span class="corner corner--tl">┌</span>
+    <span class="corner corner--tr">┐</span>
+    <span class="corner corner--bl">└</span>
+    <span class="corner corner--br">┘</span>
+
+    <div class="table-scroll">
+      <slot />
+    </div>
+  </div>
+  {caption && <figcaption class="table-caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .data-table {
+    margin: var(--space-4) 0;
+    display: block;
+    max-width: 100%;
+    clear: both;
+  }
+
+  .data-table.align-center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .table-frame {
+    position: relative;
+    background: rgba(252, 250, 245, 0.5);
+    border: 1px solid var(--border-light, #E0DCD3);
+    padding: var(--space-2);
+    overflow: hidden;
+  }
+
+  .corner {
+    position: absolute;
+    font-size: var(--text-sm);
+    line-height: 1;
+    color: var(--text-ghost, #C5C2BB);
+    background: rgba(252, 250, 245, 0.5);
+    padding: 0 3px;
+    z-index: 1;
+  }
+
+  .corner--tl { top: -1px; left: -1px; }
+  .corner--tr { top: -1px; right: -1px; }
+  .corner--bl { bottom: -1px; left: -1px; }
+  .corner--br { bottom: -1px; right: -1px; }
+
+  .table-scroll {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-medium, #D0CBC2) transparent;
+  }
+
+  .table-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .table-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .table-scroll::-webkit-scrollbar-thumb {
+    background: var(--border-medium, #D0CBC2);
+    border-radius: 2px;
+  }
+
+  /* ── Reset: override any .prose :global(table) styles ── */
+
+  .data-table :global(table) {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border: none !important;
+    background: transparent !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: var(--text-sm, 0.875rem);
+    line-height: var(--leading-normal, 1.5);
+  }
+
+  /* ── Header ─────────────────────────────────────────── */
+
+  .data-table :global(thead) {
+    border-bottom: 2px solid var(--border-medium, #D0CBC2);
+  }
+
+  .data-table :global(th) {
+    padding: var(--space-2, 12px) var(--space-2, 12px);
+    text-align: left;
+    font-weight: 600;
+    font-size: var(--text-xs, 0.75rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted, #8A8580);
+    white-space: nowrap;
+    vertical-align: bottom;
+    border: none;
+    border-bottom: 2px solid var(--border-medium, #D0CBC2);
+  }
+
+  /* ── Body cells ─────────────────────────────────────── */
+
+  .data-table :global(td) {
+    padding: var(--space-2, 12px) var(--space-2, 12px);
+    color: var(--text-secondary, #5C5954);
+    vertical-align: top;
+    border: none;
+    border-bottom: 1px solid var(--border-light, #E0DCD3);
+  }
+
+  .data-table :global(tbody tr:last-child td) {
+    border-bottom: none;
+  }
+
+  /* ── Row hover ──────────────────────────────────────── */
+
+  .data-table :global(tbody tr) {
+    transition: background 0.15s ease;
+  }
+
+  .data-table :global(tbody tr:hover) {
+    background: rgba(178, 74, 45, 0.03);
+  }
+
+  /* ── Bold cells (metric labels) ─────────────────────── */
+
+  .data-table :global(td strong),
+  .data-table :global(th strong) {
+    color: var(--text-primary, #3C3836);
+    font-weight: 600;
+  }
+
+  /* ── Inline code in cells ───────────────────────────── */
+
+  .data-table :global(td code) {
+    background: var(--bg-secondary, #F0EDE5);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+    font-size: 0.9em;
+  }
+
+  /* ── Compact variant ────────────────────────────────── */
+
+  .data-table.compact :global(th),
+  .data-table.compact :global(td) {
+    padding: var(--space-1, 8px) var(--space-2, 12px);
+  }
+
+  /* ── Caption ────────────────────────────────────────── */
+
+  .table-caption {
+    margin-top: var(--space-1);
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--text-muted, #8A8580);
+    text-align: center;
+  }
+
+  /* ── Mobile ─────────────────────────────────────────── */
+
+  @media (max-width: 640px) {
+    .table-frame {
+      padding: var(--space-1);
+    }
+
+    .data-table :global(th),
+    .data-table :global(td) {
+      padding: var(--space-1) var(--space-1);
+      font-size: var(--text-xs, 0.75rem);
+    }
+  }
+</style>

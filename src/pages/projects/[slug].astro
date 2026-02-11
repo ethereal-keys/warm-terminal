@@ -4,7 +4,19 @@ import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import ProjectTabs from '@/components/projects/ProjectTabs';
 import ProjectNav from '@/components/projects/ProjectNav.astro';
+import ProjectGlance from '@/components/projects/ProjectGlance.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { calculateReadingTime } from '@/lib/utils';
+
+import YouTubeEmbed from '@/components/content/YouTubeEmbed.astro';
+import DemoEmbed from '@/components/content/DemoEmbed.astro';
+import ReadingProgress from '@/components/interactive/ReadingProgress';
+import Comic from '@/components/content/Comic.astro';
+import AsciiDiagram from '@/components/content/AsciiDiagram.astro';
+import AnimatedImage from '@/components/content/Animatedimage.astro';
+import ImageShowcase from '@/components/content/ImageShowcase.astro';
+import Callout from '@/components/content/Callout.astro';
+import DataTable from '@/components/content/DataTable.astro';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -28,13 +40,7 @@ interface Props {
 
 const { project, prevProject, nextProject } = Astro.props;
 const { Content } = await project.render();
-import YouTubeEmbed from '@/components/content/YouTubeEmbed.astro';
-import DemoEmbed from '@/components/content/DemoEmbed.astro';
-import ReadingProgress from '@/components/interactive/ReadingProgress';
-import Comic from '@/components/content/Comic.astro';
-import AsciiDiagram from '@/components/content/AsciiDiagram.astro';
-import AnimatedImage from '@/components/content/Animatedimage.astro';
-import ImageShowcase from '@/components/content/ImageShowcase.astro';
+const readingTime = calculateReadingTime(project.body);
 ---
 
 <BaseLayout title={project.data.title} description={project.data.description}>
@@ -60,7 +66,11 @@ import ImageShowcase from '@/components/content/ImageShowcase.astro';
         <p class="description">{project.data.description}</p>
 
         <div class="meta">
-          <span class="tags">{project.data.tags.join(' · ')}</span>
+          <span class="meta-info">
+            <span class="tags">{project.data.tags.join(' · ')}</span>
+            <span class="meta-sep">·</span>
+            <span class="reading-time">{readingTime} min read</span>
+          </span>
           <div class="links">
             {project.data.github && (
               <a href={project.data.github} target="_blank" rel="noopener noreferrer">
@@ -79,11 +89,19 @@ import ImageShowcase from '@/components/content/ImageShowcase.astro';
             )}
           </div>
         </div>
+
+        <ProjectGlance
+          tags={project.data.tags}
+          role={project.data.role}
+          timeline={project.data.timeline}
+          status={project.data.status}
+          readingTime={readingTime}
+        />
       </header>
 
       <ProjectTabs client:load tabs={project.data.tabs}>
         <div class="prose">
-        <Content components={{ YouTubeEmbed, DemoEmbed, Comic, AsciiDiagram, AnimatedImage, ImageShowcase }} />
+        <Content components={{ YouTubeEmbed, DemoEmbed, Comic, AsciiDiagram, AnimatedImage, ImageShowcase, Callout, DataTable }} />
       </div>
       </ProjectTabs>
     </article>
@@ -155,6 +173,21 @@ import ImageShowcase from '@/components/content/ImageShowcase.astro';
     font-size: var(--text-sm);
   }
 
+  .meta-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    flex-wrap: wrap;
+  }
+
+  .meta-sep {
+    color: var(--text-ghost);
+  }
+
+  .reading-time {
+    color: var(--text-muted);
+  }
+
   .tags {
     color: var(--text-muted);
   }
@@ -174,27 +207,41 @@ import ImageShowcase from '@/components/content/ImageShowcase.astro';
     color: var(--rust);
   }
 
+  /* ── PROSE: constrained width + centered ── */
   .prose {
     font-size: var(--text-base);
     line-height: var(--leading-relaxed);
+    max-width: 65ch;
+    margin-left: auto;
+    margin-right: auto;
   }
 
+  /* ── H2: tab-level section headings ── */
   .prose :global(h2) {
-    font-size: var(--text-lg);
+    font-size: var(--text-2xl);
     font-weight: 600;
-    margin-top: var(--space-5);
-    margin-bottom: var(--space-2);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
     text-transform: none;
-    letter-spacing: normal;
+    letter-spacing: -0.01em;
+    padding-bottom: var(--space-1);
+    border-bottom: 1px solid var(--border-light);
   }
 
+  .prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  /* ── H3: visually distinct sub-headings ── */
   .prose :global(h3) {
-    font-size: var(--text-base);
+    font-size: var(--text-lg);
     font-weight: 600;
     margin-top: var(--space-4);
     margin-bottom: var(--space-2);
     text-transform: none;
     letter-spacing: normal;
+    padding-left: var(--space-2);
+    border-left: 2px solid var(--rust-muted);
   }
 
   .prose :global(p) {
@@ -229,5 +276,34 @@ import ImageShowcase from '@/components/content/ImageShowcase.astro';
   .prose :global(pre code) {
     background: transparent;
     padding: 0;
+  }
+
+  .prose :global(pre) {
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  /* ── Media elements: more breathing room ── */
+  .prose :global(figure) {
+    max-width: none;
+  },
+  .prose :global(.youtube-embed),
+  .prose :global(.demo-embed),
+  .prose :global(.image-showcase),
+  .prose :global(img) {
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-5);
+  }
+
+  /* ── Mobile adjustments ── */
+  @media (max-width: 640px) {
+    .prose {
+      line-height: 1.8;
+    }
+
+    .prose :global(h2) {
+      font-size: var(--text-xl);
+      margin-top: var(--space-5);
+    }
   }
 </style>

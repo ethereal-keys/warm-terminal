@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import RelatedPosts from '@/components/blog/RelatedPosts.astro';
 import ReadingProgress from '@/components/interactive/ReadingProgress';
+import DataTable from '@/components/content/DataTable.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { formatDate, calculateReadingTime } from '@/lib/utils';
 
@@ -60,7 +61,7 @@ const relatedPosts = post.data.related
       </header>
 
       <div class="prose">
-        <Content />
+        <Content components={{ DataTable }} />
       </div>
     </article>
 
@@ -130,28 +131,36 @@ const relatedPosts = post.data.related
     color: var(--text-ghost);
   }
 
+  /* ── PROSE: constrained width + centered ── */
   .prose {
     font-size: var(--text-base);
     line-height: var(--leading-relaxed);
+    max-width: 65ch;
+    margin-left: auto;
+    margin-right: auto;
   }
 
+  /* ── H2: section headings with underline ── */
   .prose :global(h2) {
-    font-size: var(--text-lg);
+    font-size: var(--text-2xl);
     font-weight: 600;
-    margin-top: var(--space-5);
-    margin-bottom: var(--space-2);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
     text-transform: none;
-    letter-spacing: normal;
+    letter-spacing: -0.01em;
     border-bottom: 1px solid var(--border-light);
     padding-bottom: var(--space-1);
   }
 
+  /* ── H3: sub-headings with rust left border ── */
   .prose :global(h3) {
-    font-size: var(--text-base);
+    font-size: var(--text-lg);
     font-weight: 600;
     margin-top: var(--space-4);
     margin-bottom: var(--space-2);
     text-transform: none;
+    padding-left: var(--space-2);
+    border-left: 2px solid var(--rust-muted);
   }
 
   .prose :global(p) {
@@ -192,5 +201,27 @@ const relatedPosts = post.data.related
   .prose :global(pre code) {
     background: transparent;
     padding: 0;
+  }
+
+  /* ── Media elements: more breathing room ── */
+  .prose :global(figure),
+  .prose :global(.youtube-embed),
+  .prose :global(.demo-embed),
+  .prose :global(.image-showcase),
+  .prose :global(img) {
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-5);
+  }
+
+  /* ── Mobile adjustments ── */
+  @media (max-width: 640px) {
+    .prose {
+      line-height: 1.8;
+    }
+
+    .prose :global(h2) {
+      font-size: var(--text-xl);
+      margin-top: var(--space-5);
+    }
   }
 </style>

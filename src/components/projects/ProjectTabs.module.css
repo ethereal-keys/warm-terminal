@@ -54,16 +54,17 @@
 }
 
 .tabDivider {
-  color: var(--border-light);
-  font-size: var(--text-sm);
-  overflow: hidden;
-  white-space: nowrap;
+  height: 1px;
+  background: var(--border-light);
   margin: var(--space-2) 0;
   user-select: none;
+  font-size: 0;
+  overflow: hidden;
 }
 
 .tabContent {
   min-height: 200px;
+  padding-top: var(--space-3);
 }
 
 @media (max-width: 640px) {

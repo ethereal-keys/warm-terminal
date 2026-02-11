@@ -1,68 +1,487 @@
 ---
-title: "SWE-Bench Agent Fine-tuning"
-description: "ML training pipeline processing 11,000+ conversation turns from successful code solutions, implementing custom tokenization for function-calling fine-tuning."
-tags: ["python", "ml", "transformers", "nlp"]
-publishedAt: 2024-11-20
-featured: true
-github: "https://github.com/ethereal-keys/NLP-Project"
+title: "What 747 Correct Answers Couldn't Teach a 0.5B Model"
+description: "We distilled Claude's problem-solving traces into training data for small open-source models. The models responded by outputting special tokens forever. A postmortem on why teaching models to use tools is harder than teaching them to write code."
+tags:
+  - python
+  - ml
+  - transformers
+  - nlp
+publishedAt: 2025-03-20
+featured: false
+github: https://github.com/ethereal-keys/NLP-Project
 order: 2
 tabs:
-  - label: "./overview"
-    id: "overview"
-  - label: "./problem"
-    id: "the-problem"
-  - label: "./pipeline"
-    id: "data-processing-pipeline"
-  - label: "./architecture"
-    id: "model-architecture"
-  - label: "./results"
-    id: "results"
+  - label: "./the-idea"
+    id: "the-idea"
+  - label: "./the-pipeline"
+    id: "the-pipeline"
+  - label: "./the-wall"
+    id: "the-wall"
+  - label: "./the-vindication"
+    id: "the-vindication"
   - label: "./reflections"
     id: "reflections"
 ---
 
-## Overview
+## The Idea
 
-Built an ML training pipeline for fine-tuning open-source LLMs on automated
-code generation tasks, benchmarking against commercial models.
+SWE-bench asks a simple question: given a real GitHub issue from an open-source
+project, can an AI produce a working patch?
 
-## The Problem
+Not "write a function." Not "complete this snippet." *Navigate a repository
+you've never seen, find the bug, fix it, and make the tests pass.* The kind
+of task that takes a human developer anywhere from twenty minutes to an
+entire afternoon.
 
-Current AI coding assistants show significant performance gaps between
-commercial and open-source solutions. This project aimed to understand
-and close that gap through targeted fine-tuning.
+Claude 3.7 Sonnet, paired with the SWE-agent framework, was solving about
+34% of these problems. The open-source alternatives we could actually
+run on our hardware? Zero. Literally zero.
 
-## Data Processing Pipeline
+The hypothesis was simple: Claude already knows how to solve these
+problems. It leaves behind a detailed trace of every command it runs,
+every file it reads, every edit it makes. What if we took those traces
+and used them to *teach* a smaller model the same behavior?
 
-Processed 11,000+ conversation turns from successful SWE-Bench solutions:
+<Comic
+  src="https://imgs.xkcd.com/comics/physicists.png"
+  alt="XKCD 793: Physicists"
+  caption="Us, NLP students, looking at software engineering automation: 'It's just fine-tuning.'"
+/>
+
+The idea had a name: knowledge distillation. And it had a long track record in ML.
+Larger models teach smaller models all the time. We had the teacher (Claude),
+the textbook (747 successful solution traces), and the students
+(Qwen2.5-Coder-0.5B and Mistral-7B). We had three 8GB GPUs and access to
+ASU's Slurm cluster, which doesn't support Docker, a detail that would
+matter later.
+
+This was a group project for CSE 576 (NLP). The team split into parallel
+approaches: agentic fine-tuning, agentless methods, reinforcement learning.
+I owned the agentic function-call fine-tuning: build the dataset from Claude's
+traces and fine-tune open-source models to reproduce its tool-calling behavior
+inside SWE-agent.
+
+What could go wrong?
+
+## The Pipeline
+
+The data engineering was the best part of this project. I'm saying that
+upfront because the rest of the story goes downhill.
+
+### Source Material
+
+SWE-agent works by giving the model a set of tools (view files, search
+code, edit files, run tests) and letting it interact with a Docker
+container that has the repository cloned and the issue loaded. Each
+successful run produces a log: a full conversation between the model
+and the environment, from the initial issue description through every
+tool call to the final patch submission.
+
+We started with 2,276 problem logs from the state-of-the-art run
+(SWE-agent + Claude 3.7 Sonnet on the SWE-bench test set). Of those,
+747 contained valid, test-passing solutions.
+
+### The Processing Pipeline
+
+Turning raw logs into training data was a multi-stage process:
+
+<AsciiDiagram title="Dataset Pipeline">
+{`
+  2,276 raw logs
+      │
+      ▼
+  ┌────────────┐
+  │  filter    │── 1,529 failures discarded
+  │  passing   │
+  └─────┬──────┘
+        │
+        ▼
+  747 successful solution logs
+        │
+        ▼
+  ┌────────────┐
+  │  parse     │── generic commands → structured
+  │  to func   │   function call dictionaries
+  │  calls     │
+  └─────┬──────┘
+        │
+        ▼
+  ┌────────────┐
+  │  add sys   │── system prompts + tool
+  │  prompts   │   specifications injected
+  └─────┬──────┘
+        │
+        ▼
+  ┌────────────┐
+  │  chunk &   │── split at ~4,096 tokens
+  │  dedup     │   remove duplicate tool calls
+  └─────┬──────┘
+        │
+        ▼
+  ~11,000 conversation turns
+  ready for fine-tuning
+`}
+</AsciiDiagram>
+
+Each entry in the final dataset was a structured conversation: a system
+message with tool definitions, followed by alternating assistant
+(model actions) and function (environment responses) turns.
 
 ```python
-def process_conversation(conv):
-    # Extract function calls and responses
-    turns = extract_turns(conv)
-    
-    # Custom tokenization for function-calling
-    tokens = tokenize_with_functions(turns)
-    
-    return format_for_training(tokens)
+def chunk_conversation(messages, max_tokens=4096):
+    """Split long solution traces into training-sized chunks.
+    Each chunk preserves the system prompt and maintains
+    conversation coherence."""
+    chunks = []
+    current_chunk = [messages[0]]  # always keep system prompt
+    current_tokens = calculate_tokens(messages[0])
+
+    for msg in messages[1:]:
+        msg_tokens = calculate_tokens(msg)
+        if current_tokens + msg_tokens > max_tokens:
+            if len(current_chunk) >= 3:
+                chunks.append(current_chunk)
+            current_chunk = [messages[0]]
+            current_tokens = calculate_tokens(messages[0])
+        current_chunk.append(msg)
+        current_tokens += msg_tokens
+
+    if len(current_chunk) >= 3:
+        chunks.append(current_chunk)
+    return chunks
 ```
 
-## Model Architecture
+### What the Data Revealed
 
-Implemented custom tokenization for function-calling patterns on:
-- Qwen2.5-Coder
-- Mistral-7B
+Analysis of the final dataset showed how Claude actually solves problems.
+The action distribution was telling:
 
-## Results
+<AsciiDiagram title="Agent Action Distribution">
+{`
+  ┌─────────────────────────────────────────────┐
+  │  examine file   ████████░░░░░░░░░  23.2%    │
+  │  modify code    ██████████░░░░░░░  26.3%    │
+  │  execute test   ████████████████░  43.4%    │
+  │  other          ██░░░░░░░░░░░░░░░   7.1%    │
+  └─────────────────────────────────────────────┘
+`}
+</AsciiDiagram>
 
-Identified critical performance gaps between commercial and open-source
-AI coding assistants, particularly in:
-- Multi-file context handling
-- Error recovery strategies
-- Code explanation quality
+43% of all actions were test execution. Claude runs tests almost twice as
+often as it modifies code. Successful problem-solving, it turns out, is
+mostly *verification*, not *generation*. The model reads, edits a little,
+tests, reads the output, edits again, tests again. It's methodical.
+Patient. The opposite of what a 0.5B model is good at.
+
+I didn't appreciate that at the time.
+
+<Callout type="tip">
+The processed dataset is publicly available:
+[**747 Claude SWE-agent Solution Traces → 11,000 Training Turns**](https://drive.google.com/drive/folders/1V3uEkmLSQ9K4iPg7NJNjUgFjqc9CyI50?usp=sharing).
+If you're working on SWE-bench fine-tuning, especially with the bash-only
+format conversion described later, this might save you a few weeks of
+pipeline work.
+</Callout>
+
+## The Wall
+
+Here's where things fall apart. Three layers of falling apart, each one
+more fundamental than the last.
+
+### Layer 1: The Qwen Disaster
+
+We started with Qwen2.5-Coder-0.5B. Small, coding-specialized, open-source.
+The plan: LoRA fine-tuning with our 11,000 conversation turns, 2 epochs,
+4 GPUs, 8,192 token context.
+
+The loss converged beautifully. Textbook training curve. We were excited.
+
+Then we ran inference.
+
+```
+<|fim_middle|><|fim_middle|><|fim_middle|><|fim_middle|>
+<|fim_middle|><|fim_middle|><|fim_middle|><|fim_middle|>
+<|fim_middle|><|fim_middle|><|fim_middle|><|fim_middle|>
+<|fim_middle|><|fim_middle|><|fim_middle|><|fim_middle|>
+...forever
+```
+
+The model had learned to output a single special token in an infinite loop.
+Not code. Not function calls. Not even coherent text. Just `<|fim_middle|>`
+until we killed the process.
+
+<Comic
+  src="https://imgs.xkcd.com/comics/data_pipeline.png"
+  alt="XKCD 2054: Data Pipeline"
+  caption="11,000 carefully processed conversation turns in, infinite special tokens out."
+/>
+
+What happened? Three compounding bugs, all documented, none of which
+we found in time:
+
+**Bug 1: The pad token was the EOS token.** Qwen2.5 ships with `pad_token`
+set to `<|endoftext|>`, which is also the EOS token. During training,
+the model sees the termination signal as padding throughout every batch.
+It learns to ignore it. Result: the model never stops generating.
+
+**Bug 2: Untrained special token embeddings.** The special tokens
+`<|im_start|>`, `<|im_end|>`, and others in Qwen2.5-Coder-0.5B have
+essentially *identical* embedding vectors. PCA analysis shows they
+cluster together indistinguishably. The `lm_head` weights for all
+special tokens except `<|endoftext|>` are identical, so the model
+literally cannot tell them apart during generation.
+
+**Bug 3: LoRA freezes the wrong layers.** Standard LoRA freezes
+`embed_tokens` and `lm_head`. With untrained special tokens, those
+are exactly the layers that *need* to be trained. Without including
+them in `modules_to_save`, the model has no mechanism to learn
+structured output formats.
+
+<Callout type="note">
+The Unsloth team documented the pad_token bug in November 2024, four
+months before our attempt. They published fixed model weights on
+HuggingFace. We didn't find it. That's on us.
+</Callout>
+
+### Layer 2: The Mistral Pivot
+
+We switched to Mistral-7B-Instruct-v0.3. Bigger model, and critically,
+Mistral's v3-tekken tokenizer explicitly supports tool-calling with
+dedicated control tokens: `[TOOL_CALLS]`, `[AVAILABLE_TOOLS]`, etc.
+
+I built a custom preprocessing pipeline from scratch. Parsed every
+conversation turn into structured Python objects. Tokenized them using
+`mistral_common` (Mistral's own tokenization library, not HuggingFace's).
+Validated the output carefully.
+
+The tokenized data looked perfect. Tool calls and arguments preserved
+intact. Special tokens correctly delineating conversation turns.
+
+Then we plugged it into the HuggingFace training pipeline.
+
+The problem: HuggingFace's `apply_chat_template` for Mistral-7B-Instruct-v0.3
+is *not the same* as `mistral_common`. Mistral's own team acknowledged this
+on HuggingFace: the tokenizer configuration is "a bit tricky" because they
+have a custom implementation. The HF template, at the time, didn't support
+`tool_use` roles at all. Messages with function-calling content were
+either silently dropped or incorrectly tokenized.
+
+We had validated our data with the right tokenizer and trained with
+the wrong one.
+
+<AsciiDiagram title="The Tokenizer Mismatch">
+{`
+  Our preprocessing        HF training pipeline
+  (mistral_common)         (apply_chat_template)
+  ─────────────────        ─────────────────────
+  [AVAILABLE_TOOLS]        (silently dropped)
+  [tool definitions]       (silently dropped)
+  [/AVAILABLE_TOOLS]       (silently dropped)
+  [INST] user msg [/INST]  [INST] user msg [/INST]
+  assistant response       assistant response
+  [TOOL_CALLS]             (silently dropped)
+  {function call json}     (silently dropped)
+  [/TOOL_CALLS]            (silently dropped)
+
+  ✓ validated perfectly    ✗ trained on gutted data
+`}
+</AsciiDiagram>
+
+The model trained successfully. It just never learned function calling,
+because the function-calling data wasn't in the training set anymore.
+
+### Layer 3: The Deeper Problem
+
+Suppose both tokenizers had worked perfectly. Suppose the pad token was
+fixed and the embeddings were trained. Would it have worked?
+
+Almost certainly not.
+
+We also built a simplified test repository with 10 curated problems ranging
+from syntax errors to multi-file logic bugs. A controlled environment
+to isolate what the models could actually do.
+
+<DataTable caption="Test Repository Results">
+
+| Model | Type | Problems Solved (of 10) |
+|-------|------|:-----------------------:|
+| **Mistral-large-latest** | API | **10** |
+| Qwen2.5-Coder-0.5B | Local | 0 |
+| Qwen2.5-Coder-7B | Local | 0 |
+| DeepSeek-Coder variants | Local | 0 |
+| Bitagent-8b | Local | 0 |
+| xLAM-2-fc-r-1b | Local | 0 |
+
+</DataTable>
+
+Every locally deployed model, regardless of size, specialization, or
+claimed function-calling support, solved zero problems. Not on SWE-bench.
+On our *simplified* test set.
+
+The failure modes were consistent:
+
+- **Repetitive behavior:** Models would attempt the same solution
+  in a loop despite error messages telling them it didn't work
+- **Context forgetting:** When we applied repetition penalties to
+  break the loops, models lost track of what they'd already tried
+- **Tool misuse:** Models would attempt to access files that don't
+  exist, produce syntactically broken function calls, or use tools
+  in nonsensical sequences
+
+The problem wasn't just tokenization. It was capacity. A 0.5B model
+has roughly 1/64th the parameters of the smallest model that's been
+shown to work for SWE-agent tasks (32B). It's like trying to teach
+someone to play chess, navigate a city, and speak a foreign language
+simultaneously, except the student has a 10-word vocabulary.
+
+## The Vindication
+
+Here's the part that stings in the best possible way.
+
+Within weeks of our March 2025 attempt, multiple top research labs
+published results doing *exactly what we tried*. Same idea, same
+data source (Claude traces), same SWE-agent framework.
+
+The difference: they used 32B+ parameter models.
+
+<DataTable caption="The Field Catches Up (March to July 2025)">
+
+| Project | Team | Base Model | SWE-bench Verified | Date |
+|---------|------|-----------|:------------------:|------|
+| SWE-agent-LM-32B | Princeton | Qwen2.5-Coder-32B | 40.2% | Apr 2025 |
+| DeepSWE | Together AI | Qwen3-32B | 42.2% | Mid 2025 |
+| Devstral | Mistral + OpenHands | 24B specialized | 46.8% | May 2025 |
+| SWE-RL | Meta | Llama-3.3-70B | 41.0% | Feb 2025 |
+| Qwen3-Coder | Alibaba | 480B MoE (35B active) | ~69.6% | Jul 2025 |
+
+</DataTable>
+
+SWE-smith (Princeton) collected 5,000 successful trajectories from
+SWE-agent + Claude 3.7 Sonnet. Our exact data source, our exact
+framework. They fine-tuned Qwen2.5-Coder-32B to 40.2%. Our 747
+trajectories are in the same ballpark as SWE-Gym's 491 that produced
+meaningful results.
+
+<Comic
+  src="https://imgs.xkcd.com/comics/the_difference.png"
+  alt="XKCD 242: The Difference"
+  caption="Us with 3 GPUs and a 0.5B model vs. Princeton with A100 clusters and a 32B model."
+/>
+
+But the most vindicating finding was about *format*. The SWE-smith
+team built mini-SWE-agent specifically for fine-tuning, and the key
+design decision was to **abandon function-calling entirely**. No structured
+JSON tool calls. No multi-role conversation protocols. Just plain
+bash commands and their output, as simple text continuation.
+
+The format we spent weeks wrestling with? Structured function calls
+with special tokens, tool definitions in system prompts, role-based
+message parsing. The field concluded it was the wrong abstraction
+for fine-tuning altogether. The tokenization headaches weren't
+incidental. They were a signal. The format itself was too complex
+for smaller models to learn reliably.
+
+<AsciiDiagram title="What We Used vs. What Works">
+{`
+  Our format (function-calling):      What SWE-smith uses (bash):
+
+  {"role": "system",                  SYSTEM: You solve GitHub
+   "tools": [{                        issues. Use bash commands.
+     "name": "edit_file",
+     "parameters": {...}              USER: Fix issue #1234
+   }]}
+  {"role": "assistant",               ASSISTANT: Let me look at
+   "function_call": {                 the relevant file.
+     "name": "edit_file",             $ cat src/utils.py
+     "arguments": "{...}"
+   }}                                 SYSTEM: [file contents]
+  {"role": "function",
+   "name": "edit_file",               ASSISTANT: I see the bug.
+   "content": "..."}                  $ edit src/utils.py ...
+
+  complex structured format           plain text continuation
+  special tokens required             any tokenizer works
+  role-based message parsing          linear conversation
+`}
+</AsciiDiagram>
+
+The difference looks cosmetic. It's not. The bash format eliminates
+every tokenization problem we hit. No special tokens to train. No
+role-switching protocol. No JSON structure to generate correctly. The
+model just learns to write bash commands and read their output, a
+pattern that's already in its pretraining data.
 
 ## Reflections
 
-The biggest challenge was handling the diversity of coding patterns across
-different repositories and languages. Future work would focus on
-domain-specific fine-tuning strategies.
+### What We Got Wrong
+
+**The model size was a mistake.** This is the hardest thing to admit
+because it wasn't a knowledge gap. It was a resource constraint
+that we rationalized into a research decision. We picked Qwen2.5-Coder-0.5B
+because it fit on our hardware, then convinced ourselves it was an
+interesting experiment to see if a small model could learn agentic behavior.
+The published literature, even at the time, suggested 7B was a
+floor for meaningful results on coding tasks, and SWE-bench needed 32B.
+
+**The tokenizer bugs were findable.** The Unsloth documentation existed.
+The Mistral HuggingFace discussion existed. We didn't search hard enough
+before committing to multi-week training runs. In ML, debugging the
+pipeline is the work, not an obstacle to it.
+
+**The format was wrong.** We inherited SWE-agent's function-calling
+interface without questioning whether it was the right abstraction
+for fine-tuning. It wasn't. The field spent the next few months
+proving that bash-only scaffolds work better for exactly the reasons
+we discovered: tokenization compatibility, structural simplicity,
+and reduced output complexity for smaller models.
+
+### What We Got Right
+
+**The data pipeline works.** 2,276 logs to 747 solutions to 11,000
+structured conversation turns, with deduplication, chunking, and
+validation. That pipeline mirrors what SWE-smith and SWE-Gym built
+independently. The [dataset](https://drive.google.com/drive/folders/1V3uEkmLSQ9K4iPg7NJNjUgFjqc9CyI50?usp=sharing)
+is public and ready to use, not just a homework assignment.
+
+**The diagnosis was correct.** Our paper identified function calling
+as the critical bottleneck, distinct from raw code generation ability.
+Devstral, SWE-smith, and mini-SWE-agent all confirmed this within
+months. We couldn't fix it, but we pointed at the right wall.
+
+**The failure modes map cleanly to the literature.** Repetitive behavior,
+context forgetting, tool misuse. These are exactly what SWE-Gym,
+SWE-smith, and R2E-Gym documented in models below 32B. We weren't
+observing random noise. We were observing the capacity boundary.
+
+### What I'd Do Now
+
+With the benefit of hindsight and the research that followed:
+
+Start with **Qwen2.5-Coder-7B-Instruct** (not the base model; the
+instruct variant has trained special token embeddings). Use the Unsloth
+pad_token fix. Include `embed_tokens` and `lm_head` in LoRA's
+`modules_to_save`. Convert the 747 trajectories to **mini-SWE-agent's
+bash-only format**, a data processing task. Exactly what this
+project proved I can do. For inference, a quantized 32B model fits in
+~20GB of VRAM.
+
+The 747 traces are still valuable. SWE-Gym got meaningful results from
+491 trajectories at 32B. The data isn't the problem. The data was
+never the problem.
+
+### The Broader Lesson
+
+There's a difference between *teaching a model to write code* and
+*teaching a model to be a software engineer*. Code generation is
+pattern completion. Software engineering is navigation, diagnosis,
+verification, and iteration. An agentic loop that requires the model
+to maintain state across dozens of interactions while using tools
+it barely understands.
+
+Knowledge distillation works for both. But the second one needs more
+parameters, simpler formats, and the humility to check whether your
+tokenizer is eating your data before you start a training run.
+
+We had 747 correct answers. The model couldn't learn from any of them.
+That's not a failure of the data. It's a lesson about what it takes
+to teach a machine to think in loops.
