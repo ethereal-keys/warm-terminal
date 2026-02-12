@@ -13,21 +13,42 @@ import Annotation from '@/components/ui/Annotation.astro';
 
     <BoxFrame padding="32px" background="rgba(252, 250, 245, 0.5)">
       <div class="bio">
-        <p class="intro">
-          I'm a systems engineer who builds infrastructure that doesn't wake
-          me up at 3am. Two years at Aruba Networks/HPE taught me that the
-          best systems are invisible.
-        </p>
 
-        <div class="section">
-          <h2>currently</h2>
-          <div class="section-line"></div>
-          <p>
-            Seeking new opportunities in cloud infrastructure, systems
-            engineering, or anywhere I can make complex things feel simple.
-            Based in the US, open to relocation.
-          </p>
+        <!-- terminal-style quick glance -->
+        <div class="glance">
+          <div class="glance-row">
+            <span class="glance-key">status</span>
+            <span class="glance-sep">//</span>
+            <span class="glance-val">ms cs @ asu, graduating may 2026</span>
+          </div>
+          <div class="glance-row">
+            <span class="glance-key">now</span>
+            <span class="glance-sep">//</span>
+            <span class="glance-val">web engineer @ edplus at asu</span>
+          </div>
+          <div class="glance-row">
+            <span class="glance-key">prev</span>
+            <span class="glance-sep">//</span>
+            <span class="glance-val">cloud developer @ aruba networks / hpe (2+ yrs)</span>
+          </div>
+          <div class="glance-row">
+            <span class="glance-key">focus</span>
+            <span class="glance-sep">//</span>
+            <span class="glance-val">cloud · systems · ml infrastructure</span>
+          </div>
+          <div class="glance-row">
+            <span class="glance-key">gpa</span>
+            <span class="glance-sep">//</span>
+            <span class="glance-val">4.00</span>
+          </div>
         </div>
+
+        <p class="intro-detail">
+          I've worked across Kubernetes clusters and CI pipelines, neural
+          style transfer plugins for game engines, OS kernel hacking in C,
+          and ML training pipelines for NLP. I like building at whatever
+          layer of the stack the interesting problems are.
+        </p>
 
         <div class="section">
           <h2>background</h2>
@@ -36,19 +57,35 @@ import Annotation from '@/components/ui/Annotation.astro';
             <div class="timeline-item">
               <span class="timeline-marker">&gt;</span>
               <div class="timeline-content">
+                <strong>Web Engineer</strong> @ EdPlus at ASU
+                <span class="timeline-date">2025 - present</span>
+                <p class="timeline-detail">
+                  AWS IAM, CI/CD pipelines, cloud security compliance.
+                </p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-marker">&gt;</span>
+              <div class="timeline-content">
                 <strong>MS Computer Science</strong> @ Arizona State University
-                <span class="timeline-date">2024 – 2026</span>
+                <span class="timeline-date">2024 - 2026</span>
+                <p class="timeline-detail">
+                  Cloud computing, advanced OS, NLP, data-intensive systems
+                  for ML, probability circuits.
+                </p>
               </div>
             </div>
             <div class="timeline-item">
               <span class="timeline-marker">&gt;</span>
               <div class="timeline-content">
                 <strong>Cloud Developer</strong> @ Aruba Networks / HPE
-                <span class="timeline-date">2022 – 2024</span>
+                <span class="timeline-date">2022 - 2024</span>
                 <p class="timeline-detail">
-                  Bare metal platform team. Kubernetes automation, fault-tolerant
-                  systems, infrastructure monitoring. Built CI pipelines that
-                  reduced deployment time from 12 hours to under 2.
+                  Bare metal platform team. Full stack ownership from OS
+                  provisioning through Kubernetes cluster setup, automation,
+                  and security. Kubernetes, ETCD, Prometheus, Grafana,
+                  Python, Bash, ESXi. Primary on-call engineer for
+                  production issues and customer escalations.
                 </p>
               </div>
             </div>
@@ -56,31 +93,30 @@ import Annotation from '@/components/ui/Annotation.astro';
         </div>
 
         <div class="section">
-          <h2>interests</h2>
+          <h2>published</h2>
           <div class="section-line"></div>
           <p>
-            When I'm not writing code, you'll find me playing guitar,
-            hunting for vinyl records, reading (sci-fi and systems design
-            books, mostly), hiking, or working on indie game prototypes.
+            <a href="https://ieeexplore.ieee.org/document/9824226" target="_blank" rel="noopener noreferrer" class="paper-link">
+              Signed English Recognition with Spatio-Temporal Graphs
+              and Language Modelling
+            </a>
+            <span class="paper-venue">IEEE, 2022</span>
           </p>
-          <Annotation rotate={-1} size="14px" class="aside">
-            — currently reading: designing data-intensive applications
-          </Annotation>
         </div>
 
         <div class="section">
-          <h2>colophon</h2>
+          <h2>outside of work</h2>
           <div class="section-line"></div>
           <p>
-            This site is built with Astro, React (for interactive bits),
-            and way too much attention to detail. The aesthetic is
-            "warm terminal"—I wanted something that felt technical but
-            not cold.
+            I play guitar, draw with ink on paper, and prototype indie games
+            in Godot (a few are up on
+            <a href="https://ethereal-keys.itch.io/" target="_blank" rel="noopener noreferrer">itch.io</a>).
+            I read a lot, mostly sci-fi and systems design books. I hike
+            when the Arizona heat allows it.
           </p>
-          <p>
-            Typeface is JetBrains Mono. Hand-written notes use Caveat.
-            Colors are warm and earthy because I stare at screens enough.
-          </p>
+          <Annotation rotate={-1} size="14px" class="aside">
+            currently reading: designing data-intensive applications
+          </Annotation>
         </div>
       </div>
     </BoxFrame>
@@ -123,11 +159,49 @@ import Annotation from '@/components/ui/Annotation.astro';
     max-width: 65ch;
   }
 
-  .intro {
-    font-size: var(--text-lg);
-    line-height: var(--leading-relaxed);
-    margin-bottom: var(--space-5);
+  /* ── quick glance block ── */
+
+  .glance {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-bottom: var(--space-4);
+    margin-bottom: var(--space-4);
+    border-bottom: 1px dashed var(--border-light);
   }
+
+  .glance-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    line-height: var(--leading-normal);
+  }
+
+  .glance-key {
+    color: var(--rust-muted);
+    min-width: 7ch;
+    flex-shrink: 0;
+  }
+
+  .glance-sep {
+    color: var(--text-ghost);
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .glance-val {
+    color: var(--text-primary);
+  }
+
+  /* ── intro paragraph ── */
+
+  .intro-detail {
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-4);
+  }
+
+  /* ── sections ── */
 
   .section {
     margin-bottom: var(--space-4);
@@ -151,6 +225,8 @@ import Annotation from '@/components/ui/Annotation.astro';
   .section p {
     margin: 0 0 var(--space-2) 0;
   }
+
+  /* ── timeline ── */
 
   .timeline {
     display: flex;
@@ -188,6 +264,28 @@ import Annotation from '@/components/ui/Annotation.astro';
     color: var(--text-secondary);
   }
 
+  /* ── publication ── */
+
+  .paper-link {
+    color: var(--text-primary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-light);
+    transition: border-color 0.2s ease;
+  }
+
+  .paper-link:hover {
+    border-color: var(--text-primary);
+  }
+
+  .paper-venue {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-top: var(--space-1);
+  }
+
+  /* ── misc ── */
+
   .aside {
     display: block;
     margin-top: var(--space-2);
@@ -199,5 +297,21 @@ import Annotation from '@/components/ui/Annotation.astro';
     gap: var(--space-3);
     margin-top: var(--space-5);
     padding-left: var(--space-4);
+  }
+
+  /* ── mobile ── */
+
+  @media (max-width: 640px) {
+    .glance-row {
+      flex-wrap: wrap;
+    }
+
+    .glance-key {
+      min-width: 6ch;
+    }
+
+    .glance-sep {
+      display: none;
+    }
   }
 </style>

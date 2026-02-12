@@ -2,12 +2,12 @@ import type { SiteConfig } from '@/types';
 
 export const SITE: SiteConfig = {
   name: 'sushanth kashyap',
-  tagline: 'cloud · systems · creative engineering',
+  tagline: 'cloud · systems · ml infrastructure',
   status: 'currently seeking opportunities',
   connectionMessage: 'connection established — welcome, visitor',
 
   experience: [
-    { prefix: '>', text: 'prev: aruba networks / hpe (2 years)' },
+    { prefix: '>', text: 'prev: aruba networks / hpe (2+ years)' },
     { prefix: '>', text: 'edu: ms cs @ arizona state' },
   ],
 
