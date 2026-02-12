@@ -7,6 +7,11 @@ import ReadingProgress from '@/components/interactive/ReadingProgress';
 import DataTable from '@/components/content/DataTable.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { formatDate, calculateReadingTime } from '@/lib/utils';
+import Comic from '@/components/content/Comic.astro';
+import AsciiDiagram from '@/components/content/AsciiDiagram.astro';
+import AnimatedImage from '@/components/content/Animatedimage.astro';
+import ImageShowcase from '@/components/content/ImageShowcase.astro';
+import Callout from '@/components/content/Callout.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts', ({ data }) => !data.draft);
@@ -61,7 +66,7 @@ const relatedPosts = post.data.related
       </header>
 
       <div class="prose">
-        <Content components={{ DataTable }} />
+        <Content components={{ DataTable, Comic, AsciiDiagram, AnimatedImage, ImageShowcase, Callout }} />
       </div>
     </article>
 
@@ -204,7 +209,9 @@ const relatedPosts = post.data.related
   }
 
   /* ── Media elements: more breathing room ── */
-  .prose :global(figure),
+  .prose :global(figure){
+    max-width: none;
+  },
   .prose :global(.youtube-embed),
   .prose :global(.demo-embed),
   .prose :global(.image-showcase),
