@@ -1,6 +1,7 @@
 ---
 import '@/styles/global.css';
 import GlobalSoundEffects from '@/components/GlobalSoundEffects';
+import MobileNotice from '@/components/interactive/MobileNotice';
 import { SITE } from '@/lib/config';
 import { ViewTransitions } from 'astro:transitions';
 
@@ -40,7 +41,8 @@ const fullTitle = title === SITE.name ? title : `${title} | ${SITE.name}`;
   </head>
   <body>
     <a href="#main" class="visually-hidden">Skip to content</a>
-<GlobalSoundEffects client:only="react" />
+    <GlobalSoundEffects client:only="react" />
+    <MobileNotice client:only="react" />
     <slot />
   </body>
 </html>

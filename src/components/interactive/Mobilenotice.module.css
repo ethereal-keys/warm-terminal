@@ -1,0 +1,190 @@
+/* =============================================
+   MobileNotice — "best viewed on desktop"
+   Matches command palette / sound-lab modal style
+   ============================================= */
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(43, 41, 38, 0.35);
+    backdrop-filter: blur(6px);
+    display: none;
+    /* hidden by default */
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    animation: fadeIn 0.2s ease;
+    padding: 24px;
+}
+
+@media (max-width: 768px) {
+    .overlay {
+        display: flex;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ── Card ────────────────────────────────────── */
+
+.card {
+    position: relative;
+    background-color: #F5F2EB;
+    background-image:
+        radial-gradient(circle, #D4CFC4 1px, transparent 1px),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E"),
+        linear-gradient(180deg, #F8F5EE 0%, #F5F2EB 100%);
+    background-size: 20px 20px, auto, 100% 100%;
+    background-position: 10px 10px, 0 0, 0 0;
+    max-width: 340px;
+    width: 100%;
+    box-shadow: 0 12px 40px rgba(50, 46, 42, 0.18);
+    border: 1px solid #C5C0B8;
+    animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ── Corner brackets ─────────────────────────── */
+
+.corner {
+    position: absolute;
+    font-size: 14px;
+    line-height: 1;
+    color: #AAA59D;
+    background: #F8F5EE;
+    padding: 0 3px;
+}
+
+.tl {
+    top: -1px;
+    left: -1px;
+}
+
+.tr {
+    top: -1px;
+    right: -1px;
+}
+
+.bl {
+    bottom: -1px;
+    left: -1px;
+}
+
+.br {
+    bottom: -1px;
+    right: -1px;
+}
+
+/* ── Content ─────────────────────────────────── */
+
+.content {
+    padding: 24px 28px;
+}
+
+.title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2B2926;
+    margin: 0;
+}
+
+.rule {
+    height: 1px;
+    background: #D4CFC4;
+    margin: 14px 0;
+}
+
+.body {
+    font-size: 12px;
+    color: #5C5954;
+    line-height: 1.6;
+    margin: 0 0 8px 0;
+}
+
+/* Terminal-style hint */
+.terminal {
+    font-size: 12px;
+    color: #8A8680;
+    margin: 12px 0 0 0;
+}
+
+.prompt {
+    color: #AAA59D;
+    user-select: none;
+}
+
+.command {
+    color: #2B2926;
+}
+
+/* Annotation (handwritten note) */
+.annotation {
+    font-family: 'Caveat', cursive;
+    font-size: 14px;
+    color: #8A8680;
+    display: block;
+    margin-top: 14px;
+    transform: rotate(-1deg);
+}
+
+/* ── Actions ─────────────────────────────────── */
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.dismissBtn {
+    background: none;
+    border: 1px solid #D4CFC4;
+    font: inherit;
+    font-size: 11px;
+    color: #5C5954;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 2px;
+    transition: all 0.15s;
+}
+
+.dismissBtn:hover {
+    border-color: #B8B3A8;
+    color: #2B2926;
+}
+
+.continueBtn {
+    background: rgba(191, 77, 40, 0.1);
+    border: 1px solid #BF4D28;
+    font: inherit;
+    font-size: 11px;
+    color: #BF4D28;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 2px;
+    transition: all 0.15s;
+}
+
+.continueBtn:hover {
+    background: #BF4D28;
+    color: white;
+}
