@@ -7,3 +7,4 @@ export { SoundToggle } from './SoundToggle';
 export { CommandPalette } from './CommandPalette';
 export { default as StickyNav } from './StickyNav';
 export { default as ReadingProgress } from './ReadingProgress';
+export { default as MobileNotice } from './Mobilenotice';
