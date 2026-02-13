@@ -56,23 +56,18 @@ export function MobileNotice() {
                     <div className={styles.rule} />
 
                     <p className={styles.body}>
-                        this site was designed for larger screens — interactive
-                        demos, the sound lab, and a few layout details work best
-                        on a desktop or laptop.
-                    </p>
-
-                    <p className={styles.body}>
-                        you're welcome to keep browsing here, though.
-                        most content is fully readable on mobile.
+                        parts of this site are still under construction for
+                        mobile. things may look a little off. best viewed
+                        on desktop for now.
                     </p>
 
                     <div className={styles.terminal}>
                         <span className={styles.prompt}>$ </span>
-                        <span className={styles.command}>resize --viewport desktop</span>
+                        <span className={styles.command}>mobile-support --status wip</span>
                     </div>
 
                     <span className={styles.annotation}>
-                        — some things just need more pixels
+                        working on it, promise
                     </span>
 
                     <div className={styles.rule} />
