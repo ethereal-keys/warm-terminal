@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import styles from './MobileNotice.module.css';
+import styles from './Mobilenotice.module.css';
 
 const STORAGE_KEY = 'warm-terminal:mobile-notice-dismissed';
 
