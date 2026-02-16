@@ -1,0 +1,383 @@
+---
+title: "Building a Synthesizer Nobody Asked For"
+description: "I built a Web Audio API synthesizer so every interaction on this portfolio plays a sound from the D major pentatonic scale. Then I exposed the entire engine so you could edit them yourself."
+tags:
+  - web-audio
+  - sound-design
+  - react
+  - synthesis
+publishedAt: 2026-02-16
+featured: true
+order: 4
+status: shipped
+role: solo
+timeline: "Jan – Feb 2026"
+tabs:
+  - label: "./the-silence"
+    id: "the-silence"
+  - label: "./the-palette"
+    id: "the-palette"
+  - label: "./the-engine"
+    id: "the-engine"
+  - label: "./the-lab"
+    id: "the-lab"
+  - label: "./reflections"
+    id: "reflections"
+---
+
+## The Silence
+
+Most developer portfolios are silent.
+
+You click a project card. Nothing. You hover over a link. Nothing. You
+navigate between pages. Nothing. The interaction model is entirely
+visual, color shifts and underlines and maybe a fade transition if
+they're feeling adventurous.
+
+I wanted this site to feel like a *place*. Not a résumé with scroll
+behavior, but somewhere you'd want to spend a few minutes. The
+breathing dots, the paper texture, the hand-drawn annotations, those
+get you part of the way there. But a place has a soundscape.
+
+<Callout type="tip">
+Want to hear it before reading about it? The [sound lab](/sound-lab)
+lets you play, edit, and build every sound on this site.
+</Callout>
+
+So the question became: what should a portfolio website *sound like*?
+
+<Comic
+  src="https://imgs.xkcd.com/comics/ui_change.png"
+  alt="XKCD 2056: UI Change"
+  caption="Me, adding sound to a portfolio site: 'This will definitely not annoy anyone.'"
+/>
+
+Not like a notification tray. Not like a video game. Not like a
+music production demo. It needed to be almost subliminal, felt more
+than heard. Something warm. Something that could play twenty sounds
+in rapid succession as you click through the site without any
+combination sounding wrong.
+
+That last constraint is the one that changed everything.
+
+### The Problem With Audio Files
+
+The obvious approach is to drop in some `.wav` files. Click sound,
+hover sound, transition sound, done.
+
+But audio files are rigid. You get exactly one timbre, one pitch, one
+duration. Want to adjust the hover sound to be a little brighter?
+Open a DAW, export, replace the file, rebuild. Want to make sure
+the click sound and the page transition sound are harmonically
+compatible? Good luck. They're just raw waveforms with no musical
+relationship to each other.
+
+I wanted the sounds to be part of the same system. Notes from the
+same scale. Timbres from the same family. Envelopes that breathe
+the same way. And I wanted to be able to tweak all of it live,
+without touching an audio editor.
+
+So I synthesized them from scratch.
+
+## The Palette
+
+Here's the core idea: every sound on this site is a note in the
+**D major pentatonic scale**.
+
+```
+D  ·  E  ·  F#  ·  A  ·  B
+```
+
+Five notes. That's it.
+
+### Why Pentatonic
+
+A pentatonic scale has a nice property: any combination of its notes
+sounds good together. There are no dissonant intervals. You can play
+any two notes simultaneously, in any order, at any timing, and the
+result will be consonant.
+
+This matters because a website has no conductor. A visitor might
+click a button (D3), hover over a nav link (E4), trigger a page
+transition (A3→D4), and hit an error (B3), all within a second.
+Those four sounds need to coexist. With a pentatonic palette, they
+always will.
+
+<AsciiDiagram title="Tonal Mapping">
+{`
+┌──────────────────────────────────────────────────┐
+│  ACTION           NOTE(S)      FEELING           │
+│  ─────────────────────────────────────────────── │
+│  select/success   D, A         root + fifth      │
+│  navigate/hover   E, F#        gentle steps      │
+│  error/close      B, low D     resolution down   │
+│  easter egg       D-F#-A-B-A   the full phrase   │
+└──────────────────────────────────────────────────┘
+`}
+</AsciiDiagram>
+
+Positive interactions (clicking, selecting) land on the root and
+fifth, the most stable tones in the scale. Navigation uses the
+middle notes, movement without tension. Errors resolve downward.
+And the easter egg plays the whole phrase.
+
+### Designing by Character, Not by Waveform
+
+I didn't start with oscillator settings. I started with
+descriptions.
+
+Every sound has a *character* written in plain English before a
+single parameter was set:
+
+- **click**: "gentle thud like a muted piano key, round, not sharp"
+- **hover**: "almost felt more than heard, like a soft exhale"
+- **page transition**: "warm tone with upward resolution, like opening a door"
+- **error**: "not alarming, but clearly 'no', like a gentle door bump"
+- **easter egg**: "melodic phrase: D-F#-A-B-A"
+
+These descriptions became the spec. The oscillator params, envelopes,
+and filter cutoffs were just the implementation details.
+
+A click doesn't need harmonics. Pure sine wave, low D for warmth,
+with a pitch envelope that falls gently from A3 to D3 over 60
+milliseconds. That falling pitch is what gives it the "thud"
+feeling. A hover is even simpler: a sine wave at E4 so quiet it
+barely registers, fading in and out over 70ms like a breath.
+
+## The Engine
+
+Under the hood, the sound system runs on the Web Audio API.
+No libraries, no samples, no audio files. Pure synthesis.
+
+### Two Modes
+
+Every sound is one of two types:
+
+<AsciiDiagram title="Sound Architecture">
+{`
+SIMPLE                           SEQUENCE
+┌───────────────┐                ┌──────────────────┐
+│ Osc A ─┐      │                │ Note 1 ─┐        │
+│        ├ Env ─┼── Filter       │ Note 2 ─┤        │
+│ Osc B ─┘      │                │         ├ Env ───┼── Filter
+└───────────────┘                │ Note 3 ─┤        │
+                                   │ ...   ──┘        │
+click, hover, error              └──────────────────┘
+                                 startup, easter egg
+`}
+</AsciiDiagram>
+
+**Simple** sounds use two oscillators mixed through a shared ADSR
+envelope and optional filter. Most UI interactions are simple
+sounds. A click is just two sine waves with a quick decay.
+
+**Sequence** sounds are timelines of notes, each with their own
+delay, frequency, duration, level, and waveform. The startup sound
+is six notes staggered over 400 milliseconds:
+
+```typescript
+// The startup sequence, what you hear when the site "boots up"
+const startupNotes = [
+  { delay: 0,   frequency: D4,  duration: 350, level: 0.25, waveform: 'sine' },
+  { delay: 80,  frequency: A3,  duration: 300, level: 0.15, waveform: 'sine' },
+  { delay: 180, frequency: F#4, duration: 280, level: 0.18, waveform: 'sine' },
+  { delay: 250, frequency: E4,  duration: 260, level: 0.12, waveform: 'triangle' },
+  { delay: 350, frequency: D5,  duration: 300, level: 0.22, waveform: 'sine' },
+  { delay: 380, frequency: A4,  duration: 280, level: 0.10, waveform: 'sine' },
+];
+```
+
+A D major arpeggio that climbs upward. The sonic equivalent of a
+machine warming up. The wind-down sound when you disable audio is
+the same phrase in reverse, resolving back down.
+
+### The ADSR Envelope
+
+Every sound is shaped by an ADSR (Attack, Decay, Sustain, Release)
+envelope, the contour of how it fades in and out:
+
+<AsciiDiagram title="ADSR Envelope">
+{`
+level
+  │
+  │    /\\
+  │   /  \\
+  │  /    \\_________
+  │ /    D    S     \\
+  │/ A               \\___
+  └───────────────────────── time
+    ↑    ↑            ↑
+  attack decay      release
+`}
+</AsciiDiagram>
+
+The click sound has a 5ms attack (instant), 80ms decay, zero
+sustain, 40ms release. Basically a sharp thump that's gone before
+you notice it. The hover sound has a 15ms attack, just enough
+slowness to feel like a breath rather than a tap.
+
+These numbers are small. Most of the sounds last less than 200
+milliseconds. But the *shape* of those milliseconds is what makes a
+click feel like a muted piano key versus a digital beep.
+
+### The AudioContext Problem
+
+The Web Audio API has a policy: audio contexts start in a
+`suspended` state until a user interaction resumes them. This is
+sensible, it prevents websites from autoplaying audio. But it
+creates a subtle bug.
+
+If you schedule sounds while the context is suspended, they queue
+up. Then the moment the user clicks something and the context
+resumes, *every queued sound plays simultaneously*. One hover,
+three navigation sounds, and a page transition, all at once.
+
+```typescript
+play(name: SoundName): void {
+  if (!this.enabled) return;
+  const ctx = this.getAudioContext();
+  if (!ctx) return;
+
+  // Don't schedule sounds if context is suspended.
+  // Prevents the "sound avalanche" on first interaction.
+  if (ctx.state === 'suspended') return;
+
+  // ...synthesize and play
+}
+```
+
+The fix is one line. Finding it took longer than I'd like to admit.
+The behavior only appeared on first visit, and only if you moved
+your mouse before clicking anything.
+
+## The Lab
+
+So far this is just a sound engine running in the background. The
+Sound Lab is what happens when you give the engine a face.
+
+The `/sound-lab` page is a full interactive synthesizer. You can
+select any sound from the portfolio's palette, adjust both
+oscillators, shape the ADSR envelope, configure the filter, edit
+sequence timelines, snap frequencies to a musical scale, preview
+changes with a waveform visualizer, export to `.wav`, or build
+entirely new sounds from scratch.
+
+### How It Looks
+
+I wanted the lab to feel like a piece of equipment you'd find in a
+recording studio that somehow ran on a terminal.
+
+The page sits on an aged graph-paper background, a dot grid with
+subtle paper grain generated through layered SVG noise filters and
+`radial-gradient` circles. The main panel floats on top like a
+sheet of cream-colored paper (`#F5F2EB`) with a quiet box shadow.
+
+Every control section lives inside the same corner-bracket frames
+(`┌ ┐ └ ┘`) used throughout the rest of the site. The dashed rules
+between sections use a `repeating-linear-gradient` that mimics the
+dashed lines you'd see on engineering paper. Even the modals for
+creating new sounds or resetting presets follow the same visual
+language: corner brackets, monospace type, muted tones, a
+`[cancel]` and `[create]` at the bottom.
+
+The knobs took a while. They're circular SVG elements with a
+rust-colored indicator line (`#BF4D28`) and an arc track that fills
+as you drag, styled to look like vintage lab equipment with subtle
+inset shadows on the body. Waveform selectors use radio-style
+indicators (`◉ ○`) beside `sine`, `triangle`, `square`, `sawtooth`.
+The level meters are built from block characters, `▓▓▓▓▓▓░░░░`,
+updating in real-time as sound plays.
+
+Everything is set in JetBrains Mono.
+
+The oscilloscope visualization runs off a shared `AnalyserNode` in
+the Web Audio graph, rendering frequency data to a canvas. It's the
+same technique behind the tiny waveform that lives in the nav bar
+logo. In the lab it's bigger and centered, and it reacts to
+whatever you're previewing.
+
+The overall feeling is somewhere between a hardware synth manual
+and a weathered notebook. Which is sort of the feeling I was going
+for with the whole site.
+
+### Closing the Loop
+
+Custom sounds created in the lab get saved to localStorage and
+automatically loaded by the portfolio's live sound system. The
+synthesizer on the `/sound-lab` page and the click sound you hear
+on the home page are the same codebase.
+
+```typescript
+// In the portfolio's sound manager
+window.addEventListener('soundlab-update', () => {
+  this.loadCustomSounds();
+});
+
+// In the Sound Lab
+window.dispatchEvent(new Event('soundlab-update'));
+```
+
+Change a sound in the lab, and the next click on the home page
+uses your version.
+
+### Scale Quantization
+
+When you drag a frequency knob, it snaps to the nearest note in
+your selected scale. D major pentatonic by default, but you can
+switch to chromatic, major, minor, or blues. This means even random
+knob-twisting produces something musical.
+
+It also means you can't accidentally make something ugly. Which
+seemed important for a tool embedded in a portfolio.
+
+## Reflections
+
+### What Surprised Me
+
+How much the envelopes matter. I spent the first week tweaking
+oscillator frequencies and waveforms, trying to get the "right
+sound." The breakthrough came when I started paying attention to
+the attack and decay curves instead. A 5ms attack versus a 15ms
+attack is the difference between a digital click and an organic
+tap. The timbre is almost secondary.
+
+### The Invisible Layer
+
+Most visitors won't consciously notice the sounds. I've watched
+people use the site and they don't comment on the audio unless
+it's pointed out. But they linger. There's a sense of
+responsiveness that vision alone doesn't quite provide. Something
+is acknowledging their presence.
+
+There's a hidden page on this site that says: *"the sound design
+took longer than the layout."*
+
+That's true. The layout came together in a few focused weekends.
+The sound system took over a month, not because the code was
+complex, but because every sound needed to feel right, sit well
+with the others, and disappear into the background while quietly
+making things a little warmer.
+
+I don't know if it was worth it in any measurable sense. But the
+site wouldn't feel like *this* without it. And I like how this
+feels.
+
+### The Guitar Connection
+
+I play guitar. I collect vinyl. I care about how things sound
+because I've spent a lot of time listening.
+
+This was the first project where my music brain and my engineering
+brain worked on the same problem. Music theory chose the notes.
+Audio engineering synthesized them. UX thinking decided when to
+play them.
+
+Go [play with it](/sound-lab). Turn the knobs. Break the sounds.
+Make them yours.
+
+<AsciiDiagram>
+{`
+  ♪ /\\_/\\ ♪
+   ( ^.^ )
+`}
+</AsciiDiagram>
