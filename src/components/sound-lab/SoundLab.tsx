@@ -11,8 +11,9 @@ import { play, stop, getWaveformData, renderToWav } from './lib/engine';
 import { DEFAULT_SOUNDS, createSound } from './lib/presets';
 import type { Sound, SimpleParams, SequenceParams, EnvelopeParams, FilterParams, OscillatorParams, SequenceNote, WaveformType } from './lib/types';
 import { generateId } from './lib/types';
-import { useSound } from '@/hooks/useSound';
-import { SoundToggle } from '@/components/interactive/SoundToggle';
+import { soundSystem } from '@/lib/sounds';
+import SoundLabWalkthrough from './SoundLabWalkthrough';
+import wtStyles from './SoundLabWalkthrough.module.css';
 
 // =============================================================================
 // MUSICAL SCALES
@@ -78,8 +79,9 @@ function formatDuration(ms: number): string {
 // MAIN COMPONENT
 // =============================================================================
 
+const WALKTHROUGH_STORAGE_KEY = 'soundlab-walkthrough-done';
+
 export default function SoundLab() {
-  const { enabled: soundOn, toggle: toggleSound } = useSound();
   const [sounds, setSounds] = useState<Record<string, Sound>>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -107,6 +109,36 @@ export default function SoundLab() {
 
   const [newSoundName, setNewSoundName] = useState('');
   const [newSoundType, setNewSoundType] = useState<'simple' | 'sequence'>('simple');
+
+  // Walkthrough state
+  const [showWalkthroughPrompt, setShowWalkthroughPrompt] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !localStorage.getItem(WALKTHROUGH_STORAGE_KEY);
+  });
+  const [walkthroughActive, setWalkthroughActive] = useState(false);
+  const [walkthroughHighlight, setWalkthroughHighlight] = useState<string | null>(null);
+
+  // Suppress global UI sounds while in Sound Lab
+  useEffect(() => {
+    soundSystem.suppressPlayback(true);
+    return () => soundSystem.suppressPlayback(false);
+  }, []);
+
+  // Walkthrough highlight system: toggle data-wt-active on matching elements
+  useEffect(() => {
+    if (!walkthroughHighlight) return;
+    const targets = walkthroughHighlight.split(',');
+    const elements: Element[] = [];
+    targets.forEach(t => {
+      document.querySelectorAll(`[data-wt="${t.trim()}"]`).forEach(el => {
+        el.setAttribute('data-wt-active', '');
+        elements.push(el);
+      });
+    });
+    return () => {
+      elements.forEach(el => el.removeAttribute('data-wt-active'));
+    };
+  }, [walkthroughHighlight]);
 
   // Close scale menu when clicking outside
   useEffect(() => {
@@ -199,6 +231,11 @@ export default function SoundLab() {
     setSounds(p => ({ ...p, [selectedId]: { ...p[selectedId], params, modified: true } }));
   }, [selectedId]);
 
+  // Walkthrough uses this to update any sound by id (no stale closure on selectedId)
+  const updateById = useCallback((id: string, params: SimpleParams | SequenceParams) => {
+    setSounds(p => ({ ...p, [id]: { ...p[id], params, modified: true } }));
+  }, []);
+
   const handleReset = useCallback(() => {
     if (original) {
       setSounds(p => ({ ...p, [selectedId]: { ...original, modified: false } }));
@@ -255,6 +292,30 @@ export default function SoundLab() {
     }
   }, [sound]);
 
+  const handleWalkthroughStart = useCallback(() => {
+    // Reset sounds used by the walkthrough to defaults so animations always start fresh
+    setSounds(prev => ({
+      ...prev,
+      click: { ...DEFAULT_SOUNDS['click'], modified: false },
+      easterEgg: { ...DEFAULT_SOUNDS['easterEgg'], modified: false },
+    }));
+    setSelectedId('click');
+    setActiveTab('oscA');
+    setShowWalkthroughPrompt(false);
+    setWalkthroughActive(true);
+  }, []);
+
+  const handleWalkthroughComplete = useCallback(() => {
+    setWalkthroughActive(false);
+    setWalkthroughHighlight(null);
+    localStorage.setItem(WALKTHROUGH_STORAGE_KEY, 'true');
+  }, []);
+
+  const handleWalkthroughDismiss = useCallback(() => {
+    setShowWalkthroughPrompt(false);
+    localStorage.setItem(WALKTHROUGH_STORAGE_KEY, 'true');
+  }, []);
+
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       // Skip if typing in a text input
@@ -303,12 +364,13 @@ export default function SoundLab() {
                 className={styles.helpBtn}
                 onClick={() => setModal('help')}
                 title="Help"
+                data-wt="help"
               >
                 ?
               </button>
             </div>
             <div className={styles.scaleWrap} ref={scaleMenuRef}>
-              <button className={styles.scaleBtn} onClick={() => setShowScaleMenu(s => !s)}>
+              <button className={styles.scaleBtn} onClick={() => setShowScaleMenu(s => !s)} data-wt="scale">
                 scale: {scale.name} ▾
               </button>
               {showScaleMenu && (
@@ -331,7 +393,6 @@ export default function SoundLab() {
               <span className={styles.backIcon}>←</span>
               <span>back to portfolio</span>
             </a>
-            <SoundToggle soundOn={soundOn} onToggle={toggleSound} size="small" />
           </div>
         </header>
 
@@ -381,10 +442,14 @@ export default function SoundLab() {
         </section>
 
         {/* Display row */}
-        <div className={styles.displayRow}>
+        <div className={styles.displayRow} data-wt="graphs">
           <div className={styles.graphBox}>
             <Scope isPlaying={isPlaying} />
-            <button className={styles.graphLabel} onClick={handlePlay}>
+            <button
+              className={styles.graphLabel}
+              onClick={handlePlay}
+              data-wt="play"
+            >
               ▶ waveform
             </button>
           </div>
@@ -449,12 +514,14 @@ export default function SoundLab() {
           <button
             className={`${styles.tabBtn} ${!canReset ? styles.tabBtnDisabled : ''}`}
             onClick={() => canReset && setModal('reset')}
+            data-wt="reset"
           >
             [r] reset
           </button>
           <button
             className={styles.tabBtn}
             onClick={handleDownload}
+            data-wt="download"
           >
             [d] download
           </button>
@@ -463,7 +530,7 @@ export default function SoundLab() {
         <div className={styles.rule} />
 
         {/* Sound Grid */}
-        <section className={styles.soundGrid}>
+        <section className={styles.soundGrid} data-wt="grid">
           {allSounds.map(s => (
             <div key={s.id} className={styles.gridItemWrap}>
               <button
@@ -485,7 +552,7 @@ export default function SoundLab() {
               )}
             </div>
           ))}
-          <button className={styles.gridAdd} onClick={() => setModal('newSound')}>+</button>
+          <button className={styles.gridAdd} onClick={() => setModal('newSound')} data-wt="add">+</button>
         </section>
 
         {/* Help modal */}
@@ -589,6 +656,40 @@ export default function SoundLab() {
           </div>
         )}
       </div>
+
+      {/* Walkthrough prompt (first visit) */}
+      {showWalkthroughPrompt && !walkthroughActive && (
+        <div className={wtStyles.prompt}>
+          <div className={wtStyles.promptInner}>
+            <div className={wtStyles.promptText}>
+              <span className={wtStyles.promptCaret}>&gt;</span>
+              <strong>sound-lab.</strong> quick tour? under a minute.
+            </div>
+            <div className={wtStyles.promptActions}>
+              <button className={wtStyles.promptBtn} onClick={handleWalkthroughDismiss}>
+                skip
+              </button>
+              <button className={`${wtStyles.promptBtn} ${wtStyles.promptBtnPrimary}`} onClick={handleWalkthroughStart}>
+                show me
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Walkthrough (active tour) */}
+      {walkthroughActive && (
+        <SoundLabWalkthrough
+          sounds={sounds}
+          selectedId={selectedId}
+          isPlaying={isPlaying}
+          onSelectSound={setSelectedId}
+          onSetTab={setActiveTab}
+          onUpdateById={updateById}
+          onSetHighlight={setWalkthroughHighlight}
+          onComplete={handleWalkthroughComplete}
+        />
+      )}
     </div>
   );
 }
@@ -1095,7 +1196,7 @@ function NoteSlider({ value, scale, onChange }: {
   const percent = notes.length > 1 ? (noteIndex / (notes.length - 1)) * 100 : 50;
 
   return (
-    <div className={styles.sliderRow}>
+    <div className={styles.sliderRow} data-wt="note">
       <span className={styles.sliderLabel}>note</span>
       <div className={styles.sliderTrack}>
         <div className={styles.sliderTrackLine} />
@@ -1123,19 +1224,20 @@ function NoteSlider({ value, scale, onChange }: {
   );
 }
 
-function Slider({ label, value, min, max, display, onChange }: {
+function Slider({ label, value, min, max, display, onChange, wt }: {
   label: string;
   value: number;
   min: number;
   max: number;
   display: string;
   onChange: (v: number) => void;
+  wt?: string;
 }) {
   const norm = (value - min) / (max - min);
   const percent = norm * 100;
 
   return (
-    <div className={styles.sliderRow}>
+    <div className={styles.sliderRow} data-wt={wt || label}>
       <span className={styles.sliderLabel}>{label}</span>
       <div className={styles.sliderTrack}>
         <div className={styles.sliderTrackLine} />
@@ -1164,7 +1266,7 @@ const WAVE_OPTIONS: { type: WaveformType; icon: string; label: string }[] = [
 
 function WaveSelect({ value, onChange }: { value: WaveformType; onChange: (w: WaveformType) => void }) {
   return (
-    <div className={styles.sliderRow}>
+    <div className={styles.sliderRow} data-wt="waveform">
       <span className={styles.sliderLabel}>wave</span>
       <div className={styles.waveOptions}>
         {WAVE_OPTIONS.map(w => (

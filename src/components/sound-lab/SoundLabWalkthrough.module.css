@@ -1,0 +1,251 @@
+/**
+ * Sound Lab Walkthrough
+ * Dark bottom bar, top prompt, next button, highlight styles
+ */
+
+/* ============================================= */
+/* WELCOME PROMPT (top of page)                  */
+/* ============================================= */
+
+.prompt {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 24px;
+  background: linear-gradient(to bottom, rgba(232, 228, 217, 0.98) 60%, rgba(232, 228, 217, 0) 100%);
+  animation: slideDown 0.5s ease-out;
+}
+
+.promptInner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 28px;
+  background: #2B2926;
+  border-radius: 3px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  max-width: 540px;
+  width: 100%;
+}
+
+.promptText {
+  flex: 1;
+  font-size: 12px;
+  color: #D4CFC4;
+  line-height: 1.6;
+}
+
+.promptText strong {
+  color: #F5F2EB;
+  font-weight: 600;
+}
+
+.promptCaret {
+  color: #BF4D28;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.promptActions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.promptBtn {
+  background: none;
+  border: 1px solid rgba(212, 207, 196, 0.2);
+  font: inherit;
+  font-size: 11px;
+  color: #8A8680;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 2px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.promptBtn:hover {
+  border-color: rgba(212, 207, 196, 0.4);
+  color: #D4CFC4;
+}
+
+.promptBtnPrimary {
+  background: rgba(191, 77, 40, 0.15);
+  border-color: #BF4D28;
+  color: #BF4D28;
+}
+
+.promptBtnPrimary:hover {
+  background: #BF4D28;
+  color: white;
+}
+
+/* ============================================= */
+/* WALKTHROUGH BAR                               */
+/* ============================================= */
+
+.bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  padding: 0 24px 24px;
+  animation: slideUp 0.4s ease-out;
+  pointer-events: none;
+}
+
+.barInner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: #2B2926;
+  border-radius: 3px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  border-left: 3px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.barFlash {
+  animation: accentFlash 0.8s ease-out;
+}
+
+.textWrap {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 18px;
+}
+
+.caret {
+  color: #BF4D28;
+  font-weight: 600;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.text {
+  font-size: 12px;
+  color: #D4CFC4;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+
+.cursor {
+  display: inline-block;
+  color: #BF4D28;
+  font-weight: 600;
+  animation: blink 0.8s step-end infinite;
+  margin-left: 1px;
+}
+
+/* ============================================= */
+/* NEXT BUTTON                                   */
+/* ============================================= */
+
+.next {
+  background: rgba(191, 77, 40, 0.15);
+  border: 1px solid #BF4D28;
+  font: inherit;
+  font-size: 11px;
+  color: #BF4D28;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 2px;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.next:hover {
+  background: #BF4D28;
+  color: white;
+}
+
+.skip {
+  background: none;
+  border: 1px solid rgba(212, 207, 196, 0.15);
+  font: inherit;
+  font-size: 10px;
+  color: #5C5954;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 2px;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.skip:hover {
+  border-color: rgba(212, 207, 196, 0.4);
+  color: #D4CFC4;
+}
+
+/* ============================================= */
+/* PROGRESS DOTS                                 */
+/* ============================================= */
+
+.progress {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #5C5954;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.dotActive {
+  background: #BF4D28;
+  transform: scale(1.5);
+}
+
+.dotDone {
+  background: #D4CFC4;
+}
+
+/* ============================================= */
+/* ANIMATIONS                                    */
+/* ============================================= */
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes accentFlash {
+  0% { border-left-color: #BF4D28; }
+  100% { border-left-color: transparent; }
+}

@@ -330,6 +330,7 @@ class SoundSystem {
   private masterVolume: number = 0.7;
   private listeners: Set<SoundStateListener> = new Set();
   private customSounds: Record<string, Sound> = {};
+  private suppressed: boolean = false;
 
   constructor() {
     // Initialize from localStorage if available
@@ -429,6 +430,22 @@ class SoundSystem {
     this.notifyListeners();
   }
 
+  /**
+   * Silently set enabled state without playing any sound.
+   * Used by Sound Lab to suppress global sounds while editing.
+   */
+  /**
+   * Suppress all playback without touching enabled state or localStorage.
+   * Used by Sound Lab to block global UI sounds while editing.
+   * Race-free: doesn't interact with init() or enabled at all.
+   */
+  suppressPlayback(value: boolean): void {
+    this.suppressed = value;
+    if (value) {
+      cancelStartupSound();
+    }
+  }
+
   toggle(): boolean {
     if (this.enabled) {
       this.disable();
@@ -461,7 +478,7 @@ class SoundSystem {
   }
 
   play(name: SoundName): void {
-    if (!this.enabled) return;
+    if (!this.enabled || this.suppressed) return;
 
     const ctx = this.getAudioContext();
     if (!ctx) return;

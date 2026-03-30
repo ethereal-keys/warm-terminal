@@ -887,6 +887,23 @@
 }
 
 /* ============================================= */
+/* WALKTHROUGH HIGHLIGHTS                        */
+/* ============================================= */
+
+:global([data-wt-active]) {
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0 0 2px rgba(191, 77, 40, 0.5), 0 0 16px rgba(191, 77, 40, 0.15);
+  border-radius: 4px;
+  animation: wtPulse 2s ease-in-out infinite;
+}
+
+@keyframes wtPulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(191, 77, 40, 0.5), 0 0 16px rgba(191, 77, 40, 0.15); }
+  50% { box-shadow: 0 0 0 2px rgba(191, 77, 40, 0.7), 0 0 24px rgba(191, 77, 40, 0.25); }
+}
+
+/* ============================================= */
 /* RESPONSIVE                                    */
 /* ============================================= */
 
