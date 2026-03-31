@@ -1,7 +1,6 @@
 ---
 import '@/styles/global.css';
 import GlobalSoundEffects from '@/components/GlobalSoundEffects';
-import Analytics from '@vercel/analytics/astro';
 import { SITE } from '@/lib/config';
 import { ViewTransitions } from 'astro:transitions';
 
@@ -66,6 +65,9 @@ const ogImageURL = new URL(ogImage, SITE_URL).toString();
     <a href="#main" class="visually-hidden">Skip to content</a>
     <GlobalSoundEffects client:only="react" />
     <slot />
-    <Analytics />
+
+    <!-- GoatCounter Analytics -->
+    <script data-goatcounter="https://sushanth-kashyap.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
   </body>
 </html>
