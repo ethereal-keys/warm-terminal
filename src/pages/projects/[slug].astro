@@ -297,6 +297,20 @@ const readingTime = calculateReadingTime(project.body);
 
   /* ── Mobile adjustments ── */
   @media (max-width: 640px) {
+    .project-content {
+      padding: var(--space-3) var(--space-2);
+    }
+
+    .meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-1);
+    }
+
+    .links {
+      flex-wrap: wrap;
+    }
+
     .prose {
       line-height: 1.8;
     }
@@ -304,6 +318,17 @@ const readingTime = calculateReadingTime(project.body);
     .prose :global(h2) {
       font-size: var(--text-xl);
       margin-top: var(--space-5);
+    }
+
+    .prose :global(pre) {
+      font-size: var(--text-xs);
+      padding: var(--space-2);
+      overflow-x: auto;
+    }
+
+    .prose :global(img) {
+      max-width: 100%;
+      height: auto;
     }
   }
 </style>

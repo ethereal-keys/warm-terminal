@@ -1,0 +1,35 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid" x="10" y="10" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.8" fill="rgba(201,196,184,0.35)"/>
+    </pattern>
+  </defs>
+
+  <!-- Graph paper background -->
+  <rect width="1200" height="630" fill="#F5F2EB"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Thin border -->
+  <rect x="48" y="48" width="1104" height="534" fill="none" stroke="#D4CFC4" stroke-width="1"/>
+
+  <!-- Corner marks -->
+  <text x="40" y="56" font-family="'JetBrains Mono', monospace" font-size="14" fill="#C5C0B8">+</text>
+  <text x="1146" y="56" font-family="'JetBrains Mono', monospace" font-size="14" fill="#C5C0B8">+</text>
+  <text x="40" y="588" font-family="'JetBrains Mono', monospace" font-size="14" fill="#C5C0B8">+</text>
+  <text x="1146" y="588" font-family="'JetBrains Mono', monospace" font-size="14" fill="#C5C0B8">+</text>
+
+  <!-- Single elegant waveform -->
+  <path
+    d="M 180 315 C 230 315 240 180 290 180 C 340 180 350 450 400 450 C 450 450 460 180 510 180 C 560 180 570 450 620 450 C 670 450 680 180 730 180 C 780 180 790 450 840 450 C 890 450 900 180 950 180 C 1000 180 1010 315 1020 315"
+    fill="none"
+    stroke="#C25535"
+    stroke-width="3"
+    stroke-linecap="round"
+  />
+
+  <!-- Title -->
+  <text x="600" y="505" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="32" font-weight="600" fill="#2B2926" text-anchor="middle" letter-spacing="-0.3">sound-lab</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="545" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="16" fill="#8A8680" text-anchor="middle">interactive synthesis engine</text>
+</svg>

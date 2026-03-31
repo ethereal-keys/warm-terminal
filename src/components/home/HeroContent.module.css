@@ -35,6 +35,15 @@
   min-height: 1.5em;
 }
 
+.statusLine1 {
+  display: contents;
+}
+
+/* Desktop: inline with dash separator */
+.statusLine2::before {
+  content: '— ';
+}
+
 /* Hidden but preserving layout space */
 .statusHidden {
   visibility: hidden;
@@ -357,8 +366,76 @@
 
 @media (max-width: 640px) {
   .header {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  /* Hide the full-size signature mark — it's a 3-line ASCII box
+     that wastes vertical space on small screens */
+  .header > :global(button:first-child),
+  .header > :global(div:first-child) {
+    display: none;
+  }
+
+  .titleArea {
+    flex: 1;
+  }
+
+  /* Sound toggle: strip to just the (· ·) indicator, top-right corner */
+  .soundControl {
+    position: absolute;
+    top: 0;
+    right: 0;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  /* Hide the "sound" text label — keep only the (· ·) / oscilloscope */
+  .soundControl :global(button) > span:first-child {
+    display: none;
+  }
+
+  /* Remove the gap now that the label is gone */
+  .soundControl :global(button) {
+    gap: 0;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    padding: 2px 0;
+  }
+
+  .advancedLink {
+    display: none;
+  }
+
+  .status {
     flex-direction: column;
     align-items: flex-start;
+    gap: 2px;
+    padding-right: 40px;
+  }
+
+  .statusLine1 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .statusLine2 {
+    padding-left: 20px;
+    color: var(--text-muted);
+  }
+
+  .statusLine2::before {
+    content: none;
+  }
+
+  .name {
+    font-size: var(--text-2xl);
+  }
+
+  .tagline {
+    margin-top: 8px;
   }
 
   .ctas {
@@ -370,10 +447,40 @@
   .ctas :global(a) {
     text-align: center;
     justify-content: center;
+    padding: 0.85rem 1.25rem;
   }
 
+  .ctaAnnotation {
+    text-align: center;
+    margin-left: 0;
+  }
+
+  /* Nav: 2x2 grid, no scrolling, no wrapping weirdness */
   .nav {
-    flex-wrap: wrap;
-    gap: var(--space-2) var(--space-4);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-1) var(--space-3);
+    padding-bottom: 0;
+  }
+
+  .navIndicator {
+    display: none;
+  }
+
+  .navLinkActive {
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 2px;
+  }
+
+  .navTooltip {
+    display: none;
+  }
+
+  .terminal {
+    font-size: var(--text-xs);
+  }
+
+  .terminalLine {
+    word-break: break-word;
   }
 }

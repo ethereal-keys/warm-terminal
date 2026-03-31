@@ -154,3 +154,23 @@
   gap: 32px;
   flex-wrap: wrap;
 }
+
+@media (max-width: 640px) {
+  .container {
+    padding: 12px 8px;
+    gap: 16px;
+  }
+
+  .knobs {
+    gap: 16px;
+  }
+
+  .typeOptions {
+    width: 100%;
+  }
+
+  .typeButton {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+}

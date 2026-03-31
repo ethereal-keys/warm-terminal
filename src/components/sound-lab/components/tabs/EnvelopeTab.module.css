@@ -71,3 +71,19 @@
   gap: 32px;
   flex-wrap: wrap;
 }
+
+@media (max-width: 640px) {
+  .container {
+    padding: 12px 8px;
+    gap: 16px;
+  }
+
+  .knobs {
+    gap: 16px;
+  }
+
+  .curveLabels {
+    font-size: 10px;
+    padding: 6px 8px 0;
+  }
+}

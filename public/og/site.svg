@@ -1,0 +1,33 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="dots" x="10" y="10" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.8" fill="rgba(201,196,184,0.35)"/>
+    </pattern>
+  </defs>
+
+  <!-- Warm cream background -->
+  <rect width="1200" height="630" fill="#F8F5ED"/>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+
+  <!-- Thin border -->
+  <rect x="48" y="48" width="1104" height="534" fill="none" stroke="#D4CFC4" stroke-width="1"/>
+
+  <!-- Corner marks -->
+  <text x="40" y="56" font-family="'JetBrains Mono', monospace" font-size="14" fill="#C5C0B8">+</text>
+  <text x="1146" y="56" font-family="'JetBrains Mono', monospace" font-size="14" fill="#C5C0B8">+</text>
+  <text x="40" y="588" font-family="'JetBrains Mono', monospace" font-size="14" fill="#C5C0B8">+</text>
+  <text x="1146" y="588" font-family="'JetBrains Mono', monospace" font-size="14" fill="#C5C0B8">+</text>
+
+  <!-- ASCII cat — closed happy eyes, music notes -->
+  <text x="600" y="204" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="36" fill="#5C5954" text-anchor="middle" xml:space="preserve">&#9834; /\_/\ &#9834;</text>
+  <text x="600" y="248" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="36" fill="#5C5954" text-anchor="middle">( ^-^ )</text>
+
+  <!-- Name -->
+  <text x="600" y="340" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="38" font-weight="400" fill="#2B2926" text-anchor="middle" letter-spacing="-0.5">sushanth kashyap</text>
+
+  <!-- Subtle line -->
+  <line x1="460" y1="365" x2="740" y2="365" stroke="#2B2926" stroke-width="1" opacity="0.25"/>
+
+  <!-- Tagline -->
+  <text x="600" y="405" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="16" fill="#8A8680" text-anchor="middle">cloud . systems . ml infrastructure</text>
+</svg>

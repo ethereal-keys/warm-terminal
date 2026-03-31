@@ -120,4 +120,29 @@ import Annotation from '@/components/ui/Annotation.astro';
     border-radius: 3px;
     font-family: var(--font-mono);
   }
+
+  @media (max-width: 640px) {
+    .social-links {
+      flex-wrap: wrap;
+      gap: var(--space-1);
+    }
+
+    .social-link {
+      font-size: var(--text-xs);
+      padding: 8px 12px;
+    }
+
+    .divider {
+      font-size: 10px;
+    }
+
+    .tip {
+      display: none;
+    }
+
+    .social-note {
+      top: -16px;
+      font-size: 12px;
+    }
+  }
 </style>

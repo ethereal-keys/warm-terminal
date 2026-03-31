@@ -346,26 +346,41 @@ export default function HeroContent() {
       {/* Connection status - always in DOM to prevent layout shift */}
       <div
         className={`
-          ${styles.status} 
+          ${styles.status}
           ${isWindingDown ? styles.statusWindingDown : ''}
           ${statusGlitching ? styles.statusGlitch : ''}
           ${!statusVisible && !isWindingDown ? styles.statusHidden : ''}
         `}
       >
-        <span className={getStatusDotClass()}>◉</span>
-        {statusVisible && showTypedStatus && isFullAnimation ? (
-          <TypedText
-            key={`typed-status-${animationTrigger}`}
-            text={SITE.connectionMessage}
-            delay={200}
-            speed={35}
-            showCursor={false}
-          />
-        ) : (
-          <span className={statusGlitching ? styles.textGlitch : ''}>
-            {statusText}
-          </span>
-        )}
+        <span className={styles.statusLine1}>
+          <span className={getStatusDotClass()}>◉</span>
+          {statusVisible && showTypedStatus && isFullAnimation ? (
+            <TypedText
+              key={`typed-status-${animationTrigger}`}
+              text="connection established"
+              delay={200}
+              speed={35}
+              showCursor={false}
+            />
+          ) : (
+            <span className={statusGlitching ? styles.textGlitch : ''}>
+              {isWindingDown ? statusText : 'connection established'}
+            </span>
+          )}
+        </span>
+        <span className={`${styles.statusLine2} ${statusGlitching ? styles.textGlitch : ''}`}>
+          {statusVisible && showTypedStatus && isFullAnimation ? (
+            <TypedText
+              key={`typed-status2-${animationTrigger}`}
+              text="welcome, visitor"
+              delay={950}
+              speed={35}
+              showCursor={false}
+            />
+          ) : (
+            !isWindingDown && 'welcome, visitor'
+          )}
+        </span>
       </div>
 
       {/* Header row */}

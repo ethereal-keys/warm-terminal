@@ -98,3 +98,34 @@
   width: 100%;
   height: auto;
 }
+
+@media (max-width: 640px) {
+  .container {
+    padding: 12px 8px;
+    gap: 16px;
+  }
+
+  .row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .knobGroup {
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .knobRow {
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pitchCurve {
+    max-width: 100%;
+  }
+
+  .title {
+    font-size: 12px;
+  }
+}

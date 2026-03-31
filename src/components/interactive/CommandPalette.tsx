@@ -51,13 +51,22 @@ export function CommandPalette({
   const prevOpenRef = useRef(isOpen);
   const { play } = useSound();
 
-  const navItems: PaletteItem[] = SITE.nav.map(item => ({
-    id: item.id,
-    type: 'navigation',
-    label: `./${item.id}`,
-    description: item.annotation,
-    path: item.path,
-  }));
+  const navItems: PaletteItem[] = [
+    ...SITE.nav.map(item => ({
+      id: item.id,
+      type: 'navigation' as const,
+      label: `./${item.id}`,
+      description: item.annotation,
+      path: item.path,
+    })),
+    {
+      id: 'sound-lab',
+      type: 'navigation',
+      label: './sound-lab',
+      description: 'audio synthesis playground',
+      path: '/sound-lab',
+    },
+  ];
 
   const filteredItems = query
     ? navItems.filter(item =>

@@ -195,3 +195,43 @@ code {
   font-family: var(--font-annotation);
   color: var(--text-muted);
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MOBILE
+   ───────────────────────────────────────────────────────────────────────────── */
+
+html {
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 640px) {
+  /* Ensure minimum touch targets (44px) */
+  a, button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Inline touch targets shouldn't force height */
+  p a, li a, span a, .annotation a {
+    min-height: auto;
+    min-width: auto;
+  }
+
+  /* Prevent code blocks from causing horizontal overflow */
+  pre {
+    max-width: calc(100vw - 2 * var(--content-padding));
+    font-size: var(--text-xs);
+  }
+
+  /* Tighten button padding for mobile */
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.75rem 1rem;
+    font-size: var(--text-xs);
+  }
+}

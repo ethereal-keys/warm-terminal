@@ -166,3 +166,23 @@
   display: flex;
   justify-content: space-between;
 }
+
+@media (max-width: 640px) {
+  .overlay {
+    padding-top: 10vh;
+    padding-left: var(--content-padding);
+    padding-right: var(--content-padding);
+  }
+
+  .palette {
+    max-width: 100%;
+  }
+
+  .results {
+    max-height: 50vh;
+  }
+
+  .itemDescription {
+    display: none;
+  }
+}

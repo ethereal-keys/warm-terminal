@@ -7,9 +7,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SoundLabApp from '../components/sound-lab/SoundLab';
 ---
 
-<BaseLayout 
-  title="Sound Lab | Warm Terminal" 
-  description="Interactive synthesis engine for designing UI sounds"
+<BaseLayout
+  title="Sound Lab"
+  description="Interactive synthesis engine for designing and downloading UI sounds"
+  ogImage="/og/sound-lab.png"
 >
   <SoundLabApp client:load />
 </BaseLayout>

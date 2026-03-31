@@ -150,3 +150,39 @@
   display: flex;
   justify-content: flex-start;
 }
+
+@media (max-width: 640px) {
+  .container {
+    padding: 12px 8px;
+    gap: 14px;
+  }
+
+  .noteEditor {
+    padding: 12px;
+  }
+
+  .noteRow {
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .noteHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .noteActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .actionButton {
+    font-size: 10px;
+    padding: 6px 8px;
+  }
+
+  .timelineSvg {
+    height: 50px;
+  }
+}

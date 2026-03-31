@@ -19,8 +19,11 @@
   box-shadow: none;
 }
 
-.page button {
+.page button:focus {
   outline: none;
+}
+
+.page button {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -283,12 +286,13 @@
   font-size: 11px;
   color: #5C5954;
   cursor: pointer;
-  padding: 0;
+  padding: 6px 12px;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  border-radius: 2px;
 }
 
 .graphLabel:hover {
@@ -893,14 +897,18 @@
 :global([data-wt-active]) {
   position: relative;
   z-index: 2;
-  box-shadow: 0 0 0 2px rgba(191, 77, 40, 0.5), 0 0 16px rgba(191, 77, 40, 0.15);
+  /* Use outline instead of box-shadow for the ring — outlines are NOT
+     clipped by parent overflow:hidden, which was causing the highlight
+     to get cut off inside scrollable containers */
+  outline: 2px solid rgba(191, 77, 40, 0.6);
+  outline-offset: 2px;
   border-radius: 4px;
   animation: wtPulse 2s ease-in-out infinite;
 }
 
 @keyframes wtPulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(191, 77, 40, 0.5), 0 0 16px rgba(191, 77, 40, 0.15); }
-  50% { box-shadow: 0 0 0 2px rgba(191, 77, 40, 0.7), 0 0 24px rgba(191, 77, 40, 0.25); }
+  0%, 100% { outline-color: rgba(191, 77, 40, 0.5); }
+  50% { outline-color: rgba(191, 77, 40, 0.8); }
 }
 
 /* ============================================= */
@@ -908,29 +916,165 @@
 /* ============================================= */
 
 @media (max-width: 640px) {
+  .page {
+    padding: 12px 8px;
+  }
+
   .paper {
-    padding: 24px 20px;
+    padding: 20px 14px;
   }
 
-  .displayRow {
+  /* ── Header ── */
+  .header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .headerRight {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .back {
+    font-size: 11px;
+    padding: 5px 8px;
+    gap: 6px;
+  }
+
+  .title {
+    font-size: 13px;
+  }
+
+  /* ── Sound info ── */
+  .soundLine {
     flex-wrap: wrap;
-    justify-content: center;
   }
 
-  .soundGrid {
-    grid-template-columns: repeat(4, 1fr);
+  .modified {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  /* ── Display row: stack vertically ── */
+  .displayRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .graphBox {
+    width: 100%;
+  }
+
+  .graphBox canvas,
+  .graphBox .canvas {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 60px;
+    aspect-ratio: 3 / 1;
+  }
+
+  /* ── Sliders ── */
+  .sliderLabel {
+    width: 40px;
+    font-size: 11px;
   }
 
   .sliderValue {
-    min-width: 80px;
+    min-width: 70px;
+    font-size: 11px;
   }
 
-  .waveOptions {
+  .sliderRow {
     gap: 8px;
   }
 
+  /* ── Tabs: horizontal scroll ── */
   .tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    gap: 12px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    flex-shrink: 0;
+    font-size: 11px;
+    padding: 2px 0 6px 0;
+  }
+
+  .tabBtn {
+    flex-shrink: 0;
+    font-size: 10px;
+  }
+
+  /* ── Sound grid ── */
+  .soundGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+
+  .gridItem {
+    font-size: 9px;
+    padding: 6px 3px;
+    min-height: 32px;
+  }
+
+  /* ── Wave options ── */
+  .waveOptions {
+    gap: 6px;
     flex-wrap: wrap;
-    gap: 8px 16px;
+  }
+
+  .waveBtn {
+    font-size: 11px;
+  }
+
+  /* ── Controls ── */
+  .controls {
+    min-height: auto;
+  }
+
+  .panel {
+    gap: 10px;
+  }
+
+  /* ── Modals ── */
+  .modal {
+    padding: 16px;
+    align-items: flex-start;
+    padding-top: 15vh;
+  }
+
+  .modalBox {
+    padding: 20px;
+    max-width: 100%;
+    min-width: auto;
+    width: 100%;
+  }
+
+  .helpGrid {
+    gap: 4px 12px;
+    font-size: 11px;
+  }
+
+  /* ── Divider ── */
+  .rule {
+    margin: 14px 0;
+  }
+
+  /* ── Arc meter ── */
+  .arcMeter svg,
+  .arcMeterCanvas {
+    max-width: 80px;
   }
 }

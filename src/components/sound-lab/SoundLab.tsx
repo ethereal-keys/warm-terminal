@@ -125,6 +125,7 @@ export default function SoundLab() {
   }, []);
 
   // Walkthrough highlight system: toggle data-wt-active on matching elements
+  // and scroll the first highlighted element into view on mobile
   useEffect(() => {
     if (!walkthroughHighlight) return;
     const targets = walkthroughHighlight.split(',');
@@ -135,6 +136,12 @@ export default function SoundLab() {
         elements.push(el);
       });
     });
+    // Scroll the first highlighted element into view so the user doesn't miss it
+    if (elements.length > 0) {
+      requestAnimationFrame(() => {
+        elements[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
     return () => {
       elements.forEach(el => el.removeAttribute('data-wt-active'));
     };
@@ -309,6 +316,11 @@ export default function SoundLab() {
     setWalkthroughActive(false);
     setWalkthroughHighlight(null);
     localStorage.setItem(WALKTHROUGH_STORAGE_KEY, 'true');
+    // Reset all sounds to defaults so walkthrough modifications don't persist
+    setSounds({ ...DEFAULT_SOUNDS });
+    setSelectedId('click');
+    setActiveTab('oscA');
+    localStorage.removeItem('soundlab-sounds');
   }, []);
 
   const handleWalkthroughDismiss = useCallback(() => {

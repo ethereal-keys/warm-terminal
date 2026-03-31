@@ -74,8 +74,8 @@ const finalFontSize = sizeMap[fontSize] || fontSize;
     position: relative;
     background: var(--bg-secondary);
     border: 1px solid var(--border-light);
-    padding: var(--space-3); /* Increased padding */
-    overflow: hidden; /* Hide scrollbars, trust fit-content */
+    padding: var(--space-3);
+    overflow-x: auto;
   }
 
   .corner {
@@ -118,5 +118,26 @@ const finalFontSize = sizeMap[fontSize] || fontSize;
     margin-top: var(--space-1);
     font-size: var(--text-sm);
     color: var(--text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .ascii-diagram {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    .diagram-frame {
+      padding: var(--space-2);
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+
+    .diagram-content {
+      font-size: 10px !important;
+    }
+
+    .diagram-caption {
+      font-size: var(--text-xs);
+    }
   }
 </style>

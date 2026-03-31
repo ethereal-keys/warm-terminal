@@ -99,7 +99,9 @@ export default function StickyNav({
         <div className={styles.right}>
           {children}
 
-          <SoundToggle soundOn={soundOn} onToggle={toggleSound} />
+          <span className={styles.soundToggleWrapper}>
+            <SoundToggle soundOn={soundOn} onToggle={toggleSound} />
+          </span>
 
           {isDeep && (
             <button
@@ -110,6 +112,14 @@ export default function StickyNav({
               ↑
             </button>
           )}
+
+          <button
+            className={styles.menuButton}
+            aria-label="Open navigation menu"
+            onClick={() => setPaletteOpen(true)}
+          >
+            /
+          </button>
         </div>
       </nav>
 

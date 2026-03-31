@@ -146,6 +146,41 @@
   box-shadow: 0 0 0 2px rgba(191, 77, 40, 0.2);
 }
 
+@media (max-width: 640px) {
+  .knob {
+    width: 52px;
+    height: 52px;
+  }
+
+  .body {
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
+  }
+
+  .indicator {
+    height: 8px;
+    top: 3px;
+  }
+
+  .tick {
+    transform-origin: center 24px;
+  }
+
+  .label {
+    font-size: 10px;
+  }
+
+  .value {
+    font-size: 11px;
+  }
+
+  .editInput {
+    width: 52px;
+    font-size: 11px;
+  }
+}
+
 /* Hover State */
 .knob:hover .body {
   border-color: var(--rust-muted, #C4674A);

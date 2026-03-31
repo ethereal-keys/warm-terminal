@@ -46,10 +46,20 @@ import HeroContent from './HeroContent';
     font-size: var(--text-xs);
   }
 
-  /* Responsive min-height for mobile */
+  /* Responsive adjustments for mobile */
   @media (max-width: 640px) {
+    .hero {
+      padding-top: 40px;
+    }
+
     .hero-content-wrapper {
-      min-height: 420px; /* Taller on mobile due to stacked layout */
+      min-height: 380px;
+    }
+
+    .hero-annotation {
+      position: static;
+      text-align: right;
+      margin-top: var(--space-2);
     }
   }
 </style>
