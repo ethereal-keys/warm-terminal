@@ -41,6 +41,8 @@ interface Props {
 const { project, prevProject, nextProject } = Astro.props;
 const { Content } = await project.render();
 const readingTime = calculateReadingTime(project.body);
+const demoHref = project.data.demo;
+const demoIsInternal = demoHref?.startsWith('/') ?? false;
 ---
 
 <BaseLayout title={project.data.title} description={project.data.description}>
@@ -77,8 +79,12 @@ const readingTime = calculateReadingTime(project.body);
                 [ github ]
               </a>
             )}
-            {project.data.demo && (
-              <a href={project.data.demo} target="_blank" rel="noopener noreferrer">
+            {demoHref && (
+              <a
+                href={demoHref}
+                target={demoIsInternal ? undefined : "_blank"}
+                rel={demoIsInternal ? undefined : "noopener noreferrer"}
+              >
                 [ demo ]
               </a>
             )}

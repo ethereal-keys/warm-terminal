@@ -66,6 +66,13 @@ export function CommandPalette({
       description: 'audio synthesis playground',
       path: '/sound-lab',
     },
+    {
+      id: 'autocss-lab',
+      type: 'navigation',
+      label: './autocss-lab',
+      description: '2018 sketch-to-code archive',
+      path: '/autocss-lab',
+    },
   ];
 
   const filteredItems = query

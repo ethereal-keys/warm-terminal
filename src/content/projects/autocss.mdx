@@ -1,10 +1,11 @@
 ---
 title: "AutoCSS: A Hackathon Retrospective"
-description: "In 2017, I built a tool to convert hand-drawn wireframes to HTML using OpenCV contour detection. Seven years later, VLMs do this with a single API call. A love letter to scrappy engineering."
+description: "In 2018, I built a tool to convert hand-drawn wireframes to HTML using OpenCV contour detection. Eight years later, VLMs do this with a single API call. A love letter to scrappy engineering."
 tags: ["python", "opencv", "hackathon", "retrospective"]
 publishedAt: 2026-02-05
 featured: true
 github: "https://github.com/ethereal-keys/AutoCSS"
+demo: "/autocss-lab"
 order: 2
 tabs:
   - label: "./the-pitch"
@@ -19,7 +20,7 @@ tabs:
 
 ## The Pitch
 
-In 2017, at a hackathon somewhere in my early undergrad, I had what felt like a
+In 2018, at a hackathon somewhere in my early undergrad, I had what felt like a
 brilliant idea: what if you could sketch a website layout on paper, point a
 camera at it, and have working HTML pop out the other end?
 
@@ -81,6 +82,12 @@ And here's what that actually looked like:
   alt="AutoCSS processing pipeline animation"
   caption="Click to play: from paper sketch to detected contours in 5 steps"
 />
+
+<Callout type="tip">
+Want to inspect the real archived stages? The [AutoCSS Lab](/autocss-lab)
+replays a few 2018 sketches frame by frame, using precomputed outputs from
+the original notebook pipeline.
+</Callout>
 
 Each frame shows a real intermediate output from the pipeline:
 
@@ -204,12 +211,12 @@ Nested boxes became nested divs. That's not nothing.
 ## The Twist
 
 To understand why our approach made sense, you need to understand what the
-world looked like in 2017.
+world looked like in 2018.
 
-<AsciiDiagram title="The 2017 AI Landscape">
+<AsciiDiagram title="The 2018 AI Landscape">
 {`
   ┌─────────────────────────────────────────────────────────────────┐
-  │                    WHAT WAS HOT IN 2017                         │
+  │                    WHAT WAS HOT IN 2018                         │
   ├─────────────────────────────────────────────────────────────────┤
   │                                                                 │
   │  GANs ████████████████████████████  CycleGAN, pix2pix          │
@@ -217,16 +224,17 @@ world looked like in 2017.
   │  RNNs ██████████████                Seq2seq, attention          │
   │  RL   █████████                     AlphaGo hype                │
   │                                                                 │
-  │  Transformers █                     (just published, ignored)   │
+  │  Transformers ██                    (2017 paper, still ignored) │
   │                                                                 │
   └─────────────────────────────────────────────────────────────────┘
 `}
 </AsciiDiagram>
 
-The transformer paper, "Attention Is All You Need," was published **June 12, 2017**.
-The same summer we were probably building this. Nobody knew what it would become.
+The transformer paper, "Attention Is All You Need," had been published the
+year before, on **June 12, 2017**. By our 2018 hackathon, nobody around us
+thought it was about to rewrite this whole problem class.
 
-At a hackathon in 2017, you used **OpenCV**:
+At a hackathon in 2018, you used **OpenCV**:
 - Ran on any laptop (no GPU required)
 - Excellent Python bindings
 - Thousands of tutorials
@@ -261,14 +269,14 @@ sketch on a napkin. Seconds later: a working website.
 
 <YouTubeEmbed videoId="outcGtbnMuQ" title="GPT-4 Developer Livestream" start={982} />
 
-The exact project we built in 2017. But working perfectly, instantly, with no
+The exact project we built in 2018. But working perfectly, instantly, with no
 edge detection, no RETR_TREE, no "draw with thick marker in good lighting."
 
 ### The Difference
 
-<AsciiDiagram title="2017 vs 2024">
+<AsciiDiagram title="2018 vs 2024">
 {`
-  AutoCSS (2017):                    GPT-4V (2024):
+  AutoCSS (2018):                    GPT-4V (2024):
 
   ┌──────────┐                       ┌──────────┐
   │ pixels   │                       │ pixels   │
@@ -323,7 +331,7 @@ One API call. No contour detection required.
   caption="Opening the repo after 7 years felt exactly like this."
 />
 
-I recently opened the AutoCSS repository for the first time in seven years.
+I recently opened the AutoCSS repository for the first time in eight years.
 
 The code is exactly what you'd expect:
 - Jupyter notebooks as the main codebase
@@ -344,7 +352,7 @@ What if the weird idea could work? Sometimes.
 ### The Right Idea, Wrong Time
 
 The core insight (visual layouts should convert directly to code) was right.
-The industry spent seven years proving it.
+The industry spent eight years proving it.
 
 We were just too early, with tools too primitive.
 

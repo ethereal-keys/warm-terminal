@@ -10,7 +10,7 @@ const projectsCollection = defineCollection({
     updatedAt: z.date().optional(),
     featured: z.boolean().default(false),
     github: z.string().url().optional(),
-    demo: z.string().url().optional(),
+    demo: z.union([z.string().url(), z.string().startsWith('/')]).optional(),
     paper: z.string().url().optional(),
     order: z.number().default(0),
     // At-a-glance metadata
